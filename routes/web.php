@@ -11,6 +11,7 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\CreditController;
 
 // ── Redirection racine ─────────────────────────────────────
 Route::get('/', fn() => redirect()->route('login'));
@@ -20,6 +21,8 @@ require __DIR__.'/auth.php';
 
 // ── Routes protégées ───────────────────────────────────────
 Route::middleware(['checkauth'])->group(function () {
+    Route::get('clients/lookup', [ClientController::class, 'lookup'])
+    ->name('clients.lookup');
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -103,6 +106,8 @@ Route::middleware(['checkauth'])->group(function () {
     });
 
     // ── CLIENTS ────────────────────────────────────────────
+    Route::get('/clients/lookup', [ClientController::class, 'lookup'])
+    ->name('clients.lookup');
     Route::middleware(['permission:clients.view'])->group(function () {
         Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
     });
@@ -111,6 +116,11 @@ Route::middleware(['checkauth'])->group(function () {
         Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
         Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
         Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+        Route::middleware(['permission:clients.view'])->group(function () {
+    Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+
+});
     });
 
     // ── VENTES ─────────────────────────────────────────────
@@ -127,5 +137,10 @@ Route::middleware(['checkauth'])->group(function () {
     Route::middleware(['permission:sales.cancel'])->group(function () {
         Route::delete('sales/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
     });
+    Route::get('/credits', [CreditController::class, 'index'])->name('credits.index');
+    Route::get('/credits-payments-history', [CreditController::class, 'paymentsHistory'])
+    ->name('credits.payments.history');
+Route::get('/credits/{credit}', [CreditController::class, 'show'])->name('credits.show');
+Route::post('/credits/{credit}/payment', [CreditController::class, 'payment'])->name('credits.payment');
 
 });

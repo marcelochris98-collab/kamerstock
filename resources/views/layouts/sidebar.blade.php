@@ -80,6 +80,45 @@
             </div>
         </div>
         @endif
+     <div class="mb-1">
+    <button @click="open = open === 'credits' ? null : 'credits'"
+        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition
+        {{ request()->routeIs('credits.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+
+        <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </span>
+
+        <span class="flex-1 text-left">Crédits</span>
+
+        <svg class="w-3 h-3 transition-transform duration-200"
+            :class="open === 'credits' ? 'rotate-90' : ''"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+    </button>
+
+    <div x-show="open === 'credits'"
+        x-transition:enter="transition ease-out duration-150"
+        x-transition:enter-start="opacity-0 -translate-y-1"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        class="mt-1 ml-4 pl-3 border-l border-slate-800 space-y-0.5">
+
+        <a href="{{ route('credits.index') }}"
+            class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+            {{ request()->routeIs('credits.index') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+            Liste des crédits
+        </a>
+        <a href="{{ route('credits.payments.history') }}"
+    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+    {{ request()->routeIs('credits.payments.history') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+    remboursements
+</a>
+    </div>
+</div>
 
         {{-- Catalogue --}}
         @if(auth()->user()->hasPermission('products.view'))

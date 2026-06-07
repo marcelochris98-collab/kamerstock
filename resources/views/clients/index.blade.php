@@ -22,6 +22,7 @@
         <h1 class="text-sm font-semibold text-slate-800">Liste des clients</h1>
         <p class="text-xs text-slate-400 mt-0.5">{{ $clients->total() }} client(s)</p>
     </div>
+
     @if(auth()->user()->hasPermission('clients.manage'))
     <button onclick="openCreate()"
         class="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
@@ -38,12 +39,16 @@
         <thead>
             <tr class="border-b border-slate-100 bg-slate-50">
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Client</th>
-                <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Telephone</th>
+                <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Téléphone</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Type</th>
                 <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Ventes</th>
+                <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Score</th>
+                <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Statut</th>
+                <th class="px-5 py-3 text-right text-xs font-medium text-slate-400">Crédit dispo</th>
                 <th class="px-5 py-3 text-right text-xs font-medium text-slate-400">Actions</th>
             </tr>
         </thead>
+
         <tbody>
             @forelse($clients as $client)
             <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
@@ -52,15 +57,21 @@
                         <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
                             {{ strtoupper(substr($client->name, 0, 1)) }}
                         </div>
+
                         <div>
                             <p class="text-xs font-semibold text-slate-800">{{ $client->name }}</p>
+
                             @if($client->email)
                             <p class="text-xs text-slate-400">{{ $client->email }}</p>
                             @endif
                         </div>
                     </div>
                 </td>
-                <td class="px-5 py-3 text-xs text-slate-600">{{ $client->phone ?? '—' }}</td>
+
+                <td class="px-5 py-3 text-xs text-slate-600">
+                    {{ $client->phone ?? '—' }}
+                </td>
+
                 <td class="px-5 py-3">
                     <span class="px-2 py-0.5 rounded text-xs font-medium
                         {{ $client->type === 'entreprise' ? 'bg-blue-50 text-blue-600' :
@@ -68,13 +79,52 @@
                         {{ $client->type_label }}
                     </span>
                 </td>
+
                 <td class="px-5 py-3 text-center">
                     <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">
                         {{ $client->sales_count }}
                     </span>
                 </td>
+
+                <td class="px-5 py-3 text-center">
+                    <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700">
+                        {{ $client->loyalty_score ?? 0 }}/100
+                    </span>
+                </td>
+
+                <td class="px-5 py-3 text-center">
+                    @php
+                        $status = $client->loyalty_status ?? 'occasionnel';
+                        $statusLabel = match($status) {
+                            'premium' => 'Premium',
+                            'fidele' => 'Fidèle',
+                            'regulier' => 'Régulier',
+                            default => 'Occasionnel',
+                        };
+                    @endphp
+
+                    <span class="px-2 py-0.5 rounded text-xs font-semibold
+                        {{ $status === 'premium' ? 'bg-amber-50 text-amber-700' :
+                           ($status === 'fidele' ? 'bg-emerald-50 text-emerald-700' :
+                           ($status === 'regulier' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600')) }}">
+                        {{ $statusLabel }}
+                    </span>
+                </td>
+
+                <td class="px-5 py-3 text-right text-xs font-semibold text-slate-700">
+                    {{ number_format($client->credit_available ?? 0, 0, ',', ' ') }} FCFA
+                </td>
+
                 <td class="px-5 py-3">
                     <div class="flex items-center justify-end gap-1.5">
+                        <a href="{{ route('clients.show', $client->id) }}"
+                           class="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-slate-700 hover:border-slate-300 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </a>
+
                         @if(auth()->user()->hasPermission('clients.manage'))
                         <button onclick="openEdit({{ $client->id }}, '{{ addslashes($client->name) }}', '{{ $client->phone }}', '{{ $client->email }}', '{{ $client->type }}')"
                             class="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-200 transition">
@@ -82,9 +132,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </button>
+
                         <form method="POST" action="{{ route('clients.destroy', $client) }}"
                             onsubmit="return confirm('Supprimer ce client ?')">
-                            @csrf @method('DELETE')
+                            @csrf
+                            @method('DELETE')
+
                             <button type="submit"
                                 class="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +151,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="5" class="px-5 py-12 text-center">
+                <td colspan="8" class="px-5 py-12 text-center">
                     <p class="text-sm font-medium text-slate-400">Aucun client</p>
                     <p class="text-xs text-slate-300 mt-1">Ajoutez votre premier client</p>
                 </td>
@@ -106,17 +159,26 @@
             @endforelse
         </tbody>
     </table>
+
     @if($clients->hasPages())
     <div class="px-5 py-3 border-t border-slate-50 flex items-center justify-between">
-        <p class="text-xs text-slate-400">{{ $clients->firstItem() }} - {{ $clients->lastItem() }} sur {{ $clients->total() }}</p>
+        <p class="text-xs text-slate-400">
+            {{ $clients->firstItem() }} - {{ $clients->lastItem() }} sur {{ $clients->total() }}
+        </p>
+
         <div class="flex gap-2">
             @if($clients->onFirstPage())
-            <span class="px-3 py-1.5 text-xs text-slate-300 border border-slate-100 rounded-lg">Precedent</span>
+            <span class="px-3 py-1.5 text-xs text-slate-300 border border-slate-100 rounded-lg">Précédent</span>
             @else
-            <a href="{{ $clients->previousPageUrl() }}" class="px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">Precedent</a>
+            <a href="{{ $clients->previousPageUrl() }}" class="px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                Précédent
+            </a>
             @endif
+
             @if($clients->hasMorePages())
-            <a href="{{ $clients->nextPageUrl() }}" class="px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">Suivant</a>
+            <a href="{{ $clients->nextPageUrl() }}" class="px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                Suivant
+            </a>
             @else
             <span class="px-3 py-1.5 text-xs text-slate-300 border border-slate-100 rounded-lg">Suivant</span>
             @endif
@@ -129,23 +191,28 @@
 <div id="createModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
     <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
         <h3 class="text-sm font-semibold text-slate-800 mb-4">Nouveau client</h3>
+
         <form method="POST" action="{{ route('clients.store') }}">
             @csrf
+
             <div class="mb-3">
                 <label class="block text-xs font-medium text-slate-600 mb-1">Nom complet <span class="text-red-400">*</span></label>
                 <input type="text" name="name" placeholder="Nom"
                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
+
             <div class="mb-3">
-                <label class="block text-xs font-medium text-slate-600 mb-1">Telephone</label>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Téléphone</label>
                 <input type="text" name="phone" placeholder="Tel"
                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
+
             <div class="mb-3">
                 <label class="block text-xs font-medium text-slate-600 mb-1">Email</label>
                 <input type="email" name="email" placeholder="Email"
                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
+
             <div class="mb-5">
                 <label class="block text-xs font-medium text-slate-600 mb-1">Type</label>
                 <select name="type"
@@ -155,11 +222,13 @@
                     <option value="revendeur">Revendeur</option>
                 </select>
             </div>
+
             <div class="flex gap-2">
                 <button type="button" onclick="closeCreate()"
                     class="flex-1 py-2 border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-50 transition">
                     Annuler
                 </button>
+
                 <button type="submit"
                     class="flex-1 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition">
                     Enregistrer
@@ -173,23 +242,29 @@
 <div id="editModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
     <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
         <h3 class="text-sm font-semibold text-slate-800 mb-4">Modifier le client</h3>
+
         <form method="POST" id="editForm">
-            @csrf @method('PUT')
+            @csrf
+            @method('PUT')
+
             <div class="mb-3">
                 <label class="block text-xs font-medium text-slate-600 mb-1">Nom complet</label>
                 <input type="text" name="name" id="editName"
                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
+
             <div class="mb-3">
-                <label class="block text-xs font-medium text-slate-600 mb-1">Telephone</label>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Téléphone</label>
                 <input type="text" name="phone" id="editPhone"
                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
+
             <div class="mb-3">
                 <label class="block text-xs font-medium text-slate-600 mb-1">Email</label>
                 <input type="email" name="email" id="editEmail"
                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
+
             <div class="mb-5">
                 <label class="block text-xs font-medium text-slate-600 mb-1">Type</label>
                 <select name="type" id="editType"
@@ -199,11 +274,13 @@
                     <option value="revendeur">Revendeur</option>
                 </select>
             </div>
+
             <div class="flex gap-2">
                 <button type="button" onclick="closeEdit()"
                     class="flex-1 py-2 border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-50 transition">
                     Annuler
                 </button>
+
                 <button type="submit"
                     class="flex-1 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition">
                     Sauvegarder
@@ -221,19 +298,23 @@ function openCreate() {
     document.getElementById('createModal').classList.remove('hidden');
     document.getElementById('createModal').classList.add('flex');
 }
+
 function closeCreate() {
     document.getElementById('createModal').classList.add('hidden');
     document.getElementById('createModal').classList.remove('flex');
 }
+
 function openEdit(id, name, phone, email, type) {
-    document.getElementById('editName').value  = name;
-    document.getElementById('editPhone').value = phone;
-    document.getElementById('editEmail').value = email;
-    document.getElementById('editType').value  = type;
+    document.getElementById('editName').value  = name || '';
+    document.getElementById('editPhone').value = phone || '';
+    document.getElementById('editEmail').value = email || '';
+    document.getElementById('editType').value  = type || 'particulier';
     document.getElementById('editForm').action = `/clients/${id}`;
+
     document.getElementById('editModal').classList.remove('hidden');
     document.getElementById('editModal').classList.add('flex');
 }
+
 function closeEdit() {
     document.getElementById('editModal').classList.add('hidden');
     document.getElementById('editModal').classList.remove('flex');
