@@ -58,4 +58,23 @@ class CategoryController extends Controller
 
         return back()->with('success', " Catégorie supprimée !");
     }
+    public function lookup(Request $request)
+{
+    $name = trim($request->name ?? '');
+
+    $categories = Category::query()
+        ->where('name', 'like', "%{$name}%")
+        ->limit(5)
+        ->get();
+
+    return response()->json([
+        'found' => $categories->isNotEmpty(),
+        'categories' => $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+            ];
+        }),
+    ]);
+}
 }

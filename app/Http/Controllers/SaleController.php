@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\CreditSale;
 use App\Models\CreditHistory;
 use App\Services\ClientScoringService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -38,16 +39,14 @@ class SaleController extends Controller
         return view('sales.create', compact('products', 'clients'));
     }
 
-    public function store(Request $request, ClientScoringService $scoringService)
+    public function store(Request $request, ClientScoringService $scoringService, NotificationService $notificationService)
     {
         $request->validate([
             'items'              => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity'   => 'required|integer|min:1',
-
             'payment_mode'       => 'required|in:cash,orange_money,mtn_money,credit,mixte',
             'amount_paid'        => 'nullable|numeric|min:0',
-
             'client_id'          => 'nullable|exists:clients,id',
             'client_name'        => 'required_without:client_id|string|max:255',
             'client_phone'       => 'required_without:client_id|string|max:50',
@@ -94,8 +93,19 @@ class SaleController extends Controller
             return back()->withInput()->withErrors(['metier' => $errors]);
         }
 
+        $creditCreated = false;
+        $stockAlerts = [];
+
         try {
-            $sale = DB::transaction(function () use ($request, $details, $total, $scoringService) {
+            $sale = DB::transaction(function () use (
+                $request,
+                $details,
+                $total,
+                $scoringService,
+                $notificationService,
+                &$creditCreated,
+                &$stockAlerts
+            ) {
                 if ($request->filled('client_id')) {
                     $client = Client::findOrFail($request->client_id);
                 } else {
@@ -131,12 +141,7 @@ class SaleController extends Controller
                     $amountPaid = $total;
                 }
 
-                if ($isCredit) {
-                    $changeDue = 0;
-                } else {
-                    $changeDue = max(0, $amountPaid - $total);
-                }
-
+                $changeDue = $isCredit ? 0 : max(0, $amountPaid - $total);
                 $amountDue = max($total - $amountPaid, 0);
 
                 $sale = Sale::create([
@@ -159,6 +164,16 @@ class SaleController extends Controller
                     ]);
 
                     $detail['product']->decrement('quantity', $detail['quantity']);
+
+                    $productAfterSale = Product::find($detail['product']->id);
+
+                    if (
+                        $productAfterSale &&
+                        $productAfterSale->is_active &&
+                        $productAfterSale->quantity <= $productAfterSale->alert_threshold
+                    ) {
+                        $stockAlerts[] = $productAfterSale->name;
+                    }
                 }
 
                 if ($isCredit || $amountDue > 0) {
@@ -171,6 +186,8 @@ class SaleController extends Controller
                         'amount_due' => $amountDue,
                         'status' => $amountPaid > 0 ? 'partiel' : 'en_attente',
                     ]);
+
+                    $creditCreated = true;
 
                     CreditHistory::create([
                         'credit_sale_id' => $credit->id,
@@ -186,7 +203,31 @@ class SaleController extends Controller
                             'amount_due' => $amountDue,
                         ],
                     ]);
+
+                    $notificationService->notifyManagers(
+                        'credit_created',
+                        'Nouveau crédit client',
+                        'Un crédit de ' . number_format($amountDue, 0, ',', ' ') . ' FCFA a été créé pour ' . $client->name . '.',
+                        route('credits.show', $credit),
+                        [
+                            'credit_id' => $credit->id,
+                            'client_id' => $client->id,
+                            'amount_due' => $amountDue,
+                        ]
+                    );
                 }
+
+                $notificationService->notifyManagers(
+                    'sale_created',
+                    'Vente effectuée',
+                    'Une vente de ' . number_format($total, 0, ',', ' ') . ' FCFA a été enregistrée pour ' . $client->name . '.',
+                    route('sales.receipt', $sale),
+                    [
+                        'sale_id' => $sale->id,
+                        'client_id' => $client->id,
+                        'total' => $total,
+                    ]
+                );
 
                 $scoringService->update($client);
 
@@ -195,9 +236,37 @@ class SaleController extends Controller
 
             ActivityLog::record('sale.create', "Vente enregistrée — Total : {$total} FCFA");
 
+            $toasts = [
+                [
+                    'type' => 'success',
+                    'title' => 'Vente effectuée',
+                    'message' => 'La vente a été enregistrée avec succès.',
+                    'sound' => true,
+                ],
+            ];
+
+            if ($creditCreated) {
+                $toasts[] = [
+                    'type' => 'warning',
+                    'title' => 'Crédit créé',
+                    'message' => 'Un crédit client a été généré pour cette vente.',
+                    'sound' => true,
+                ];
+            }
+
+            foreach (array_unique($stockAlerts) as $productName) {
+                $toasts[] = [
+                    'type' => 'danger',
+                    'title' => 'Stock faible',
+                    'message' => $productName . ' est maintenant en stock critique.',
+                    'sound' => true,
+                ];
+            }
+
             return redirect()
                 ->route('sales.receipt', $sale->id)
-                ->with('success', 'Vente enregistrée !');
+                ->with('success', 'Vente enregistrée !')
+                ->with('toast_notifications', $toasts);
         } catch (\Throwable $e) {
             return back()
                 ->withInput()

@@ -23,7 +23,7 @@
         <p class="text-xs text-slate-400 mt-0.5">{{ $clients->total() }} client(s)</p>
     </div>
 
-    @if(auth()->user()->hasPermission('clients.manage'))
+   <!-- @if(auth()->user()->hasPermission('clients.manage'))
     <button onclick="openCreate()"
         class="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,7 @@
         </svg>
         Ajouter
     </button>
-    @endif
+    @endif-->
 </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">

@@ -277,6 +277,28 @@
                 </a>
                 @endif
             </div>
+            {{--notification --}}
+           <!-- <a href="{{ route('notifications.index') }}"
+    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition
+    {{ request()->routeIs('notifications.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+
+    <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+           </span>
+               <span class="flex-1 text-left">Notifications</span>
+              @php
+                $unreadNotificationsCount = \App\Models\Notification::where('is_read', false)->count();
+                     @endphp
+                        @if($unreadNotificationsCount > 0)
+                   <span class="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+                {{ $unreadNotificationsCount }}
+              </span>
+          @endif
+         </a>-->
+
         </div>
         @endif
 
@@ -329,19 +351,37 @@
         </a>
         @endif
 
-        @if(auth()->user()->hasPermission('settings.manage'))
-        <a href="{{ route('admin.settings.index') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition mb-1
-            {{ request()->routeIs('admin.settings.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
-            <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-            </span>
-            <span class="flex-1">Parametres</span>
-        </a>
-        @endif
+       @if(auth()->user()->hasPermission('settings.manage'))
+<a href="{{ route('admin.settings.index') }}"
+    class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition mb-1
+    {{ request()->routeIs('admin.settings.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+
+    <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+    </span>
+
+    <span class="flex-1">Paramètres</span>
+</a>
+
+<a href="{{ route('settings.credit.edit') }}"
+    class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition mb-1
+    {{ request()->routeIs('settings.credit.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+
+    <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 9v1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+    </span>
+
+    <span class="flex-1">Crédit intelligent</span>
+</a>
+@endif
         @endif
 
     </nav>

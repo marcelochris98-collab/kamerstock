@@ -10,9 +10,9 @@ class SupplierController extends Controller
 {
     public function index()
     {
-        $suppliers = Supplier::withCount('products')
-                             ->orderBy('name')
-                             ->paginate(20);
+       $suppliers = Supplier::where('is_active', true)
+                 ->orderBy('name')
+                      ->paginate(20);
         return view('suppliers.index', compact('suppliers'));
     }
 
@@ -50,17 +50,57 @@ class SupplierController extends Controller
         return back()->with('success', " Fournisseur mis à jour !");
     }
 
-    public function destroy(Supplier $supplier)
-    {
-        if ($supplier->products()->count() > 0) {
-            return back()->withErrors([
-                'error' => ' Impossible de supprimer — ce fournisseur a des produits associés.'
-            ]);
-        }
+  public function destroy(Supplier $supplier)
+{
+    $name = $supplier->name;
 
-        $supplier->update(['is_active' => false]);
-        ActivityLog::record('supplier.delete', "Fournisseur désactivé : {$supplier->name}");
+    $supplier->update([
+        'is_active' => false,
+    ]);
 
-        return back()->with('success', " Fournisseur désactivé !");
+    ActivityLog::record('supplier.delete', "Fournisseur désactivé : {$name}");
+
+    return back()
+        ->with('success', "Fournisseur désactivé !")
+        ->with('toast_notifications', [
+            [
+                'type' => 'success',
+                'title' => 'Fournisseur désactivé',
+                'message' => 'Le fournisseur a été retiré de la liste active.',
+                'sound' => true,
+            ],
+        ]);
+}
+    public function lookup(Request $request)
+{
+    $phone = preg_replace('/\D+/', '', $request->phone ?? '');
+    $name = trim($request->name ?? '');
+
+    $query = Supplier::query()->where('is_active', true);
+
+    if ($phone !== '') {
+        $query->whereRaw(
+            "REPLACE(REPLACE(REPLACE(REPLACE(phone, ' ', ''), '-', ''), '+', ''), '.', '') LIKE ?",
+            ["%{$phone}%"]
+        );
     }
+
+    if ($phone === '' && $name !== '') {
+        $query->where('name', 'like', "%{$name}%");
+    }
+
+    $suppliers = $query->limit(5)->get();
+
+    return response()->json([
+        'found' => $suppliers->isNotEmpty(),
+        'suppliers' => $suppliers->map(function ($supplier) {
+            return [
+                'id' => $supplier->id,
+                'name' => $supplier->name,
+                'phone' => $supplier->phone,
+                'email' => $supplier->email,
+            ];
+        }),
+    ]);
+}
 }

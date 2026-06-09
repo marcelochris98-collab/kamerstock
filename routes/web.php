@@ -12,6 +12,10 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\CreditController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\CreditSettingController;
+use Symfony\Component\Routing\Loader\Configurator\Routes;
+
 
 // ── Redirection racine ─────────────────────────────────────
 Route::get('/', fn() => redirect()->route('login'));
@@ -76,6 +80,8 @@ Route::middleware(['checkauth'])->group(function () {
     Route::middleware(['permission:products.delete'])->group(function () {
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     });
+    Route::get('/categories/lookup', [CategoryController::class, 'lookup'])
+    ->name('categories.lookup');
 
     // ── CATEGORIES ─────────────────────────────────────────
     Route::middleware(['permission:categories.manage'])->group(function () {
@@ -93,6 +99,9 @@ Route::middleware(['checkauth'])->group(function () {
     Route::middleware(['permission:stock.manage'])->group(function () {
         Route::post('stock', [StockMovementController::class, 'store'])->name('stock.store');
     });
+
+    Route::get('/suppliers/lookup', [SupplierController::class, 'lookup'])
+    ->name('suppliers.lookup');
 
     // ── FOURNISSEURS ───────────────────────────────────────
     Route::middleware(['permission:suppliers.view'])->group(function () {
@@ -142,5 +151,19 @@ Route::middleware(['checkauth'])->group(function () {
     ->name('credits.payments.history');
 Route::get('/credits/{credit}', [CreditController::class, 'show'])->name('credits.show');
 Route::post('/credits/{credit}/payment', [CreditController::class, 'payment'])->name('credits.payment');
+Route::get('/notifications', [NotificationController::class, 'index'])
+    ->name('notifications.index');
+
+Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+    ->name('notifications.readAll');
+
+Route::get('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
+    ->name('notifications.read');
+    //setting credits-----------------------
+    Route::get('/settings/credit', [CreditSettingController::class, 'edit'])
+    ->name('settings.credit.edit');
+
+Route::put('/settings/credit', [CreditSettingController::class, 'update'])
+    ->name('settings.credit.update');
 
 });

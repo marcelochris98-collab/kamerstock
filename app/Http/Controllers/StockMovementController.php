@@ -13,9 +13,13 @@ class StockMovementController extends Controller
     public function index()
     {
         $movements = StockMovement::with(['product', 'user'])
-                                  ->orderBy('created_at', 'desc')
-                                  ->paginate(20);
-        $products  = Product::where('is_active', true)->orderBy('name')->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        $products = Product::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         return view('stock.index', compact('movements', 'products'));
     }
 
@@ -31,18 +35,18 @@ class StockMovementController extends Controller
             'quantity.min'        => 'La quantité doit être supérieure à 0.',
         ]);
 
-        $product = Product::find($request->product_id);
+        $product = Product::findOrFail($request->product_id);
 
-        // Validation métier
         if ($request->type === 'sortie') {
             if ($product->quantity <= 0) {
                 return back()->withErrors([
-                    'quantity' => " Stock déjà à zéro pour « {$product->name} »."
+                    'quantity' => "Stock déjà à zéro pour « {$product->name} »."
                 ]);
             }
+
             if ($product->quantity < $request->quantity) {
                 return back()->withErrors([
-                    'quantity' => " Stock insuffisant — disponible : {$product->quantity}, demandé : {$request->quantity}."
+                    'quantity' => "Stock insuffisant — disponible : {$product->quantity}, demandé : {$request->quantity}."
                 ]);
             }
         }
@@ -63,8 +67,36 @@ class StockMovementController extends Controller
             }
         });
 
-        ActivityLog::record('stock.movement', "Mouvement stock : {$request->type} de {$request->quantity} pour {$product->name}");
+        $product->refresh();
 
-        return back()->with('success', ' Mouvement de stock enregistré !');
+        ActivityLog::record(
+            'stock.movement',
+            "Mouvement stock : {$request->type} de {$request->quantity} pour {$product->name}"
+        );
+
+        $toasts = [
+            [
+                'type' => 'success',
+                'title' => 'Mouvement enregistré',
+                'message' => 'Le mouvement de stock a été enregistré avec succès.',
+                'sound' => true,
+            ],
+        ];
+
+        if (
+            $product->is_active &&
+            $product->quantity <= $product->alert_threshold
+        ) {
+            $toasts[] = [
+                'type' => 'danger',
+                'title' => 'Stock faible',
+                'message' => $product->name . ' est maintenant en stock critique.',
+                'sound' => true,
+            ];
+        }
+
+        return back()
+            ->with('success', 'Mouvement de stock enregistré !')
+            ->with('toast_notifications', $toasts);
     }
 }
