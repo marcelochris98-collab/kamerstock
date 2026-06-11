@@ -4,10 +4,13 @@
   "packages": {
     "php": "8.3"
   },
+  "variables": {
+    "COMPOSER_ALLOW_SUPERUSER": "1"
+  },
   "steps": {
     "install": {
       "commands": [
-        "composer install --no-dev --optimize-autoloader --no-interaction",
+        "composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=ext-*",
         "npm ci"
       ]
     },
