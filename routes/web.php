@@ -8,33 +8,36 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockMovementController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CreditSettingController;
-use Symfony\Component\Routing\Loader\Configurator\Routes;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\ClientPortalController;
 
+// Redirection racine
+Route::get('/', fn () => redirect()->route('login'));
 
-// ── Redirection racine ─────────────────────────────────────
-Route::get('/', fn() => redirect()->route('login'));
+// Route test temporaire
+Route::get('/test-purchases', function () {
+    return 'ROUTE PURCHASE OK';
+});
 
-// ── Authentification (Breeze) ──────────────────────────────
-require __DIR__.'/auth.php';
+// Authentification
+require __DIR__ . '/auth.php';
 
-// ── Routes protégées ───────────────────────────────────────
+// Routes protégées
 Route::middleware(['checkauth'])->group(function () {
-    Route::get('clients/lookup', [ClientController::class, 'lookup'])
-    ->name('clients.lookup');
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── ZONE ADMINISTRATION ──────────────────────────────────
+    // Zone administration
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        // Utilisateurs (Protégé par sa propre permission)
+        // Utilisateurs
         Route::middleware(['permission:users.manage'])->group(function () {
             Route::get('users', [UserController::class, 'index'])->name('users.index');
             Route::post('users', [UserController::class, 'store'])->name('users.store');
@@ -43,7 +46,7 @@ Route::middleware(['checkauth'])->group(function () {
             Route::patch('users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
         });
 
-        // Rôles & Permissions (Protégé par sa propre permission)
+        // Rôles & Permissions
         Route::middleware(['permission:users.manage'])->group(function () {
             Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
             Route::post('roles', [RoleController::class, 'store'])->name('roles.store');
@@ -52,21 +55,24 @@ Route::middleware(['checkauth'])->group(function () {
             Route::post('roles/{role}/permissions', [RoleController::class, 'syncPermissions'])->name('roles.permissions');
         });
 
-        // Paramètres (CORRIGÉ : Changement du POST en PUT pour correspondre au formulaire)
+        // Paramètres entreprise
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
             Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
         });
     });
 
-    // ── CATALOGUE ──────────────────────────────────────────
-    // 1. Déclarer d'abord la route spécifique "create"
+    // Routes AJAX intelligentes
+    Route::get('/categories/lookup', [CategoryController::class, 'lookup'])->name('categories.lookup');
+    Route::get('/suppliers/lookup', [SupplierController::class, 'lookup'])->name('suppliers.lookup');
+    Route::get('/clients/lookup', [ClientController::class, 'lookup'])->name('clients.lookup');
+
+    // Catalogue / Produits
     Route::middleware(['permission:products.create'])->group(function () {
         Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('products', [ProductController::class, 'store'])->name('products.store');
     });
 
-    // 2. Déclarer les routes d'affichage de la liste et du détail ensuite
     Route::middleware(['permission:products.view'])->group(function () {
         Route::get('products', [ProductController::class, 'index'])->name('products.index');
         Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
@@ -80,10 +86,8 @@ Route::middleware(['checkauth'])->group(function () {
     Route::middleware(['permission:products.delete'])->group(function () {
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     });
-    Route::get('/categories/lookup', [CategoryController::class, 'lookup'])
-    ->name('categories.lookup');
 
-    // ── CATEGORIES ─────────────────────────────────────────
+    // Catégories
     Route::middleware(['permission:categories.manage'])->group(function () {
         Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
         Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
@@ -91,7 +95,7 @@ Route::middleware(['checkauth'])->group(function () {
         Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     });
 
-    // ── STOCK ──────────────────────────────────────────────
+    // Stock
     Route::middleware(['permission:stock.view'])->group(function () {
         Route::get('stock', [StockMovementController::class, 'index'])->name('stock.index');
     });
@@ -100,39 +104,31 @@ Route::middleware(['checkauth'])->group(function () {
         Route::post('stock', [StockMovementController::class, 'store'])->name('stock.store');
     });
 
-    Route::get('/suppliers/lookup', [SupplierController::class, 'lookup'])
-    ->name('suppliers.lookup');
+  // Fournisseurs
+Route::middleware(['permission:suppliers.view'])->group(function () {
+    Route::get('suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
+});
 
-    // ── FOURNISSEURS ───────────────────────────────────────
-    Route::middleware(['permission:suppliers.view'])->group(function () {
-        Route::get('suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
-    });
+Route::middleware(['permission:suppliers.manage'])->group(function () {
+    Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+});
 
-    Route::middleware(['permission:suppliers.manage'])->group(function () {
-        Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
-        Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
-        Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
-    });
-
-    // ── CLIENTS ────────────────────────────────────────────
-    Route::get('/clients/lookup', [ClientController::class, 'lookup'])
-    ->name('clients.lookup');
+    // Clients
     Route::middleware(['permission:clients.view'])->group(function () {
         Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+        Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     });
 
     Route::middleware(['permission:clients.manage'])->group(function () {
         Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
         Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
         Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
-        Route::middleware(['permission:clients.view'])->group(function () {
-    Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
-    Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
-
-});
     });
 
-    // ── VENTES ─────────────────────────────────────────────
+    // Ventes
     Route::middleware(['permission:sales.view'])->group(function () {
         Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
         Route::get('sales/{sale}/receipt', [SaleController::class, 'receipt'])->name('sales.receipt');
@@ -146,24 +142,44 @@ Route::middleware(['checkauth'])->group(function () {
     Route::middleware(['permission:sales.cancel'])->group(function () {
         Route::delete('sales/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
     });
+
+    // Crédits clients
     Route::get('/credits', [CreditController::class, 'index'])->name('credits.index');
-    Route::get('/credits-payments-history', [CreditController::class, 'paymentsHistory'])
-    ->name('credits.payments.history');
-Route::get('/credits/{credit}', [CreditController::class, 'show'])->name('credits.show');
-Route::post('/credits/{credit}/payment', [CreditController::class, 'payment'])->name('credits.payment');
-Route::get('/notifications', [NotificationController::class, 'index'])
-    ->name('notifications.index');
+    Route::get('/credits-payments-history', [CreditController::class, 'paymentsHistory'])->name('credits.payments.history');
+    Route::get('/credits/{credit}', [CreditController::class, 'show'])->name('credits.show');
+    Route::post('/credits/{credit}/payment', [CreditController::class, 'payment'])->name('credits.payment');
 
-Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
-    ->name('notifications.readAll');
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::get('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
-Route::get('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
-    ->name('notifications.read');
-    //setting credits-----------------------
-    Route::get('/settings/credit', [CreditSettingController::class, 'edit'])
-    ->name('settings.credit.edit');
+    // Paramètres crédit intelligent
+    Route::get('/settings/credit', [CreditSettingController::class, 'edit'])->name('settings.credit.edit');
+    Route::put('/settings/credit', [CreditSettingController::class, 'update'])->name('settings.credit.update');
 
-Route::put('/settings/credit', [CreditSettingController::class, 'update'])
-    ->name('settings.credit.update');
+    // Achats & Fournisseurs
+    Route::get('/purchases/dashboard', [PurchaseController::class, 'dashboard'])->name('purchases.dashboard');
+    Route::get('/purchases/debts', [PurchaseController::class, 'debts'])->name('purchases.debts');
+    Route::get('/purchases/payments-history', [PurchaseController::class, 'paymentsHistory'])->name('purchases.payments-history');
 
+    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
+    Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::post('/purchases/{purchase}/payment', [PurchaseController::class, 'payment'])->name('purchases.payment');
+
+    // Activation portail client depuis l'administration
+Route::post('/clients/{client}/portal/enable', [ClientPortalController::class, 'enable'])->name('clients.portal.enable');
+Route::post('/clients/{client}/portal/disable', [ClientPortalController::class, 'disable'])->name('clients.portal.disable');
 });
+
+// Portail client public
+Route::get('/client/login', [ClientPortalController::class, 'login'])->name('client.portal.login');
+Route::post('/client/login', [ClientPortalController::class, 'authenticate'])->name('client.portal.authenticate');
+Route::post('/client/logout', [ClientPortalController::class, 'logout'])->name('client.portal.logout');
+
+Route::get('/client/dashboard', [ClientPortalController::class, 'dashboard'])->name('client.portal.dashboard');
+Route::get('/client/sales', [ClientPortalController::class, 'sales'])->name('client.portal.sales');
+Route::get('/client/credits', [ClientPortalController::class, 'credits'])->name('client.portal.credits');
+Route::get('/client/messages', [ClientPortalController::class, 'messages'])->name('client.portal.messages');

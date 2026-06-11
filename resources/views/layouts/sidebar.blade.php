@@ -222,24 +222,49 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
             </button>
-            <div x-show="open === 'fournisseurs'"
-                x-transition:enter="transition ease-out duration-150"
-                x-transition:enter-start="opacity-0 -translate-y-1"
-                x-transition:enter-end="opacity-100 translate-y-0"
-                class="mt-1 ml-4 pl-3 border-l border-slate-800 space-y-0.5">
-                <a href="{{ route('suppliers.index') }}"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
-                    {{ request()->routeIs('suppliers.index') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
-                    Liste fournisseurs
-                </a>
-                @if(auth()->user()->hasPermission('suppliers.manage'))
-                <a href="{{ route('suppliers.index') }}#nouveau"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-500 hover:text-white transition">
+           <div x-show="open === 'fournisseurs'"
+    x-transition:enter="transition ease-out duration-150"
+    x-transition:enter-start="opacity-0 -translate-y-1"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    class="mt-1 ml-4 pl-3 border-l border-slate-800 space-y-0.5">
 
-                </a>
-                @endif
-            </div>
-        </div>
+    <a href="{{ route('suppliers.index') }}"
+        class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+        {{ request()->routeIs('suppliers.index') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+        Liste fournisseurs
+    </a>
+
+    <a href="{{ route('purchases.index') }}"
+        class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+        {{ request()->routeIs('purchases.index') || request()->routeIs('purchases.show') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+        Achats fournisseurs
+    </a>
+
+   <!-- <a href="{{ route('purchases.create') }}"
+        class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+        {{ request()->routeIs('purchases.create') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+        Nouvel achat
+    </a>-->
+
+    <a href="{{ route('purchases.debts') }}"
+        class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+        {{ request()->routeIs('purchases.debts') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+        Dettes fournisseurs
+    </a>
+
+    <a href="{{ route('purchases.payments-history') }}"
+        class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+        {{ request()->routeIs('purchases.payments-history') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+        Paiements fournisseurs
+    </a>
+
+    <a href="{{ route('purchases.dashboard') }}"
+        class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+        {{ request()->routeIs('purchases.dashboard') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+        Dashboard achats
+    </a>
+
+</div>
         @endif
 
         {{-- Clients --}}
@@ -379,7 +404,7 @@
         </svg>
     </span>
 
-    <span class="flex-1">Crédit intelligent</span>
+    <span class="flex-1">credit auto</span>
 </a>
 @endif
         @endif
