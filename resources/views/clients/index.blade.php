@@ -19,18 +19,55 @@
 </div>
 @endif
 
+@if(session('portal_access'))
+@php($access = session('portal_access'))
+<div class="mb-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+    <p class="text-xs font-bold text-amber-800 mb-2">
+        Accès portail généré pour {{ $access['client_name'] }}
+    </p>
+
+    <div class="text-xs text-amber-700 space-y-1 mb-3">
+        <p><strong>Lien :</strong> {{ $access['url'] }}</p>
+        <p><strong>Téléphone :</strong> {{ $access['phone'] ?? '—' }}</p>
+        <p><strong>PIN :</strong> {{ $access['pin'] }}</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+        @if($access['whatsapp_url'])
+        <a href="{{ $access['whatsapp_url'] }}" target="_blank"
+            class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold">
+            Envoyer WhatsApp
+        </a>
+        @endif
+
+        @if($access['email_url'])
+        <a href="{{ $access['email_url'] }}"
+            class="px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold">
+            Envoyer Email
+        </a>
+        @endif
+
+        <button type="button"
+            onclick="navigator.clipboard.writeText(@js($access['message'])); alert('Message copié')"
+            class="px-3 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold">
+            Copier message
+        </button>
+    </div>
+</div>
+@endif
+
 <div class="flex items-center justify-between mb-5">
     <div>
         <h1 class="text-sm font-semibold text-slate-800">Clients</h1>
         <p class="text-xs text-slate-400 mt-0.5">{{ $clients->total() }} client(s)</p>
     </div>
 
-   <!-- @if(auth()->user()->hasPermission('clients.manage'))
+    @if(auth()->user()->hasPermission('clients.manage'))
     <button onclick="document.getElementById('client-form').classList.toggle('hidden')"
         class="px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
         Ajouter client
     </button>
-    @endif-->
+    @endif
 </div>
 
 @if(auth()->user()->hasPermission('clients.manage'))
@@ -82,147 +119,157 @@
 @endif
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <table class="w-full">
-        <thead>
-            <tr class="border-b border-slate-100 bg-slate-50">
-                <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Client</th>
-                <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Contact</th>
-                <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Score</th>
-                <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Crédit dispo</th>
-                <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Portail</th>
-                <th class="px-5 py-3 text-right text-xs font-medium text-slate-400">Actions</th>
-            </tr>
-        </thead>
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[900px]">
+            <thead>
+                <tr class="border-b border-slate-100 bg-slate-50">
+                    <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Client</th>
+                    <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Contact</th>
+                    <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Score</th>
+                    <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Crédit dispo</th>
+                    <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Portail</th>
+                    <th class="px-5 py-3 text-right text-xs font-medium text-slate-400">Actions</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            @forelse($clients as $client)
-            <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
-                <td class="px-5 py-3">
-                    <p class="text-xs font-semibold text-slate-800">{{ $client->name }}</p>
-                    <p class="text-xs text-slate-400">{{ $client->type_label ?? $client->type ?? 'particulier' }}</p>
-                </td>
+            <tbody>
+                @forelse($clients as $client)
+                <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
+                    <td class="px-5 py-3">
+                        <p class="text-xs font-semibold text-slate-800">{{ $client->name }}</p>
+                        <p class="text-xs text-slate-400">{{ $client->type_label ?? $client->type ?? 'particulier' }}</p>
+                    </td>
 
-                <td class="px-5 py-3">
-                    <p class="text-xs text-slate-600">{{ $client->phone ?? '—' }}</p>
-                    <p class="text-xs text-slate-400">{{ $client->email ?? '—' }}</p>
-                </td>
+                    <td class="px-5 py-3">
+                        <p class="text-xs text-slate-600">{{ $client->phone ?? '—' }}</p>
+                        <p class="text-xs text-slate-400">{{ $client->email ?? '—' }}</p>
+                    </td>
 
-                <td class="px-5 py-3 text-center">
-                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
-                        {{ $client->loyalty_score ?? 0 }}/100
-                    </span>
-                    <p class="text-xs text-slate-400 mt-1">{{ $client->loyalty_status ?? 'occasionnel' }}</p>
-                </td>
-
-                <td class="px-5 py-3 text-center">
-                    <p class="text-xs font-semibold text-emerald-600">
-                        {{ number_format($client->credit_available ?? 0, 0, ',', ' ') }} FCFA
-                    </p>
-                </td>
-
-                <td class="px-5 py-3 text-center">
-                    @if($client->portal_enabled)
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
-                            Activé
+                    <td class="px-5 py-3 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                            {{ $client->loyalty_score ?? 0 }}/100
                         </span>
-                    @else
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">
-                            Désactivé
-                        </span>
-                    @endif
-                </td>
+                        <p class="text-xs text-slate-400 mt-1">{{ $client->loyalty_status ?? 'occasionnel' }}</p>
+                    </td>
 
-                <td class="px-5 py-3">
-                    <div class="flex items-center justify-end gap-2 flex-wrap">
-                        <a href="{{ route('clients.show', $client) }}"
-                            class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-50">
-                            Voir
-                        </a>
+                    <td class="px-5 py-3 text-center">
+                        <p class="text-xs font-semibold text-emerald-600">
+                            {{ number_format($client->credit_available ?? 0, 0, ',', ' ') }} FCFA
+                        </p>
+                    </td>
 
-                        @if(auth()->user()->hasPermission('clients.manage'))
-                            @if(!$client->portal_enabled)
-                                <form method="POST" action="{{ route('clients.portal.enable', $client) }}">
+                    <td class="px-5 py-3 text-center">
+                        @if($client->portal_enabled)
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+                                Activé
+                            </span>
+                        @else
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">
+                                Désactivé
+                            </span>
+                        @endif
+                    </td>
+
+                    <td class="px-5 py-3">
+                        <div class="flex items-center justify-end gap-2 flex-wrap">
+                            <a href="{{ route('clients.show', $client) }}"
+                                class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-50">
+                                Voir
+                            </a>
+
+                            @if(auth()->user()->hasPermission('clients.manage'))
+                                @if(!$client->portal_enabled)
+                                    <form method="POST" action="{{ route('clients.portal.enable', $client) }}">
+                                        @csrf
+                                        <button type="submit"
+                                            class="px-3 py-1.5 rounded-lg text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100">
+                                            Activer + accès
+                                        </button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('clients.portal.access', $client) }}">
+                                        @csrf
+                                        <button type="submit"
+                                            class="px-3 py-1.5 rounded-lg text-xs bg-blue-50 text-blue-600 hover:bg-blue-100">
+                                            Renvoyer accès
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="{{ route('clients.portal.disable', $client) }}"
+                                        onsubmit="return confirm('Désactiver le portail de ce client ?')">
+                                        @csrf
+                                        <button type="submit"
+                                            class="px-3 py-1.5 rounded-lg text-xs bg-red-50 text-red-500 hover:bg-red-100">
+                                            Désactiver portail
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <button onclick="document.getElementById('edit-client-{{ $client->id }}').classList.toggle('hidden')"
+                                    class="px-3 py-1.5 border border-amber-200 rounded-lg text-xs text-amber-600 hover:bg-amber-50">
+                                    Modifier
+                                </button>
+
+                                <form method="POST" action="{{ route('clients.destroy', $client) }}"
+                                    onsubmit="return confirm('Supprimer ce client ?')">
                                     @csrf
+                                    @method('DELETE')
                                     <button type="submit"
-                                        class="px-3 py-1.5 rounded-lg text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100">
-                                        Activer portail
-                                    </button>
-                                </form>
-                            @else
-                                <form method="POST" action="{{ route('clients.portal.disable', $client) }}"
-                                    onsubmit="return confirm('Désactiver le portail de ce client ?')">
-                                    @csrf
-                                    <button type="submit"
-                                        class="px-3 py-1.5 rounded-lg text-xs bg-red-50 text-red-500 hover:bg-red-100">
-                                        Désactiver portail
+                                        class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 hover:bg-red-50">
+                                        Supprimer
                                     </button>
                                 </form>
                             @endif
-
-                            <button onclick="document.getElementById('edit-client-{{ $client->id }}').classList.toggle('hidden')"
-                                class="px-3 py-1.5 border border-amber-200 rounded-lg text-xs text-amber-600 hover:bg-amber-50">
-                                Modifier
-                            </button>
-
-                            <form method="POST" action="{{ route('clients.destroy', $client) }}"
-                                onsubmit="return confirm('Supprimer ce client ?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 hover:bg-red-50">
-                                    Supprimer
-                                </button>
-                            </form>
-                        @endif
-                    </div>
-                </td>
-            </tr>
-
-            @if(auth()->user()->hasPermission('clients.manage'))
-            <tr id="edit-client-{{ $client->id }}" class="hidden bg-slate-50 border-b border-slate-100">
-                <td colspan="6" class="px-5 py-4">
-                    <form method="POST" action="{{ route('clients.update', $client) }}">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                            <input type="text" name="name" value="{{ $client->name }}" required
-                                class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
-
-                            <input type="text" name="phone" value="{{ $client->phone }}" required
-                                class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
-
-                            <input type="email" name="email" value="{{ $client->email }}"
-                                class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
-
-                            <select name="type" class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
-                                <option value="particulier" {{ $client->type === 'particulier' ? 'selected' : '' }}>Particulier</option>
-                                <option value="entreprise" {{ $client->type === 'entreprise' ? 'selected' : '' }}>Entreprise</option>
-                                <option value="revendeur" {{ $client->type === 'revendeur' ? 'selected' : '' }}>Revendeur</option>
-                            </select>
-
-                            <input type="text" name="address" value="{{ $client->address }}"
-                                class="px-3 py-2 border border-slate-200 rounded-lg text-xs md:col-span-2">
                         </div>
+                    </td>
+                </tr>
 
-                        <button type="submit"
-                            class="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold">
-                            Mettre à jour
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @endif
+                @if(auth()->user()->hasPermission('clients.manage'))
+                <tr id="edit-client-{{ $client->id }}" class="hidden bg-slate-50 border-b border-slate-100">
+                    <td colspan="6" class="px-5 py-4">
+                        <form method="POST" action="{{ route('clients.update', $client) }}">
+                            @csrf
+                            @method('PUT')
 
-            @empty
-            <tr>
-                <td colspan="6" class="px-5 py-12 text-center">
-                    <p class="text-sm font-medium text-slate-400">Aucun client trouvé</p>
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                                <input type="text" name="name" value="{{ $client->name }}" required
+                                    class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
+
+                                <input type="text" name="phone" value="{{ $client->phone }}" required
+                                    class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
+
+                                <input type="email" name="email" value="{{ $client->email }}"
+                                    class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
+
+                                <select name="type" class="px-3 py-2 border border-slate-200 rounded-lg text-xs">
+                                    <option value="particulier" {{ $client->type === 'particulier' ? 'selected' : '' }}>Particulier</option>
+                                    <option value="entreprise" {{ $client->type === 'entreprise' ? 'selected' : '' }}>Entreprise</option>
+                                    <option value="revendeur" {{ $client->type === 'revendeur' ? 'selected' : '' }}>Revendeur</option>
+                                </select>
+
+                                <input type="text" name="address" value="{{ $client->address }}"
+                                    class="px-3 py-2 border border-slate-200 rounded-lg text-xs md:col-span-2">
+                            </div>
+
+                            <button type="submit"
+                                class="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold">
+                                Mettre à jour
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @endif
+
+                @empty
+                <tr>
+                    <td colspan="6" class="px-5 py-12 text-center">
+                        <p class="text-sm font-medium text-slate-400">Aucun client trouvé</p>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
     @if($clients->hasPages())
     <div class="px-5 py-3 border-t border-slate-50">

@@ -1,12 +1,40 @@
-<header class="h-12 bg-white border-b border-slate-100 px-6 flex items-center justify-between flex-shrink-0">
+<header class="h-14 bg-white border-b border-slate-100 px-3 sm:px-6 flex items-center justify-between flex-shrink-0 sticky top-0 z-30">
 
-    <div class="flex items-center gap-2">
-        <span class="text-xs text-slate-400">KamerStock</span>
-        <span class="text-slate-200">/</span>
-        <span class="text-sm font-semibold text-slate-800">@yield('page-title', 'Dashboard')</span>
+    <div class="flex items-center gap-2 min-w-0">
+        {{-- Menu mobile --}}
+        <button type="button"
+            @click="mobileSidebarOpen = true"
+            class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg border border-slate-100 text-slate-600 bg-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+
+        {{-- Réduire sidebar desktop --}}
+        <button type="button"
+            @click="toggleSidebar()"
+            class="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg border border-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition">
+            <svg x-show="!sidebarCollapsed" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 19l-7-7 7-7"/>
+            </svg>
+            <svg x-show="sidebarCollapsed" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
+
+        <div class="min-w-0">
+            <div class="flex items-center gap-2 truncate">
+                <span class="text-xs text-slate-400 hidden sm:inline">KamerStock</span>
+                <span class="text-slate-200 hidden sm:inline">/</span>
+                <span class="text-sm font-semibold text-slate-800 truncate">@yield('page-title', 'Dashboard')</span>
+            </div>
+        </div>
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3">
 
         <span class="text-xs text-slate-400 hidden md:block">
             {{ now()->locale('fr')->isoFormat('ddd D MMM YYYY') }}
@@ -23,14 +51,13 @@
                 ->get();
 
             $unreadNotificationsCount = \App\Models\Notification::where('is_read', false)->count();
-
             $totalAlertCount = $stockAlertCount + $unreadNotificationsCount;
         @endphp
 
-        {{-- Cloche notifications --}}
+        {{-- Notifications --}}
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open"
-                class="relative w-8 h-8 flex items-center justify-center rounded-lg border border-slate-100 bg-white hover:bg-slate-50 transition text-slate-500">
+                class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-slate-100 bg-white hover:bg-slate-50 transition text-slate-500">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -44,17 +71,14 @@
             </button>
 
             <div x-show="open" @click.outside="open = false"
-                x-transition:enter="transition ease-out duration-150"
-                x-transition:enter-start="opacity-0 scale-95"
-                x-transition:enter-end="opacity-100 scale-100"
-                class="absolute right-0 top-10 w-80 bg-white border border-slate-100 rounded-xl shadow-lg z-50 overflow-hidden">
+                x-transition
+                class="absolute right-0 top-11 w-[calc(100vw-1.5rem)] sm:w-80 bg-white border border-slate-100 rounded-xl shadow-lg z-50 overflow-hidden">
 
                 <div class="px-4 py-3 border-b border-slate-50 flex items-center justify-between">
                     <span class="text-xs font-semibold text-slate-700">Notifications</span>
                     <span class="text-xs text-slate-400">{{ $totalAlertCount }} alerte(s)</span>
                 </div>
 
-                {{-- Notifications système --}}
                 @forelse($unreadNotifications as $notification)
                     <a href="{{ route('notifications.read', $notification) }}"
                         class="block px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition">
@@ -74,7 +98,6 @@
                     @endif
                 @endforelse
 
-                {{-- Alertes stock --}}
                 @if($stockAlertCount > 0)
                     <div class="px-4 py-2 bg-slate-50 border-b border-slate-100">
                         <span class="text-xs font-semibold text-slate-600">Alertes stock</span>
@@ -104,7 +127,7 @@
         </div>
 
         {{-- Profil --}}
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
             <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-white font-semibold text-xs">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </div>
@@ -117,7 +140,7 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" title="Déconnexion"
-                class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-100 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition">
+                class="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-100 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>

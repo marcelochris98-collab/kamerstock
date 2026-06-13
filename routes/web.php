@@ -170,8 +170,10 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
     Route::post('/purchases/{purchase}/payment', [PurchaseController::class, 'payment'])->name('purchases.payment');
 
     // Activation portail client depuis l'administration
-Route::post('/clients/{client}/portal/enable', [ClientPortalController::class, 'enable'])->name('clients.portal.enable');
-Route::post('/clients/{client}/portal/disable', [ClientPortalController::class, 'disable'])->name('clients.portal.disable');
+Route::post('/clients/{client}/portal/enable', [ClientPortalController::class, 'enable']) ->name('clients.portal.enable');
+Route::post('/clients/{client}/portal/access', [ClientPortalController::class, 'sendAccess']) ->name('clients.portal.access');
+Route::post('/clients/{client}/portal/disable', [ClientPortalController::class, 'disable']) ->name('clients.portal.disable');
+Route::post('/client/messages/send', [ClientPortalController::class, 'sendMessage']) ->name('client.portal.messages.send');
 });
 
 // Portail client public
