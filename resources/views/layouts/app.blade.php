@@ -135,6 +135,17 @@
                         }
                     }
 
+                    // Refresh CRM messages badge count dynamically
+                    const crmBadge = document.getElementById('headerCrmChatBadge');
+                    if (crmBadge && typeof data.unread_crm_count !== 'undefined') {
+                        if (data.unread_crm_count > 0) {
+                            crmBadge.textContent = data.unread_crm_count > 99 ? '99+' : data.unread_crm_count;
+                            crmBadge.classList.remove('hidden');
+                        } else {
+                            crmBadge.classList.add('hidden');
+                        }
+                    }
+
                     if (window.location.pathname.includes('/admin/crm-messages')) {
                         if (typeof refreshAdminChat === 'function') {
                             refreshAdminChat();

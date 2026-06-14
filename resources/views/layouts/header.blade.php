@@ -94,6 +94,28 @@
             $totalAlertCount = $stockAlertCount + $unreadNotificationsCount;
         @endphp
 
+        {{-- Message Icon --}}
+        @if(auth()->user()->hasPermission('crm.messages'))
+            @php
+                $unreadCrmMessagesCount = \App\Models\ClientMessage::whereNotNull('client_id')
+                    ->whereNull('user_id')
+                    ->whereNull('read_at')
+                    ->count();
+            @endphp
+            <div class="relative">
+                <a href="{{ route('admin.crm_messages.index') }}"
+                    class="relative w-8 h-8 flex items-center justify-center rounded-lg border border-slate-100 bg-white hover:bg-slate-50 transition text-slate-500"
+                    title="Messages Clients">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <span id="headerCrmChatBadge" class="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full {{ $unreadCrmMessagesCount > 0 ? '' : 'hidden' }}">
+                        {{ $unreadCrmMessagesCount }}
+                    </span>
+                </a>
+            </div>
+        @endif
+
         {{-- Cloche notifications --}}
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open"

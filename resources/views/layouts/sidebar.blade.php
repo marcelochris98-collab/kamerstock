@@ -198,7 +198,7 @@
         @endif
 
         {{-- CRM & Relation Client --}}
-        @if(auth()->user()->hasPermission('clients.view') || auth()->user()->hasPermission('crm.messages'))
+        @if(auth()->user()->hasPermission('clients.view'))
         <div class="mb-1">
             <button @click="open = open === 'crm' ? '' : 'crm'"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition
@@ -232,13 +232,6 @@
                     {{ request()->routeIs('credits.payments.history') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Remboursements
                 </a>
-                @if(auth()->user()->hasPermission('crm.messages'))
-                <a href="{{ route('admin.crm_messages.index') }}"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
-                    {{ request()->routeIs('admin.crm_messages.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
-                    Messagerie CRM
-                </a>
-                @endif
             </div>
         </div>
         @endif

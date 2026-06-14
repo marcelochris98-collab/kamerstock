@@ -85,6 +85,7 @@ class NotificationController extends Controller
                 ];
             }),
             'unread_count' => Notification::where('user_id', $user->id)->where('is_read', false)->count(),
+            'unread_crm_count' => \App\Models\ClientMessage::whereNotNull('client_id')->whereNull('user_id')->whereNull('read_at')->count(),
             'timestamp' => now()->toIso8601String(),
         ]);
     }
