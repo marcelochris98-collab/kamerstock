@@ -11,14 +11,18 @@ class Product extends Model
 
     protected $fillable = [
         'category_id', 'supplier_id', 'name', 'reference',
-        'unit', 'price_buy', 'price_sell', 'quantity',
-        'alert_threshold', 'tax_rate', 'description', 'is_active'
+        'unit', 'price_buy', 'price_sell',
+        'price_sell_company', 'price_sell_reseller', 'price_sell_wholesale',
+        'quantity', 'alert_threshold', 'tax_rate', 'description', 'is_active'
     ];
 
     protected $casts = [
         'is_active'  => 'boolean',
         'price_buy'  => 'decimal:2',
         'price_sell' => 'decimal:2',
+        'price_sell_company' => 'decimal:2',
+        'price_sell_reseller' => 'decimal:2',
+        'price_sell_wholesale' => 'decimal:2',
         'tax_rate'   => 'decimal:2',
     ];
 
@@ -69,5 +73,21 @@ class Product extends Model
     {
         if ($this->price_buy == 0) return 0;
         return round(($this->margin / $this->price_buy) * 100, 2);
+    }
+
+    public function getPriceForType(?string $type): float
+    {
+        if (!$type) {
+            return (float) $this->price_sell;
+        }
+
+        $price = match($type) {
+            'entreprise' => $this->price_sell_company,
+            'revendeur'  => $this->price_sell_reseller,
+            'grossiste'  => $this->price_sell_wholesale,
+            default      => $this->price_sell,
+        };
+
+        return (float) ($price ?: $this->price_sell);
     }
 }

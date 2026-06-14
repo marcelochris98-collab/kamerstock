@@ -142,6 +142,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- Prédiction IA Rupture Stock -->
+        <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="p-1 bg-slate-900 rounded text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xs font-semibold text-slate-800">Prédiction de Rupture</h3>
+            </div>
+            
+            <div class="text-center py-2 mb-3 bg-slate-50 rounded-lg border border-slate-100">
+                @if($stockPrediction['days_remaining'] >= 999)
+                    <p class="text-2xl font-bold text-emerald-600">Stable</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Aucune rupture prévue</p>
+                @else
+                    <p class="text-3xl font-bold {{ $stockPrediction['days_remaining'] <= 7 ? 'text-red-500' : 'text-amber-500' }}">
+                        {{ $stockPrediction['days_remaining'] }} <span class="text-xs font-normal text-slate-500">jours</span>
+                    </p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Est. avant rupture de stock</p>
+                @endif
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Vélocité quotidienne :</span>
+                    <span class="font-medium text-slate-700">{{ $stockPrediction['daily_velocity'] }} / jour</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Confiance :</span>
+                    <span class="font-semibold px-1.5 py-0.5 rounded text-[10px]
+                        {{ $stockPrediction['confidence'] === 'High' ? 'bg-emerald-50 text-emerald-700' : 
+                           ($stockPrediction['confidence'] === 'Medium' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600') }}">
+                        {{ $stockPrediction['confidence'] === 'High' ? 'Élevée' : ($stockPrediction['confidence'] === 'Medium' ? 'Moyenne' : 'Faible') }}
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-slate-500 mt-3 bg-slate-50 p-2.5 rounded border border-slate-100">
+                {{ $stockPrediction['explanation'] }}
+            </p>
+            <p class="text-[9px] text-slate-400 mt-2 text-right">Source : {{ $stockPrediction['source'] }}</p>
+        </div>
     </div>
 </div>
 

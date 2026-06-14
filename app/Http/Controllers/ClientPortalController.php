@@ -160,7 +160,7 @@ class ClientPortalController extends Controller
 
         $messages = ClientMessage::where('client_id', $client->id)
             ->oldest()
-            ->paginate(30);
+            ->get();
 
         return view('client-portal.messages', compact('client', 'messages'));
     }
@@ -181,6 +181,16 @@ class ClientPortalController extends Controller
             'message' => $request->message,
             'type' => 'client',
         ]);
+
+        app(\App\Services\NotificationService::class)->notifyByPermission(
+            'crm.messages',
+            'crm_message_received',
+            'Nouveau message client',
+            "Le client {$client->name} a envoyé un message : " . \Illuminate\Support\Str::limit($request->message, 80),
+            route('admin.crm_messages.index', ['client_id' => $client->id]),
+            ['client_id' => $client->id],
+            'messaging'
+        );
 
         return back()->with('success', 'Votre message a été envoyé.');
     }
@@ -285,5 +295,128 @@ class ClientPortalController extends Controller
         }
 
         return $digits ?: null;
+    }
+
+    public function getMessagesJson()
+    {
+        $client = $this->currentClient();
+
+        ClientMessage::where('client_id', $client->id)
+            ->whereNotNull('user_id')
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $messages = ClientMessage::where('client_id', $client->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'client_id' => $client->id,
+            'messages' => $messages->map(function ($msg) {
+                return [
+                    'id' => $msg->id,
+                    'subject' => $msg->subject,
+                    'message' => $msg->message,
+                    'type' => $msg->type,
+                    'is_from_client' => is_null($msg->user_id),
+                    'created_at' => $msg->created_at->format('d/m/Y H:i'),
+                ];
+            })
+        ]);
+    }
+
+    public function sendMessageAjax(Request $request)
+    {
+        $client = $this->currentClient();
+
+        $request->validate([
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $msg = ClientMessage::create([
+            'client_id' => $client->id,
+            'user_id' => null,
+            'subject' => 'Message client (chat)',
+            'message' => $request->message,
+            'type' => 'client',
+        ]);
+
+        app(\App\Services\NotificationService::class)->notifyByPermission(
+            'crm.messages',
+            'crm_message_received',
+            'Nouveau message client (chat)',
+            "Le client {$client->name} a écrit dans le chat : " . \Illuminate\Support\Str::limit($request->message, 80),
+            route('admin.crm_messages.index', ['client_id' => $client->id]),
+            ['client_id' => $client->id],
+            'messaging'
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => [
+                'id' => $msg->id,
+                'subject' => $msg->subject,
+                'message' => $msg->message,
+                'type' => $msg->type,
+                'is_from_client' => true,
+                'created_at' => $msg->created_at->format('d/m/Y H:i'),
+            ]
+        ]);
+    }
+
+    public function updateNotificationSettings(Request $request)
+    {
+        $client = $this->currentClient();
+        
+        $client->forceFill([
+            'notifications_enabled' => $request->has('notifications_enabled'),
+            'sounds_enabled'        => $request->has('sounds_enabled'),
+        ])->save();
+        
+        return back()->with('success', 'Vos préférences de notification ont été mises à jour.');
+    }
+
+    public function pollNotifications(Request $request)
+    {
+        $client = $this->currentClient();
+        
+        // Vérifier si les notifications sont activées pour ce client
+        if (isset($client->notifications_enabled) && !$client->notifications_enabled) {
+            return response()->json([
+                'messages' => [],
+                'unread_count' => 0,
+                'timestamp' => now()->toIso8601String()
+            ]);
+        }
+
+        $lastChecked = $request->query('last_checked');
+
+        $query = \App\Models\ClientMessage::where('client_id', $client->id)
+            ->whereNotNull('user_id')
+            ->whereNull('read_at');
+
+        if ($lastChecked) {
+            $query->where('created_at', '>', $lastChecked);
+        }
+
+        $newMessages = $query->latest()->get();
+
+        $soundsEnabled = isset($client->sounds_enabled) ? $client->sounds_enabled : true;
+
+        return response()->json([
+            'messages' => $newMessages->map(function ($msg) use ($soundsEnabled) {
+                return [
+                    'id' => $msg->id,
+                    'title' => 'Nouveau message support',
+                    'message' => \Illuminate\Support\Str::limit($msg->message, 80),
+                    'sound' => $soundsEnabled ? 'reception' : null,
+                ];
+            }),
+            'unread_count' => \App\Models\ClientMessage::where('client_id', $client->id)
+                ->whereNotNull('user_id')
+                ->whereNull('read_at')
+                ->count(),
+            'timestamp' => now()->toIso8601String(),
+        ]);
     }
 }

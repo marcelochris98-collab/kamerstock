@@ -6,15 +6,33 @@ use App\Models\Client;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Services\ClientScoringService;
+use App\Services\AiService;
 
 
 class ClientController extends Controller
 {
-   public function index(ClientScoringService $scoringService)
+   public function index(Request $request, ClientScoringService $scoringService)
 {
-    $clients = Client::withCount('sales')
-        ->orderBy('name')
-        ->paginate(20);
+    $query = Client::withCount('sales');
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('phone', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
+    }
+
+    if ($request->filled('type')) {
+        $query->where('type', $request->type);
+    }
+
+    if ($request->filled('risk_rating')) {
+        $query->where('risk_rating', $request->risk_rating);
+    }
+
+    $clients = $query->orderBy('name')->paginate(20);
 
     foreach ($clients as $client) {
         $scoringService->update($client);
@@ -29,7 +47,7 @@ class ClientController extends Controller
             'name'         => 'required|string|max:150',
             'phone'        => 'nullable|string|max:20',
             'email'        => 'nullable|email|max:100',
-            'type'         => 'required|in:particulier,entreprise,revendeur',
+            'type'         => 'required|in:particulier,entreprise,revendeur,grossiste',
             'credit_limit' => 'nullable|numeric|min:0',
         ], [
             'name.required' => 'Le nom est obligatoire.',
@@ -48,7 +66,7 @@ class ClientController extends Controller
             'name'  => 'required|string|max:150',
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:100',
-            'type'  => 'required|in:particulier,entreprise,revendeur',
+            'type'  => 'required|in:particulier,entreprise,revendeur,grossiste',
         ]);
 
         $client->update($request->all());
@@ -71,17 +89,20 @@ class ClientController extends Controller
 
         return back()->with('success', " Client supprimé !");
     }
-    public function show(Client $client, ClientScoringService $scoringService)
-{
-    $client = $scoringService->update($client);
+    public function show(Client $client, ClientScoringService $scoringService, AiService $aiService)
+    {
+        $client = $scoringService->update($client);
 
-    $client->load([
-        'sales' => fn ($query) => $query->latest()->limit(10),
-        'creditSales' => fn ($query) => $query->latest()->limit(10),
-    ]);
+        $client->load([
+            'sales' => fn ($query) => $query->latest()->limit(10),
+            'creditSales' => fn ($query) => $query->latest()->limit(10),
+        ]);
 
-    return view('clients.show', compact('client'));
-}
+        $creditRisk = $aiService->evaluateClientCreditRisk($client);
+        $recommendations = $aiService->recommendProductsForClient($client);
+
+        return view('clients.show', compact('client', 'creditRisk', 'recommendations'));
+    }
 public function lookup(Request $request)
 {
     $phone = preg_replace('/\D+/', '', $request->phone ?? '');
@@ -110,8 +131,10 @@ public function lookup(Request $request)
                 'name' => $client->name,
                 'phone' => $client->phone,
                 'type' => $client->type_label,
+                'raw_type' => $client->type ?? 'particulier',
                 'score' => $client->loyalty_score ?? 0,
                 'status' => $client->loyalty_status ?? 'occasionnel',
+                'loyalty_points' => $client->loyalty_points ?? 0,
                 'credit_available' => $client->credit_available ?? 0,
             ];
         }),

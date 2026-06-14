@@ -57,4 +57,26 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Update the user's notification preferences.
+     */
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'sound_volume' => 'required|integer|min:0|max:100',
+            'categories'   => 'nullable|array',
+            'categories.*' => 'string|in:messaging,sales,stock,finance,admin',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'notifications_enabled'   => $request->has('notifications_enabled'),
+            'sounds_enabled'          => $request->has('sounds_enabled'),
+            'sound_volume'            => $request->sound_volume,
+            'notification_categories' => $request->categories ?? [],
+        ]);
+
+        return redirect()->route('profile.edit')->with('success', 'Vos préférences de notification ont été mises à jour.');
+    }
 }

@@ -17,11 +17,35 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sales = Sale::with(['user', 'client', 'details'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = Sale::with(['user', 'client', 'details']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhere('payment_mode', 'like', "%{$search}%")
+                  ->orWhereHas('client', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_mode')) {
+            $query->where('payment_mode', $request->payment_mode);
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        }
+
+        $sales = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return view('sales.index', compact('sales'));
     }
@@ -47,12 +71,25 @@ class SaleController extends Controller
             'items.*.quantity'   => 'required|integer|min:1',
             'payment_mode'       => 'required|in:cash,orange_money,mtn_money,credit,mixte',
             'amount_paid'        => 'nullable|numeric|min:0',
+            'payments'           => 'nullable|array',
+            'payments.*'         => 'nullable|numeric|min:0',
             'client_id'          => 'nullable|exists:clients,id',
             'client_name'        => 'required_without:client_id|string|max:255',
             'client_phone'       => 'required_without:client_id|string|max:50',
-            'client_type'        => 'nullable|in:particulier,entreprise,revendeur',
+            'client_type'        => 'nullable|in:particulier,entreprise,revendeur,grossiste',
             'client_email'       => 'nullable|email|max:255',
+            'redeem_points'      => 'nullable|integer|min:0',
         ]);
+
+        $clientType = 'particulier';
+        if ($request->filled('client_id')) {
+            $c = Client::find($request->client_id);
+            if ($c) {
+                $clientType = $c->type;
+            }
+        } else if ($request->filled('client_type')) {
+            $clientType = $request->client_type;
+        }
 
         $details = [];
         $total = 0;
@@ -70,13 +107,14 @@ class SaleController extends Controller
                 continue;
             }
 
-            $subtotal = $product->price_sell * $item['quantity'];
+            $unitPrice = $product->getPriceForType($clientType);
+            $subtotal = $unitPrice * $item['quantity'];
             $total += $subtotal;
 
             $details[] = [
                 'product' => $product,
                 'quantity' => $item['quantity'],
-                'unit_price' => $product->price_sell,
+                'unit_price' => $unitPrice,
                 'subtotal' => $subtotal,
             ];
         }
@@ -85,8 +123,25 @@ class SaleController extends Controller
             $errors[] = 'Le panier est vide.';
         }
 
-        if ($request->payment_mode === 'cash' && ((float) ($request->amount_paid ?? 0)) < $total) {
-            $errors[] = "Montant insuffisant — il manque " . number_format($total - (float) $request->amount_paid, 0, ',', ' ') . " FCFA.";
+        $redeemPoints = intval($request->redeem_points ?? 0);
+        $loyaltyDiscount = 0;
+        if ($redeemPoints > 0) {
+            if ($request->filled('client_id')) {
+                $c = Client::find($request->client_id);
+                if ($c && $c->loyalty_points >= $redeemPoints) {
+                    $loyaltyDiscount = $redeemPoints * 10; // 1 point = 10 FCFA
+                } else {
+                    $errors[] = "Points de fidélité insuffisants.";
+                }
+            } else {
+                $errors[] = "Impossible d'utiliser des points de fidélité pour un nouveau client.";
+            }
+        }
+
+        $netTotal = max(0, $total - $loyaltyDiscount);
+
+        if ($request->payment_mode === 'cash' && ((float) ($request->amount_paid ?? 0)) < $netTotal) {
+            $errors[] = "Montant insuffisant — il manque " . number_format($netTotal - (float) $request->amount_paid, 0, ',', ' ') . " FCFA.";
         }
 
         if (!empty($errors)) {
@@ -101,6 +156,9 @@ class SaleController extends Controller
                 $request,
                 $details,
                 $total,
+                $netTotal,
+                $loyaltyDiscount,
+                $redeemPoints,
                 $scoringService,
                 $notificationService,
                 &$creditCreated,
@@ -135,24 +193,61 @@ class SaleController extends Controller
                 }
 
                 $isCredit = $request->payment_mode === 'credit';
-                $amountPaid = (float) ($request->amount_paid ?? 0);
-
-                if ($isCredit && $amountPaid > $total) {
-                    $amountPaid = $total;
+                $amountPaid = 0;
+                if ($request->payment_mode === 'mixte') {
+                    if ($request->has('payments')) {
+                        foreach ($request->payments as $mode => $amt) {
+                            $amountPaid += (float) $amt;
+                        }
+                    }
+                } else {
+                    $amountPaid = (float) ($request->amount_paid ?? 0);
                 }
 
-                $changeDue = $isCredit ? 0 : max(0, $amountPaid - $total);
-                $amountDue = max($total - $amountPaid, 0);
+                if ($isCredit && $amountPaid > $netTotal) {
+                    $amountPaid = $netTotal;
+                }
+
+                $changeDue = $isCredit ? 0 : max(0, $amountPaid - $netTotal);
+                $amountDue = max($netTotal - $amountPaid, 0);
 
                 $sale = Sale::create([
                     'user_id' => auth()->id(),
                     'client_id' => $client->id,
-                    'total_amount' => $total,
+                    'total_amount' => $netTotal,
                     'amount_paid' => $amountPaid,
                     'change_due' => $changeDue,
+                    'discount' => $loyaltyDiscount,
                     'payment_mode' => $request->payment_mode,
                     'status' => $amountDue > 0 ? 'credit' : 'completee',
                 ]);
+
+                // Record detailed payments
+                if ($request->payment_mode === 'mixte') {
+                    if ($request->has('payments')) {
+                        foreach ($request->payments as $mode => $amt) {
+                            $amtFloat = (float) $amt;
+                            if ($amtFloat > 0) {
+                                if (in_array($mode, ['cash', 'orange_money', 'mtn_money', 'virement', 'cheque'])) {
+                                    \App\Models\SalePayment::create([
+                                        'sale_id' => $sale->id,
+                                        'payment_mode' => $mode,
+                                        'amount' => $amtFloat,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                } else if ($request->payment_mode !== 'credit' && $amountPaid > 0) {
+                    $actualPaid = min($netTotal, $amountPaid);
+                    if (in_array($request->payment_mode, ['cash', 'orange_money', 'mtn_money', 'virement', 'cheque'])) {
+                        \App\Models\SalePayment::create([
+                            'sale_id' => $sale->id,
+                            'payment_mode' => $request->payment_mode,
+                            'amount' => $actualPaid,
+                        ]);
+                    }
+                }
 
                 foreach ($details as $detail) {
                     SaleDetail::create([
@@ -176,12 +271,33 @@ class SaleController extends Controller
                     }
                 }
 
+                if ($redeemPoints > 0) {
+                    $client->decrement('loyalty_points', $redeemPoints);
+                    \App\Models\LoyaltyPointsHistory::create([
+                        'client_id' => $client->id,
+                        'sale_id' => $sale->id,
+                        'points' => -$redeemPoints,
+                        'description' => "Points convertis en réduction de " . number_format($loyaltyDiscount, 0, ',', ' ') . " FCFA",
+                    ]);
+                }
+
+                $pointsEarned = floor($netTotal / 1000);
+                if ($pointsEarned > 0) {
+                    $client->increment('loyalty_points', $pointsEarned);
+                    \App\Models\LoyaltyPointsHistory::create([
+                        'client_id' => $client->id,
+                        'sale_id' => $sale->id,
+                        'points' => $pointsEarned,
+                        'description' => "Points cumulés pour la vente #" . $sale->id,
+                    ]);
+                }
+
                 if ($isCredit || $amountDue > 0) {
                     $credit = CreditSale::create([
                         'sale_id' => $sale->id,
                         'client_id' => $client->id,
                         'user_id' => auth()->id(),
-                        'total_amount' => $total,
+                        'total_amount' => $netTotal,
                         'amount_paid' => $amountPaid,
                         'amount_due' => $amountDue,
                         'status' => $amountPaid > 0 ? 'partiel' : 'en_attente',
@@ -198,7 +314,7 @@ class SaleController extends Controller
                         'amount' => $amountDue,
                         'meta' => [
                             'sale_id' => $sale->id,
-                            'total_amount' => $total,
+                            'total_amount' => $netTotal,
                             'amount_paid' => $amountPaid,
                             'amount_due' => $amountDue,
                         ],
@@ -220,21 +336,33 @@ class SaleController extends Controller
                 $notificationService->notifyManagers(
                     'sale_created',
                     'Vente effectuée',
-                    'Une vente de ' . number_format($total, 0, ',', ' ') . ' FCFA a été enregistrée pour ' . $client->name . '.',
+                    'Une vente de ' . number_format($netTotal, 0, ',', ' ') . ' FCFA a été enregistrée pour ' . $client->name . '.',
                     route('sales.receipt', $sale),
                     [
                         'sale_id' => $sale->id,
                         'client_id' => $client->id,
-                        'total' => $total,
+                        'total' => $netTotal,
                     ]
                 );
+
+                if ($client->portal_enabled) {
+                    $notificationService->notifyClient(
+                        $client->id,
+                        'invoice_available',
+                        'Nouvelle facture disponible',
+                        "Votre facture pour l'achat #{$sale->id} d'un montant de " . number_format($netTotal, 0, ',', ' ') . " FCFA est disponible.",
+                        route('client.portal.sales'),
+                        ['sale_id' => $sale->id],
+                        'sales'
+                    );
+                }
 
                 $scoringService->update($client);
 
                 return $sale;
             });
 
-            ActivityLog::record('sale.create', "Vente enregistrée — Total : {$total} FCFA");
+            ActivityLog::record('sale.create', "Vente enregistrée — Total : {$netTotal} FCFA");
 
             $toasts = [
                 [
@@ -278,7 +406,7 @@ class SaleController extends Controller
 
     public function receipt(Sale $sale)
     {
-        $sale->load(['user', 'client', 'details.product']);
+        $sale->load(['user', 'client', 'details.product', 'payments']);
         $settings = Setting::first();
 
         return view('sales.receipt', compact('sale', 'settings'));
@@ -299,6 +427,16 @@ class SaleController extends Controller
         });
 
         ActivityLog::record('sale.cancel', "Vente annulée : #{$sale->id}");
+
+        app(\App\Services\NotificationService::class)->notifyByPermission(
+            'sales.view',
+            'sale_cancelled',
+            'Vente annulée',
+            "La vente #{$sale->id} d'un montant de " . number_format($sale->total_amount, 0, ',', ' ') . " FCFA a été annulée.",
+            route('sales.index'),
+            ['sale_id' => $sale->id],
+            'sales'
+        );
 
         return back()->with('success', 'Vente annulée — stock restauré !');
     }

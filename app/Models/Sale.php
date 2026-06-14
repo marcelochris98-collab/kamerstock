@@ -37,6 +37,11 @@ class Sale extends Model
         return $this->hasMany(SaleDetail::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(SalePayment::class);
+    }
+
     public function getPaymentModeLabelAttribute(): string
     {
         return match($this->payment_mode) {

@@ -48,6 +48,11 @@ class RoleAndPermissionSeeder extends Seeder
             ['name' => 'Voir journal',        'slug' => 'logs.view',        'module' => 'Administration','action' => 'view'],
             ['name' => 'Gérer paramètres',    'slug' => 'settings.manage',  'module' => 'Administration','action' => 'manage'],
             ['name' => 'Voir dashboard',      'slug' => 'dashboard.view',   'module' => 'Administration','action' => 'view'],
+
+            // Nouveaux Modules
+            ['name' => 'Accéder messagerie CRM', 'slug' => 'crm.messages',  'module' => 'Clients',       'action' => 'messages'],
+            ['name' => 'Voir achats',         'slug' => 'purchases.view',   'module' => 'Achats',        'action' => 'view'],
+            ['name' => 'Gérer achats',        'slug' => 'purchases.manage', 'module' => 'Achats',        'action' => 'manage'],
         ];
 
         foreach ($permissions as $perm) {
@@ -67,23 +72,60 @@ class RoleAndPermissionSeeder extends Seeder
 
         $admin->permissions()->sync(Permission::pluck('id'));
 
-        // ── RÔLES DE BASE (sans permissions — admin les attribue) ──
+        // ── RÔLES DE BASE AVEC LEURS PERMISSIONS PAR DÉFAUT ──
 
-        Role::firstOrCreate(
+        $caissier = Role::firstOrCreate(
             ['slug' => 'caissier'],
             ['name' => 'Caissier', 'description' => 'Gestion des ventes et clients', 'is_active' => true]
         );
+        $caissier->permissions()->sync(
+            Permission::whereIn('slug', [
+                'sales.create',
+                'sales.view',
+                'clients.view',
+                'clients.manage',
+                'products.view',
+                'dashboard.view'
+            ])->pluck('id')
+        );
 
-        Role::firstOrCreate(
+        $magasinier = Role::firstOrCreate(
             ['slug' => 'magasinier'],
             ['name' => 'Magasinier', 'description' => 'Gestion du stock et fournisseurs', 'is_active' => true]
         );
+        $magasinier->permissions()->sync(
+            Permission::whereIn('slug', [
+                'products.view',
+                'products.create',
+                'products.edit',
+                'categories.view',
+                'categories.manage',
+                'stock.view',
+                'stock.manage',
+                'suppliers.view',
+                'suppliers.manage',
+                'purchases.view',
+                'purchases.manage',
+                'dashboard.view'
+            ])->pluck('id')
+        );
 
-        Role::firstOrCreate(
+        $comptable = Role::firstOrCreate(
             ['slug' => 'comptable'],
             ['name' => 'Comptable', 'description' => 'Lecture ventes et rapports', 'is_active' => true]
         );
+        $comptable->permissions()->sync(
+            Permission::whereIn('slug', [
+                'sales.view',
+                'reports.view',
+                'reports.export',
+                'clients.view',
+                'suppliers.view',
+                'purchases.view',
+                'dashboard.view'
+            ])->pluck('id')
+        );
 
-        $this->command->info('✅ Permissions et rôles créés avec succès !');
+        $this->command->info('✅ Permissions et rôles créés et synchronisés avec succès !');
     }
 }

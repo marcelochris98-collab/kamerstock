@@ -46,6 +46,16 @@ class UserController extends Controller
 
         ActivityLog::record('user.create', "Création utilisateur : {$user->name}");
 
+        app(\App\Services\NotificationService::class)->notifyByPermission(
+            'users.manage',
+            'user_created',
+            'Nouvel utilisateur',
+            "L'utilisateur {$user->name} a été créé avec le rôle {$user->role_label}.",
+            route('admin.users.index'),
+            ['user_id' => $user->id],
+            'admin'
+        );
+
         return back()->with('success', "✅ Utilisateur {$user->name} créé avec succès !");
     }
 

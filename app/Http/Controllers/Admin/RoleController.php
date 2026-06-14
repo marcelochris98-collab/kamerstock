@@ -60,6 +60,16 @@ class RoleController extends Controller
 
         ActivityLog::record('role.update', "Modification rôle : {$role->name}");
 
+        app(\App\Services\NotificationService::class)->notifyByPermission(
+            'roles.manage',
+            'role_updated',
+            'Rôle modifié',
+            "Le rôle {$role->name} a été mis à jour.",
+            route('admin.roles.index'),
+            ['role_id' => $role->id],
+            'admin'
+        );
+
         return back()->with('success', " Rôle mis à jour !");
     } 
 
@@ -93,6 +103,16 @@ class RoleController extends Controller
         $role->permissions()->sync($request->permissions ?? []);
 
         ActivityLog::record('role.permissions', "Permissions modifiées pour le rôle : {$role->name}");
+
+        app(\App\Services\NotificationService::class)->notifyByPermission(
+            'roles.manage',
+            'role_permissions_synced',
+            'Permissions de rôle modifiées',
+            "Les permissions pour le rôle {$role->name} ont été modifiées.",
+            route('admin.roles.index'),
+            ['role_id' => $role->id],
+            'admin'
+        );
 
         return back()->with('success', " Permissions mises à jour !");
     }

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Supplier;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
+use App\Services\AiService;
 
 class ProductController extends Controller
 {
@@ -43,23 +44,26 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'            => 'required|string|max:150',
-            'reference'       => 'required|string|max:50|unique:products,reference',
+            'name'                 => 'required|string|max:150',
+            'reference'            => 'required|string|max:50|unique:products,reference',
 
-            'category_id'     => 'nullable|exists:categories,id',
-            'category_name'   => 'nullable|string|max:150',
+            'category_id'          => 'nullable|exists:categories,id',
+            'category_name'        => 'nullable|string|max:150',
 
-            'supplier_id'     => 'nullable|exists:suppliers,id',
-            'supplier_name'   => 'nullable|string|max:150',
-            'supplier_phone'  => 'nullable|string|max:50',
-            'supplier_email'  => 'nullable|email|max:150',
+            'supplier_id'          => 'nullable|exists:suppliers,id',
+            'supplier_name'        => 'nullable|string|max:150',
+            'supplier_phone'       => 'nullable|string|max:50',
+            'supplier_email'       => 'nullable|email|max:150',
 
-            'unit'            => 'required|in:piece,metre,kg,litre,boite,sachet',
-            'price_buy'       => 'required|numeric|min:0',
-            'price_sell'      => 'required|numeric|min:0',
-            'quantity'        => 'required|integer|min:0',
-            'alert_threshold' => 'required|integer|min:0',
-            'description'     => 'nullable|string',
+            'unit'                 => 'required|in:piece,metre,kg,litre,boite,sachet',
+            'price_buy'            => 'required|numeric|min:0',
+            'price_sell'           => 'required|numeric|min:0',
+            'price_sell_company'   => 'nullable|numeric|min:0',
+            'price_sell_reseller'  => 'nullable|numeric|min:0',
+            'price_sell_wholesale' => 'nullable|numeric|min:0',
+            'quantity'             => 'required|integer|min:0',
+            'alert_threshold'      => 'required|integer|min:0',
+            'description'          => 'nullable|string',
         ], [
             'name.required'    => 'Le nom est obligatoire.',
             'reference.unique' => 'Cette référence existe déjà.',
@@ -156,6 +160,9 @@ class ProductController extends Controller
             'unit' => $request->unit,
             'price_buy' => $request->price_buy,
             'price_sell' => $request->price_sell,
+            'price_sell_company' => $request->price_sell_company,
+            'price_sell_reseller' => $request->price_sell_reseller,
+            'price_sell_wholesale' => $request->price_sell_wholesale,
             'quantity' => $request->quantity,
             'alert_threshold' => $request->alert_threshold,
             'description' => $request->description,
@@ -176,7 +183,7 @@ class ProductController extends Controller
             ]);
     }
 
-    public function show(Product $product)
+    public function show(Product $product, AiService $aiService)
     {
         $product->load([
             'category',
@@ -184,7 +191,9 @@ class ProductController extends Controller
             'stockMovements' => fn ($q) => $q->latest()->limit(10),
         ]);
 
-        return view('products.show', compact('product'));
+        $stockPrediction = $aiService->predictStockAlert($product);
+
+        return view('products.show', compact('product', 'stockPrediction'));
     }
 
     public function edit(Product $product)
@@ -198,15 +207,18 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $request->validate([
-            'name'            => 'required|string|max:150',
-            'reference'       => 'required|string|max:50|unique:products,reference,' . $product->id,
-            'category_id'     => 'nullable|exists:categories,id',
-            'supplier_id'     => 'nullable|exists:suppliers,id',
-            'unit'            => 'required|in:piece,metre,kg,litre,boite,sachet',
-            'price_buy'       => 'required|numeric|min:0',
-            'price_sell'      => 'required|numeric|min:0',
-            'alert_threshold' => 'required|integer|min:0',
-            'description'     => 'nullable|string',
+            'name'                 => 'required|string|max:150',
+            'reference'            => 'required|string|max:50|unique:products,reference,' . $product->id,
+            'category_id'          => 'nullable|exists:categories,id',
+            'supplier_id'          => 'nullable|exists:suppliers,id',
+            'unit'                 => 'required|in:piece,metre,kg,litre,boite,sachet',
+            'price_buy'            => 'required|numeric|min:0',
+            'price_sell'           => 'required|numeric|min:0',
+            'price_sell_company'   => 'nullable|numeric|min:0',
+            'price_sell_reseller'  => 'nullable|numeric|min:0',
+            'price_sell_wholesale' => 'nullable|numeric|min:0',
+            'alert_threshold'      => 'required|integer|min:0',
+            'description'          => 'nullable|string',
         ]);
 
         if ($request->price_sell < $request->price_buy) {

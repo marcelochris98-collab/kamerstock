@@ -25,12 +25,18 @@
         <p class="text-xs text-slate-400 mt-0.5">{{ $suppliers->total() }} fournisseur(s) actif(s)</p>
     </div>
 
-    @if(auth()->user()->hasPermission('suppliers.manage'))
-    <button onclick="document.getElementById('supplier-form').classList.toggle('hidden')"
-        class="px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
-        Ajouter fournisseur
-    </button>
-    @endif
+    <div class="flex items-center gap-2">
+        <a href="{{ route('export', 'suppliers') }}"
+            class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
+            Exporter CSV
+        </a>
+        @if(auth()->user()->hasPermission('suppliers.manage'))
+        <button onclick="document.getElementById('supplier-form').classList.toggle('hidden')"
+            class="px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
+            Ajouter fournisseur
+        </button>
+        @endif
+    </div>
 </div>
 
 @if(auth()->user()->hasPermission('suppliers.manage'))
@@ -83,6 +89,22 @@
     </form>
 </div>
 @endif
+
+{{-- Filtres --}}
+<div class="bg-white rounded-xl shadow-sm p-4 mb-5">
+    <form method="GET" action="{{ route('suppliers.index') }}" class="flex items-center gap-3">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher par nom, téléphone, contact..."
+            class="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 w-72 bg-slate-50 focus:bg-white transition">
+        <button type="submit" class="px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition">
+            Filtrer
+        </button>
+        @if(request('search'))
+        <a href="{{ route('suppliers.index') }}" class="text-xs text-slate-400 hover:text-slate-600 transition pl-1">
+            Réinitialiser
+        </a>
+        @endif
+    </form>
+</div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
     <table class="w-full">

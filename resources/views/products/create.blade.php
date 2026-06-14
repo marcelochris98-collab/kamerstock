@@ -103,10 +103,28 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Prix vente (FCFA) <span class="text-red-400">*</span></label>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Prix vente particulier (FCFA) <span class="text-red-400">*</span></label>
                     <input type="number" name="price_sell" value="{{ old('price_sell', 0) }}" min="0" step="1"
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 @error('price_sell') border-red-300 @enderror">
                     @error('price_sell') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Prix entreprise (FCFA)</label>
+                    <input type="number" name="price_sell_company" value="{{ old('price_sell_company') }}" min="0" step="1"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Prix revendeur (FCFA)</label>
+                    <input type="number" name="price_sell_reseller" value="{{ old('price_sell_reseller') }}" min="0" step="1"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Prix grossiste (FCFA)</label>
+                    <input type="number" name="price_sell_wholesale" value="{{ old('price_sell_wholesale') }}" min="0" step="1"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
                 </div>
             </div>
 

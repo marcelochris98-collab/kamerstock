@@ -12,12 +12,25 @@ use Illuminate\Support\Facades\DB;
 
 class CreditController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $credits = CreditSale::with(['client', 'sale'])
-            ->whereIn('status', ['en_attente', 'partiel', 'en_retard'])
-            ->latest()
-            ->paginate(20);
+        $query = CreditSale::with(['client', 'sale']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('client', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        } else {
+            $query->whereIn('status', ['en_attente', 'partiel', 'en_retard']);
+        }
+
+        $credits = $query->latest()->paginate(20);
 
         return view('credits.index', compact('credits'));
     }
@@ -91,6 +104,18 @@ class CreditController extends Controller
                 ]
             );
 
+            if ($credit->client && $credit->client->portal_enabled) {
+                $notificationService->notifyClient(
+                    $credit->client_id,
+                    'payment_validated',
+                    'Paiement validé',
+                    "Votre paiement de " . number_format($amount, 0, ',', ' ') . " FCFA pour votre crédit #" . $credit->id . " a été validé. Merci !",
+                    route('client.portal.credits'),
+                    ['credit_id' => $credit->id, 'amount' => $amount],
+                    'finance'
+                );
+            }
+
             $newPaid = (float) $credit->amount_paid + $amount;
             $newDue = max((float) $credit->total_amount - $newPaid, 0);
             $status = $newDue <= 0 ? 'solde' : 'partiel';
@@ -122,6 +147,18 @@ class CreditController extends Controller
                         'credit_id' => $credit->id,
                     ]
                 );
+
+                if ($credit->client && $credit->client->portal_enabled) {
+                    $notificationService->notifyClient(
+                        $credit->client_id,
+                        'credit_closed',
+                        'Crédit soldé',
+                        "Félicitations, votre crédit #" . $credit->id . " a été entièrement soldé.",
+                        route('client.portal.credits'),
+                        ['credit_id' => $credit->id],
+                        'finance'
+                    );
+                }
             }
 
             $scoringService->update($credit->client);

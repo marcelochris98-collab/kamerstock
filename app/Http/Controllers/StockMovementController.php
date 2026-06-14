@@ -74,12 +74,48 @@ class StockMovementController extends Controller
             "Mouvement stock : {$request->type} de {$request->quantity} pour {$product->name}"
         );
 
+        // Notifications persistantes
+        if ($request->type === 'entree') {
+            app(\App\Services\NotificationService::class)->notifyByPermission(
+                'stock.view',
+                'stock_entry',
+                'Entrée de stock',
+                "{$request->quantity} unités du produit {$product->name} ont été ajoutées.",
+                route('products.show', $product->id),
+                ['product_id' => $product->id, 'quantity' => $request->quantity],
+                'stock'
+            );
+        } else {
+            app(\App\Services\NotificationService::class)->notifyByPermission(
+                'stock.view',
+                'stock_exit',
+                'Sortie de stock',
+                "{$request->quantity} unités du produit {$product->name} ont été retirées.",
+                route('products.show', $product->id),
+                ['product_id' => $product->id, 'quantity' => $request->quantity],
+                'stock'
+            );
+        }
+
+        if ($product->is_active && $product->quantity <= $product->alert_threshold) {
+            $isRupture = $product->quantity <= 0;
+            app(\App\Services\NotificationService::class)->notifyByPermission(
+                'stock.view',
+                $isRupture ? 'stock_empty' : 'stock_low',
+                $isRupture ? 'Rupture de stock' : 'Stock faible',
+                $isRupture ? "Le produit {$product->name} est en rupture de stock !" : "Le produit {$product->name} a atteint le seuil d'alerte (Reste : {$product->quantity} unités).",
+                route('products.show', $product->id),
+                ['product_id' => $product->id, 'quantity' => $product->quantity],
+                'stock'
+            );
+        }
+
         $toasts = [
             [
                 'type' => 'success',
                 'title' => 'Mouvement enregistré',
                 'message' => 'Le mouvement de stock a été enregistré avec succès.',
-                'sound' => true,
+                'sound' => 'envoi',
             ],
         ];
 
@@ -91,7 +127,7 @@ class StockMovementController extends Controller
                 'type' => 'danger',
                 'title' => 'Stock faible',
                 'message' => $product->name . ' est maintenant en stock critique.',
-                'sound' => true,
+                'sound' => 'alerte',
             ];
         }
 

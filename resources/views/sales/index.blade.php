@@ -16,15 +16,63 @@
         <h1 class="text-sm font-semibold text-slate-800">Historique des ventes</h1>
         <p class="text-xs text-slate-400 mt-0.5">{{ $sales->total() }} vente(s)</p>
     </div>
-    @if(auth()->user()->hasPermission('sales.create'))
-    <a href="{{ route('sales.create') }}"
-        class="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Nouvelle vente
-    </a>
-    @endif
+    <div class="flex items-center gap-2">
+        <a href="{{ route('export', 'sales') }}"
+            class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
+            Exporter CSV
+        </a>
+        @if(auth()->user()->hasPermission('sales.create'))
+        <a href="{{ route('sales.create') }}"
+            class="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nouvelle vente
+        </a>
+        @endif
+    </div>
+</div>
+
+{{-- Filtres --}}
+<div class="bg-white rounded-xl shadow-sm p-4 mb-5">
+    <form method="GET" action="{{ route('sales.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher client, téléphone, N°..."
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+        </div>
+        <div>
+            <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                <option value="">Tous les statuts</option>
+                <option value="completee" {{ request('status') === 'completee' ? 'selected' : '' }}>Complétée</option>
+                <option value="credit" {{ request('status') === 'credit' ? 'selected' : '' }}>Crédit</option>
+                <option value="annulee" {{ request('status') === 'annulee' ? 'selected' : '' }}>Annulée</option>
+            </select>
+        </div>
+        <div>
+            <select name="payment_mode" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                <option value="">Tous les modes</option>
+                <option value="cash" {{ request('payment_mode') === 'cash' ? 'selected' : '' }}>Espèces</option>
+                <option value="orange_money" {{ request('payment_mode') === 'orange_money' ? 'selected' : '' }}>Orange Money</option>
+                <option value="mtn_money" {{ request('payment_mode') === 'mtn_money' ? 'selected' : '' }}>MTN Money</option>
+                <option value="credit" {{ request('payment_mode') === 'credit' ? 'selected' : '' }}>Crédit</option>
+                <option value="mixte" {{ request('payment_mode') === 'mixte' ? 'selected' : '' }}>Mixte</option>
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-1/2 px-2 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+            <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-1/2 px-2 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="flex-1 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition">
+                Filtrer
+            </button>
+            @if(request('search') || request('status') || request('payment_mode') || request('start_date') || request('end_date'))
+            <a href="{{ route('sales.index') }}" class="py-2 px-3 border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-50 transition text-center flex items-center justify-center">
+                Reset
+            </a>
+            @endif
+        </div>
+    </form>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">

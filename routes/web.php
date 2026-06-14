@@ -47,7 +47,7 @@ Route::middleware(['checkauth'])->group(function () {
         });
 
         // Rôles & Permissions
-        Route::middleware(['permission:users.manage'])->group(function () {
+        Route::middleware(['permission:roles.manage'])->group(function () {
             Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
             Route::post('roles', [RoleController::class, 'store'])->name('roles.store');
             Route::put('roles/{role}', [RoleController::class, 'update'])->name('roles.update');
@@ -55,10 +55,16 @@ Route::middleware(['checkauth'])->group(function () {
             Route::post('roles/{role}/permissions', [RoleController::class, 'syncPermissions'])->name('roles.permissions');
         });
 
-        // Paramètres entreprise
+        // Paramètres entreprise & Sauvegardes
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
             Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+            Route::get('backups', [App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups.index');
+            Route::post('backups', [App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backups.create');
+            Route::get('backups/{filename}/download', [App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backups.download');
+            Route::delete('backups/{filename}', [App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('backups.destroy');
+            Route::post('backups/{filename}/restore', [App\Http\Controllers\Admin\BackupController::class, 'restore'])->name('backups.restore');
         });
     });
 
@@ -66,6 +72,7 @@ Route::middleware(['checkauth'])->group(function () {
     Route::get('/categories/lookup', [CategoryController::class, 'lookup'])->name('categories.lookup');
     Route::get('/suppliers/lookup', [SupplierController::class, 'lookup'])->name('suppliers.lookup');
     Route::get('/clients/lookup', [ClientController::class, 'lookup'])->name('clients.lookup');
+    Route::get('/global-search', [App\Http\Controllers\GlobalSearchController::class, 'search'])->name('global_search');
 
     // Catalogue / Produits
     Route::middleware(['permission:products.create'])->group(function () {
@@ -143,37 +150,100 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
         Route::delete('sales/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
     });
 
+    // Devis & Proformas
+    Route::middleware(['permission:sales.create'])->group(function () {
+        Route::get('quotes/create', [App\Http\Controllers\QuoteController::class, 'create'])->name('quotes.create');
+        Route::post('quotes', [App\Http\Controllers\QuoteController::class, 'store'])->name('quotes.store');
+        Route::post('quotes/{quote}/convert', [App\Http\Controllers\QuoteController::class, 'convertToSale'])->name('quotes.convert');
+        Route::delete('quotes/{quote}', [App\Http\Controllers\QuoteController::class, 'destroy'])->name('quotes.destroy');
+    });
+
+    Route::middleware(['permission:sales.view'])->group(function () {
+        Route::get('quotes', [App\Http\Controllers\QuoteController::class, 'index'])->name('quotes.index');
+        Route::get('quotes/{quote}', [App\Http\Controllers\QuoteController::class, 'show'])->name('quotes.show');
+        Route::get('quotes/{quote}/print', [App\Http\Controllers\QuoteController::class, 'print'])->name('quotes.print');
+    });
+
     // Crédits clients
-    Route::get('/credits', [CreditController::class, 'index'])->name('credits.index');
-    Route::get('/credits-payments-history', [CreditController::class, 'paymentsHistory'])->name('credits.payments.history');
-    Route::get('/credits/{credit}', [CreditController::class, 'show'])->name('credits.show');
-    Route::post('/credits/{credit}/payment', [CreditController::class, 'payment'])->name('credits.payment');
+    Route::middleware(['permission:clients.view'])->group(function () {
+        Route::get('/credits', [CreditController::class, 'index'])->name('credits.index');
+        Route::get('/credits-payments-history', [CreditController::class, 'paymentsHistory'])->name('credits.payments.history');
+        Route::get('/credits/{credit}', [CreditController::class, 'show'])->name('credits.show');
+        Route::post('/credits/{credit}/payment', [CreditController::class, 'payment'])->name('credits.payment');
+    });
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/poll', [NotificationController::class, 'poll'])->name('notifications.poll');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
     Route::get('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
     // Paramètres crédit intelligent
-    Route::get('/settings/credit', [CreditSettingController::class, 'edit'])->name('settings.credit.edit');
-    Route::put('/settings/credit', [CreditSettingController::class, 'update'])->name('settings.credit.update');
+    Route::middleware(['permission:settings.manage'])->group(function () {
+        Route::get('/settings/credit', [CreditSettingController::class, 'edit'])->name('settings.credit.edit');
+        Route::put('/settings/credit', [CreditSettingController::class, 'update'])->name('settings.credit.update');
+    });
 
-    // Achats & Fournisseurs
-    Route::get('/purchases/dashboard', [PurchaseController::class, 'dashboard'])->name('purchases.dashboard');
-    Route::get('/purchases/debts', [PurchaseController::class, 'debts'])->name('purchases.debts');
-    Route::get('/purchases/payments-history', [PurchaseController::class, 'paymentsHistory'])->name('purchases.payments-history');
+    // Achats & Fournisseurs (Standard Purchases)
+    Route::middleware(['permission:purchases.view'])->group(function () {
+        Route::get('/purchases/dashboard', [PurchaseController::class, 'dashboard'])->name('purchases.dashboard');
+        Route::get('/purchases/debts', [PurchaseController::class, 'debts'])->name('purchases.debts');
+        Route::get('/purchases/payments-history', [PurchaseController::class, 'paymentsHistory'])->name('purchases.payments-history');
+        Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+        Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    });
 
-    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::post('/purchases/{purchase}/payment', [PurchaseController::class, 'payment'])->name('purchases.payment');
+    Route::middleware(['permission:purchases.manage'])->group(function () {
+        Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
+        Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        Route::post('/purchases/{purchase}/payment', [PurchaseController::class, 'payment'])->name('purchases.payment');
+    });
+
+    // Achats Avancés (Advanced Purchases)
+    Route::middleware(['permission:purchases.view'])->group(function () {
+        Route::get('/advanced-purchases/orders', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersIndex'])->name('advanced_purchases.orders.index');
+        Route::get('/advanced-purchases/orders/{order}', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersShow'])->name('advanced_purchases.orders.show');
+        Route::get('/advanced-purchases/returns', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsIndex'])->name('advanced_purchases.returns.index');
+        Route::get('/advanced-purchases/returns/{return}', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsShow'])->name('advanced_purchases.returns.show');
+    });
+
+    Route::middleware(['permission:purchases.manage'])->group(function () {
+        Route::get('/advanced-purchases/suggestions', [App\Http\Controllers\AdvancedPurchaseController::class, 'suggestions'])->name('advanced_purchases.suggestions');
+        Route::get('/advanced-purchases/orders/create', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersCreate'])->name('advanced_purchases.orders.create');
+        Route::post('/advanced-purchases/orders', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersStore'])->name('advanced_purchases.orders.store');
+        Route::post('/advanced-purchases/orders/{order}/receive', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersReceive'])->name('advanced_purchases.orders.receive');
+        Route::post('/advanced-purchases/orders/{order}/cancel', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersCancel'])->name('advanced_purchases.orders.cancel');
+        Route::post('/advanced-purchases/orders/{order}/convert', [App\Http\Controllers\AdvancedPurchaseController::class, 'convertToInvoice'])->name('advanced_purchases.orders.convert');
+        Route::get('/advanced-purchases/returns/create', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsCreate'])->name('advanced_purchases.returns.create');
+        Route::post('/advanced-purchases/returns', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsStore'])->name('advanced_purchases.returns.store');
+    });
 
     // Activation portail client depuis l'administration
-Route::post('/clients/{client}/portal/enable', [ClientPortalController::class, 'enable']) ->name('clients.portal.enable');
-Route::post('/clients/{client}/portal/access', [ClientPortalController::class, 'sendAccess']) ->name('clients.portal.access');
-Route::post('/clients/{client}/portal/disable', [ClientPortalController::class, 'disable']) ->name('clients.portal.disable');
-Route::post('/client/messages/send', [ClientPortalController::class, 'sendMessage']) ->name('client.portal.messages.send');
+    Route::post('/clients/{client}/portal/enable', [ClientPortalController::class, 'enable']) ->name('clients.portal.enable');
+    Route::post('/clients/{client}/portal/access', [ClientPortalController::class, 'sendAccess']) ->name('clients.portal.access');
+    Route::post('/clients/{client}/portal/disable', [ClientPortalController::class, 'disable']) ->name('clients.portal.disable');
+    Route::post('/client/messages/send', [ClientPortalController::class, 'sendMessage']) ->name('client.portal.messages.send');
+
+    // CRM Messages Administration
+    Route::middleware(['permission:crm.messages'])->group(function () {
+        Route::get('/crm-messages', [App\Http\Controllers\Admin\CrmMessageController::class, 'index'])->name('admin.crm_messages.index');
+        Route::get('/crm-messages/{client}/history', [App\Http\Controllers\Admin\CrmMessageController::class, 'history'])->name('admin.crm_messages.history');
+        Route::post('/crm-messages/{client}/reply', [App\Http\Controllers\Admin\CrmMessageController::class, 'reply'])->name('admin.crm_messages.reply');
+    });
+
+    // Rapports & Statistiques (Reports & Stats)
+    Route::middleware(['permission:reports.view'])->group(function () {
+        Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    });
+
+    // Exports de Données (Exports)
+    Route::get('/export/{type}', [App\Http\Controllers\ExportController::class, 'export'])->name('export');
+
+    // Profil utilisateur
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/notifications', [App\Http\Controllers\ProfileController::class, 'updateNotifications'])->name('profile.notifications.update');
+    Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Portail client public
@@ -185,3 +255,7 @@ Route::get('/client/dashboard', [ClientPortalController::class, 'dashboard'])->n
 Route::get('/client/sales', [ClientPortalController::class, 'sales'])->name('client.portal.sales');
 Route::get('/client/credits', [ClientPortalController::class, 'credits'])->name('client.portal.credits');
 Route::get('/client/messages', [ClientPortalController::class, 'messages'])->name('client.portal.messages');
+Route::get('/client/messages/json', [ClientPortalController::class, 'getMessagesJson'])->name('client.portal.messages.json');
+Route::post('/client/messages/send-ajax', [ClientPortalController::class, 'sendMessageAjax'])->name('client.portal.messages.send_ajax');
+Route::post('/client/settings/notifications', [ClientPortalController::class, 'updateNotificationSettings'])->name('client.portal.settings.notifications');
+Route::get('/client/notifications/poll', [ClientPortalController::class, 'pollNotifications'])->name('client.portal.notifications.poll');

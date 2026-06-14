@@ -62,12 +62,18 @@
         <p class="text-xs text-slate-400 mt-0.5">{{ $clients->total() }} client(s)</p>
     </div>
 
-    @if(auth()->user()->hasPermission('clients.manage'))
-    <button onclick="document.getElementById('client-form').classList.toggle('hidden')"
-        class="px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
-        Ajouter client
-    </button>
-    @endif
+    <div class="flex items-center gap-2">
+        <a href="{{ route('export', 'clients') }}"
+            class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
+            Exporter CSV
+        </a>
+        @if(auth()->user()->hasPermission('clients.manage'))
+        <button onclick="document.getElementById('client-form').classList.toggle('hidden')"
+            class="px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
+            Ajouter client
+        </button>
+        @endif
+    </div>
 </div>
 
 @if(auth()->user()->hasPermission('clients.manage'))
@@ -100,6 +106,7 @@
                     <option value="particulier">Particulier</option>
                     <option value="entreprise">Entreprise</option>
                     <option value="revendeur">Revendeur</option>
+                    <option value="grossiste">Grossiste</option>
                 </select>
             </div>
 
@@ -117,6 +124,44 @@
     </form>
 </div>
 @endif
+
+{{-- Filtres --}}
+<div class="bg-white rounded-xl shadow-sm p-4 mb-5">
+    <form method="GET" action="{{ route('clients.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher client, téléphone, email..."
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+        </div>
+        <div>
+            <select name="type" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                <option value="">Tous les types</option>
+                <option value="particulier" {{ request('type') === 'particulier' ? 'selected' : '' }}>Particulier</option>
+                <option value="entreprise" {{ request('type') === 'entreprise' ? 'selected' : '' }}>Entreprise</option>
+                <option value="revendeur" {{ request('type') === 'revendeur' ? 'selected' : '' }}>Revendeur</option>
+                <option value="grossiste" {{ request('type') === 'grossiste' ? 'selected' : '' }}>Grossiste</option>
+            </select>
+        </div>
+        <div>
+            <select name="risk_rating" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                <option value="">Tous les scores de risque</option>
+                <option value="A" {{ request('risk_rating') === 'A' ? 'selected' : '' }}>A (Très Faible)</option>
+                <option value="B" {{ request('risk_rating') === 'B' ? 'selected' : '' }}>B (Faible)</option>
+                <option value="C" {{ request('risk_rating') === 'C' ? 'selected' : '' }}>C (Moyen)</option>
+                <option value="D" {{ request('risk_rating') === 'D' ? 'selected' : '' }}>D (Élevé)</option>
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="flex-1 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition">
+                Filtrer
+            </button>
+            @if(request('search') || request('type') || request('risk_rating'))
+            <a href="{{ route('clients.index') }}" class="py-2 px-3 border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-50 transition text-center flex items-center justify-center">
+                Reset
+            </a>
+            @endif
+        </div>
+    </form>
+</div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
@@ -245,6 +290,7 @@
                                     <option value="particulier" {{ $client->type === 'particulier' ? 'selected' : '' }}>Particulier</option>
                                     <option value="entreprise" {{ $client->type === 'entreprise' ? 'selected' : '' }}>Entreprise</option>
                                     <option value="revendeur" {{ $client->type === 'revendeur' ? 'selected' : '' }}>Revendeur</option>
+                                    <option value="grossiste" {{ $client->type === 'grossiste' ? 'selected' : '' }}>Grossiste</option>
                                 </select>
 
                                 <input type="text" name="address" value="{{ $client->address }}"

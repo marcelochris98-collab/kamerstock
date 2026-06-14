@@ -90,6 +90,18 @@
                 <p class="text-slate-500">Sous-total</p>
                 <p class="font-medium text-slate-700">{{ number_format($sale->total_amount, 0, ',', ' ') }} {{ $settings->currency ?? 'XAF' }}</p>
             </div>
+            @if($sale->payments->count() > 0)
+            <div class="border-t border-slate-50 py-1.5 space-y-1 mb-2">
+                <p class="text-[10px] font-semibold text-slate-400">Règlements :</p>
+                @foreach($sale->payments as $payment)
+                <div class="flex items-center justify-between text-xs pl-2">
+                    <p class="text-slate-500">{{ $payment->payment_mode_label }}</p>
+                    <p class="font-medium text-slate-700">{{ number_format($payment->amount, 0, ',', ' ') }} {{ $settings->currency ?? 'XAF' }}</p>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
             @if($sale->status !== 'credit')
             <div class="flex items-center justify-between text-xs">
                 <p class="text-slate-500">Montant reçu</p>

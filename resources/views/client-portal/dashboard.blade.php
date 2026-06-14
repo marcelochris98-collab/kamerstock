@@ -9,7 +9,7 @@
     <p class="text-xs text-slate-400 mt-1">Bienvenue dans votre espace client KamerStock.</p>
 </div>
 
-<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5">
+<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-5">
     <div class="bg-white rounded-xl shadow-sm p-4">
         <p class="text-xs text-slate-400">Achats</p>
         <p class="text-xl font-bold text-slate-800 mt-1">{{ $salesCount }}</p>
@@ -26,8 +26,14 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-sm p-4">
+        <p class="text-xs text-slate-400">Fidélité</p>
+        <p class="text-sm font-bold text-amber-500 mt-1 break-words">{{ number_format($client->loyalty_points ?? 0, 0, ',', ' ') }} pts</p>
+        <p class="text-[9px] text-slate-400 mt-0.5">Valeur : {{ number_format(($client->loyalty_points ?? 0) * 10, 0, ',', ' ') }} F</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-4">
         <p class="text-xs text-slate-400">Messages</p>
-        <p class="text-xl font-bold text-amber-600 mt-1">{{ $unreadMessages }}</p>
+        <p class="text-xl font-bold text-indigo-600 mt-1">{{ $unreadMessages }}</p>
     </div>
 </div>
 
@@ -69,6 +75,27 @@
         <div class="px-4 py-6 text-center text-xs text-slate-400">Aucun message.</div>
         @endforelse
     </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-hidden p-5 mt-5 max-w-md">
+    <h2 class="text-xs font-bold text-slate-800 mb-1">Préférences de Notification</h2>
+    <p class="text-[10px] text-slate-400 mb-4">Gérez les alertes sonores et visuelles de votre espace.</p>
+    <form method="POST" action="{{ route('client.portal.settings.notifications') }}">
+        @csrf
+        <div class="space-y-3">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" name="notifications_enabled" value="1" {{ $client->notifications_enabled ? 'checked' : '' }} class="w-4 h-4 accent-slate-900 border-slate-200 rounded">
+                <span class="text-xs text-slate-700">Activer les notifications sur mon espace</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" name="sounds_enabled" value="1" {{ $client->sounds_enabled ? 'checked' : '' }} class="w-4 h-4 accent-slate-900 border-slate-200 rounded">
+                <span class="text-xs text-slate-700">Activer les alertes sonores de chat</span>
+            </label>
+        </div>
+        <button type="submit" class="mt-4 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-semibold rounded-lg transition">
+            Enregistrer les préférences
+        </button>
+    </form>
 </div>
 
 @endsection

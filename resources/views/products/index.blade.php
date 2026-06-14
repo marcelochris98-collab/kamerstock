@@ -23,15 +23,21 @@
         <h1 class="text-sm font-semibold text-slate-800">Liste des produits</h1>
         <p class="text-xs text-slate-400 mt-0.5">{{ $products->total() }} produit(s) actif(s)</p>
     </div>
-    @if(auth()->user()->hasPermission('products.create'))
-    <a href="{{ route('products.create') }}"
-        class="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Ajouter un produit
-    </a>
-    @endif
+    <div class="flex items-center gap-2">
+        <a href="{{ route('export', 'products') }}"
+            class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
+            Exporter CSV
+        </a>
+        @if(auth()->user()->hasPermission('products.create'))
+        <a href="{{ route('products.create') }}"
+            class="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Ajouter un produit
+        </a>
+        @endif
+    </div>
 </div>
 
 {{-- Filtres --}}

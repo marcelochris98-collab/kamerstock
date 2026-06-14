@@ -16,6 +16,42 @@
         <h1 class="text-sm font-semibold text-slate-800">Liste des crédits clients</h1>
         <p class="text-xs text-slate-400 mt-0.5">{{ $credits->total() }} crédit(s) actif(s)</p>
     </div>
+
+    <div>
+        <a href="{{ route('export', 'credits') }}"
+            class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
+            Exporter CSV
+        </a>
+    </div>
+</div>
+
+{{-- Filtres --}}
+<div class="bg-white rounded-xl shadow-sm p-4 mb-5">
+    <form method="GET" action="{{ route('credits.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher client, téléphone..."
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+        </div>
+        <div>
+            <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+                <option value="">Tous les statuts actifs</option>
+                <option value="en_attente" {{ request('status') === 'en_attente' ? 'selected' : '' }}>En attente</option>
+                <option value="partiel" {{ request('status') === 'partiel' ? 'selected' : '' }}>Partiel</option>
+                <option value="en_retard" {{ request('status') === 'en_retard' ? 'selected' : '' }}>En retard</option>
+                <option value="solde" {{ request('status') === 'solde' ? 'selected' : '' }}>Soldé</option>
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="flex-1 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition">
+                Filtrer
+            </button>
+            @if(request('search') || request('status'))
+            <a href="{{ route('credits.index') }}" class="py-2 px-3 border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-50 transition text-center flex items-center justify-center">
+                Reset
+            </a>
+            @endif
+        </div>
+    </form>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">

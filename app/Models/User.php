@@ -11,7 +11,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'is_active', 'last_login'
+        'name', 'email', 'password', 'role_id', 'is_active', 'last_login',
+        'notifications_enabled', 'sounds_enabled', 'sound_volume', 'notification_categories'
     ];
 
     protected $hidden = [
@@ -25,6 +26,10 @@ class User extends Authenticatable
             'last_login'        => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
+            'notifications_enabled' => 'boolean',
+            'sounds_enabled'        => 'boolean',
+            'sound_volume'          => 'integer',
+            'notification_categories' => 'array',
         ];
     }
 
@@ -45,6 +50,7 @@ class User extends Authenticatable
     public function hasPermission(string $slug): bool
     {
         if (!$this->role) return false;
+        if ($this->role->slug === 'admin') return true;
         return $this->role->permissions()->where('slug', $slug)->exists();
     }
 
