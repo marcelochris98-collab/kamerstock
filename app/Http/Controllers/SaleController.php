@@ -10,6 +10,7 @@ use App\Models\ActivityLog;
 use App\Models\Setting;
 use App\Models\CreditSale;
 use App\Models\CreditHistory;
+use App\Models\StockMovement;
 use App\Services\ClientScoringService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -260,6 +261,16 @@ class SaleController extends Controller
 
                     $detail['product']->decrement('quantity', $detail['quantity']);
 
+                    StockMovement::create([
+                        'product_id' => $detail['product']->id,
+                        'user_id' => auth()->id(),
+                        'type' => 'sortie',
+                        'quantity' => $detail['quantity'],
+                        'reason' => 'Vente client #' . $sale->id,
+                        'reference_type' => Sale::class,
+                        'reference_id' => $sale->id,
+                    ]);
+
                     $productAfterSale = Product::find($detail['product']->id);
 
                     if (
@@ -421,6 +432,16 @@ class SaleController extends Controller
         DB::transaction(function () use ($sale) {
             foreach ($sale->details as $detail) {
                 $detail->product->increment('quantity', $detail->quantity);
+
+                StockMovement::create([
+                    'product_id' => $detail->product_id,
+                    'user_id' => auth()->id(),
+                    'type' => 'entree',
+                    'quantity' => $detail->quantity,
+                    'reason' => 'Retour stock apres annulation vente #' . $sale->id,
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                ]);
             }
 
             $sale->update(['status' => 'annulee']);

@@ -22,7 +22,7 @@
 </div>
 
 {{-- STATS --}}
-<div class="grid grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700 rounded-xl shadow-sm p-4 text-white hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs text-indigo-100 font-medium">CA du jour</span>
@@ -90,10 +90,10 @@
 </div>
 
 {{-- GRAPHE + TOP PRODUITS --}}
-<div class="grid grid-cols-3 gap-4 mb-4">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
 
     {{-- Graphe ventes --}}
-    <div class="col-span-2 bg-white border border-slate-100 rounded-xl overflow-hidden">
+    <div class="lg:col-span-2 bg-white border border-slate-100 rounded-xl overflow-hidden">
         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-50">
             <div>
                 <p class="text-xs font-semibold text-slate-700">Ventes — 7 derniers jours</p>
@@ -140,17 +140,18 @@
 </div>
 
 {{-- DERNIÈRES VENTES + ALERTES --}}
-<div class="grid grid-cols-3 gap-4">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
     {{-- Dernières ventes --}}
-    <div class="col-span-2 bg-white border border-slate-100 rounded-xl overflow-hidden">
+    <div class="lg:col-span-2 bg-white border border-slate-100 rounded-xl overflow-hidden">
         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-50">
             <p class="text-xs font-semibold text-slate-700">Dernières ventes</p>
             @if(auth()->user()->hasPermission('sales.view'))
             <a href="{{ route('sales.index') }}" class="text-xs text-slate-400 hover:text-slate-600">Voir tout</a>
             @endif
         </div>
-        <table class="w-full">
+        <div class="overflow-x-auto">
+            <table class="w-full">
             <thead>
                 <tr class="border-b border-slate-50">
                     <th class="px-4 py-2 text-left text-xs text-slate-400 font-medium">N°</th>
@@ -186,6 +187,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
     {{-- Alertes stock --}}

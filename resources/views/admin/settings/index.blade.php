@@ -18,7 +18,6 @@
     <div class="max-w-3xl bg-white border border-slate-200 shadow-sm rounded-xl p-6">
         <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -29,49 +28,83 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nom de la boutique <span class="text-red-500">*</span></label>
-                    <input type="text" name="shop_name" value="{{ old('shop_name', $settings->shop_name) }}"
+                    <input type="text" name="shop_name" value="{{ old('shop_name', $settings->shop_name ?? 'KamerStock') }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('shop_name') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Adresse</label>
-                    <input type="text" name="address" value="{{ old('address', $settings->address) }}"
+                    <input type="text" name="address" value="{{ old('address', $settings->address ?? '') }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('address') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Téléphone</label>
-                    <input type="text" name="phone" value="{{ old('phone', $settings->phone) }}"
+                    <input type="text" name="phone" value="{{ old('phone', $settings->phone ?? '') }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('phone') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
-                    <input type="email" name="email" value="{{ old('email', $settings->email) }}"
+                    <input type="email" name="email" value="{{ old('email', $settings->email ?? '') }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('email') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- Zone Upload Logo --}}
-<div class="md:col-span-2">
-    <label class="block text-xs font-semibold text-slate-600 mb-1">Logo de la quincaillerie</label>
-    <div class="flex items-center gap-4 mt-2">
-        @if($settings->logo)
-            {{-- ICI : On utilise directement la variable car elle contient déjà "logos/..." --}}
-            <img src="{{ asset('storage/' . $settings->logo) }}" alt="Logo" class="w-12 h-12 rounded-lg object-cover border border-slate-200">
-        @else
-            <div class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-xs font-bold">
-                No Lgo
-            </div>
-        @endif
-        <input type="file" name="logo"
-            class="text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-slate-200 file:text-xs file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 cursor-pointer">
-    </div>
-    @error('logo') <span class="text-red-500 text-[10px] block mt-1">{{ $message }}</span> @enderror
-</div>
+                {{-- Zone Upload Logo avec Prévisualisation et Suppression Dynamique --}}
+                <div class="md:col-span-2" x-data="logoUploader()">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Logo de la quincaillerie</label>
+                    <div class="flex items-center gap-4 mt-2">
+                        <!-- Preview Container -->
+                        <div class="relative group">
+                            <!-- Image -->
+                            <template x-if="previewUrl">
+                                <img :src="previewUrl" alt="Logo Preview" class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm transition-all duration-300 group-hover:scale-105">
+                            </template>
+                            <!-- Placeholder -->
+                            <template x-if="!previewUrl">
+                                <div class="w-16 h-16 rounded-xl bg-slate-100 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 text-[10px] font-semibold transition-all duration-300">
+                                    <svg class="w-5 h-5 mb-0.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Aucun</span>
+                                </div>
+                            </template>
+                            <!-- Delete Button -->
+                            <template x-if="previewUrl">
+                                <button type="button" @click="removeLogo()" 
+                                    class="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-650 text-white rounded-full p-0.5 shadow-md hover:scale-110 active:scale-90 transition-all duration-150"
+                                    title="Supprimer le logo">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Upload Controls -->
+                        <div class="flex flex-col gap-1.5">
+                            <div class="relative">
+                                <input type="file" name="logo" id="logo_input" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                                    @change="fileChosen($event)" class="hidden">
+                                <label for="logo_input" 
+                                    class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 active:bg-slate-100 cursor-pointer shadow-sm transition-all duration-150 hover:border-slate-350 select-none">
+                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    Choisir une image
+                                </label>
+                            </div>
+                            <p class="text-[9px] text-slate-400">Format PNG, JPG, JPEG, WEBP, GIF ou SVG (Max. 4 Mo)</p>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="remove_logo" :value="shouldRemove ? '1' : '0'">
+                    @error('logo') <span class="text-red-500 text-[10px] block mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Paramètres Système & Comptables --}}
                 <div class="md:col-span-2 mt-4">
@@ -80,21 +113,21 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Devise <span class="text-red-500">*</span></label>
-                    <input type="text" name="currency" value="{{ old('currency', $settings->currency) }}"
+                    <input type="text" name="currency" value="{{ old('currency', $settings->currency ?? 'FCFA') }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('currency') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Taux de TVA (%) <span class="text-red-500">*</span></label>
-                    <input type="number" step="0.01" name="tax_rate" value="{{ old('tax_rate', $settings->tax_rate) }}"
+                    <input type="number" step="0.01" name="tax_rate" value="{{ old('tax_rate', $settings->tax_rate ?? 17.5) }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('tax_rate') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Préfixe des Factures <span class="text-red-500">*</span></label>
-                    <input type="text" name="invoice_prefix" value="{{ old('invoice_prefix', $settings->invoice_prefix) }}"
+                    <input type="text" name="invoice_prefix" value="{{ old('invoice_prefix', $settings->invoice_prefix ?? 'FAC') }}"
                         class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                     @error('invoice_prefix') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
@@ -110,4 +143,34 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function logoUploader() {
+        return {
+            previewUrl: '{{ $settings && $settings->logo ? asset("storage/" . $settings->logo) : "" }}',
+            shouldRemove: false,
+            
+            fileChosen(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.previewUrl = e.target.result;
+                    this.shouldRemove = false;
+                };
+                reader.readAsDataURL(file);
+            },
+            
+            removeLogo() {
+                this.previewUrl = '';
+                this.shouldRemove = true;
+                const fileInput = document.getElementById('logo_input');
+                if (fileInput) fileInput.value = '';
+            }
+        };
+    }
+</script>
+@endpush
 @endsection

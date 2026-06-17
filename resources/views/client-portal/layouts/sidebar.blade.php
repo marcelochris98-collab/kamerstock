@@ -147,17 +147,32 @@
 
         {{-- Stock --}}
         @if(auth()->user()->hasPermission('stock.view'))
-        <a href="{{ route('stock.index') }}"
-            title="Stock"
-            class="{{ $itemClass }} {{ request()->routeIs('stock.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
-            <span class="{{ $iconClass }}">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+        <div class="mb-1">
+            <button @click="if (sidebarCollapsed && !mobileSidebarOpen) { window.location='{{ route('stock.index') }}' } else { open = open === 'stock' ? null : 'stock' }"
+                title="Stock"
+                class="w-full {{ $itemClass }} {{ request()->routeIs('stock.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                <span class="{{ $iconClass }}">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                    </svg>
+                </span>
+                <span x-show="!sidebarCollapsed || mobileSidebarOpen" class="flex-1 text-left">Stock</span>
+                <svg x-show="!sidebarCollapsed || mobileSidebarOpen" class="w-3 h-3 transition-transform duration-200" :class="open === 'stock' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-            </span>
-            <span x-show="!sidebarCollapsed || mobileSidebarOpen" class="flex-1">Stock</span>
-        </a>
+            </button>
+
+            <div x-show="(!sidebarCollapsed || mobileSidebarOpen) && open === 'stock'" x-transition
+                class="mt-1 ml-4 pl-3 border-l border-slate-800 space-y-0.5">
+                <a href="{{ route('stock.index') }}" class="{{ $subLinkClass }} {{ request()->routeIs('stock.index') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+                    Tableau de Bord
+                </a>
+                <a href="{{ route('stock.history') }}" class="{{ $subLinkClass }} {{ request()->routeIs('stock.history') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+                    Historique
+                </a>
+            </div>
+        </div>
         @endif
 
         {{-- Fournisseurs --}}

@@ -17,10 +17,10 @@
 </div>
 @endif
 
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Formulaire création role --}}
-    <div class="col-span-1 space-y-4">
+    <div class="lg:col-span-1 space-y-4">
         <div class="bg-white rounded-xl shadow-sm p-5">
             <h2 class="text-sm font-semibold text-slate-800 mb-4">Nouveau role</h2>
             <form method="POST" action="{{ route('admin.roles.store') }}">
@@ -67,7 +67,7 @@
     </div>
 
     {{-- Liste roles --}}
-    <div class="col-span-2 space-y-4">
+    <div class="lg:col-span-2 space-y-4">
         @foreach($roles as $role)
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-50">
@@ -143,7 +143,7 @@
                 @foreach($modules as $module => $perms)
                 <div>
                     <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ $module }}</p>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         @foreach($perms as $perm)
                         <label class="flex items-center gap-2 p-2 border border-slate-100 rounded-lg cursor-pointer hover:bg-slate-50 transition">
                             <input type="checkbox" name="permissions[]" value="{{ $perm->id }}"

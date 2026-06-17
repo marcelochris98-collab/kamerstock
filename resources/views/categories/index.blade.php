@@ -17,9 +17,9 @@
 </div>
 @endif
 
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <div class="col-span-1">
+    <div class="lg:col-span-1">
         <div class="bg-white rounded-xl shadow-sm p-5">
             <h2 class="text-sm font-semibold text-slate-800 mb-4">Nouvelle categorie</h2>
             <form method="POST" action="{{ route('categories.store') }}">
@@ -39,12 +39,13 @@
         </div>
     </div>
 
-    <div class="col-span-2">
+    <div class="lg:col-span-2">
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-50">
                 <p class="text-sm font-semibold text-slate-800">Toutes les categories</p>
                 <span class="text-xs text-slate-400">{{ $categories->total() }} categorie(s)</span>
             </div>
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-slate-50 bg-slate-50">
@@ -90,6 +91,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
             @if($categories->hasPages())
             <div class="px-5 py-3 border-t border-slate-50 flex items-center justify-between">
                 <p class="text-xs text-slate-400">{{ $categories->firstItem() }} - {{ $categories->lastItem() }} sur {{ $categories->total() }}</p>

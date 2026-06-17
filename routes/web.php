@@ -15,10 +15,16 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\ClientPortalController;
 
-// Redirection racine
-Route::get('/', fn () => redirect()->route('login'));
+// Redirection racine ou landing page
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('welcome');
+});
 
 // Route test temporaire
 Route::get('/test-purchases', function () {
@@ -29,7 +35,7 @@ Route::get('/test-purchases', function () {
 require __DIR__ . '/auth.php';
 
 // Routes protégées
-Route::middleware(['checkauth'])->group(function () {
+Route::middleware(['checkauth', 'audit'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -58,13 +64,17 @@ Route::middleware(['checkauth'])->group(function () {
         // Paramètres entreprise & Sauvegardes
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
-            Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::match(['put', 'post'], 'settings', [SettingController::class, 'update'])->name('settings.update');
 
             Route::get('backups', [App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups.index');
             Route::post('backups', [App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backups.create');
             Route::get('backups/{filename}/download', [App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backups.download');
             Route::delete('backups/{filename}', [App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('backups.destroy');
             Route::post('backups/{filename}/restore', [App\Http\Controllers\Admin\BackupController::class, 'restore'])->name('backups.restore');
+        });
+
+        Route::middleware(['permission:logs.view'])->group(function () {
+            Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         });
     });
 
@@ -105,6 +115,7 @@ Route::middleware(['checkauth'])->group(function () {
     // Stock
     Route::middleware(['permission:stock.view'])->group(function () {
         Route::get('stock', [StockMovementController::class, 'index'])->name('stock.index');
+        Route::get('stock/history', [StockMovementController::class, 'history'])->name('stock.history');
     });
 
     Route::middleware(['permission:stock.manage'])->group(function () {
@@ -190,7 +201,6 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
         Route::get('/purchases/debts', [PurchaseController::class, 'debts'])->name('purchases.debts');
         Route::get('/purchases/payments-history', [PurchaseController::class, 'paymentsHistory'])->name('purchases.payments-history');
         Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
-        Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     });
 
     Route::middleware(['permission:purchases.manage'])->group(function () {
@@ -199,12 +209,14 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
         Route::post('/purchases/{purchase}/payment', [PurchaseController::class, 'payment'])->name('purchases.payment');
     });
 
+    Route::middleware(['permission:purchases.view'])->group(function () {
+        Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    });
+
     // Achats Avancés (Advanced Purchases)
     Route::middleware(['permission:purchases.view'])->group(function () {
         Route::get('/advanced-purchases/orders', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersIndex'])->name('advanced_purchases.orders.index');
-        Route::get('/advanced-purchases/orders/{order}', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersShow'])->name('advanced_purchases.orders.show');
         Route::get('/advanced-purchases/returns', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsIndex'])->name('advanced_purchases.returns.index');
-        Route::get('/advanced-purchases/returns/{return}', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsShow'])->name('advanced_purchases.returns.show');
     });
 
     Route::middleware(['permission:purchases.manage'])->group(function () {
@@ -212,10 +224,15 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
         Route::get('/advanced-purchases/orders/create', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersCreate'])->name('advanced_purchases.orders.create');
         Route::post('/advanced-purchases/orders', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersStore'])->name('advanced_purchases.orders.store');
         Route::post('/advanced-purchases/orders/{order}/receive', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersReceive'])->name('advanced_purchases.orders.receive');
-        Route::post('/advanced-purchases/orders/{order}/cancel', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersCancel'])->name('advanced_purchases.orders.cancel');
         Route::post('/advanced-purchases/orders/{order}/convert', [App\Http\Controllers\AdvancedPurchaseController::class, 'convertToInvoice'])->name('advanced_purchases.orders.convert');
+        Route::post('/advanced-purchases/orders/{order}/cancel', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersCancel'])->name('advanced_purchases.orders.cancel');
         Route::get('/advanced-purchases/returns/create', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsCreate'])->name('advanced_purchases.returns.create');
         Route::post('/advanced-purchases/returns', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsStore'])->name('advanced_purchases.returns.store');
+    });
+
+    Route::middleware(['permission:purchases.view'])->group(function () {
+        Route::get('/advanced-purchases/orders/{order}', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersShow'])->name('advanced_purchases.orders.show');
+        Route::get('/advanced-purchases/returns/{return}', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsShow'])->name('advanced_purchases.returns.show');
     });
 
     // Activation portail client depuis l'administration

@@ -17,17 +17,17 @@
 <form method="POST" action="{{ route('sales.store') }}" id="saleForm">
 @csrf
 
-<div class="grid grid-cols-3 gap-5">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
     {{-- Produits disponibles --}}
-    <div class="col-span-2">
+    <div class="lg:col-span-2">
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-50 flex items-center gap-3">
                 <input type="text" id="searchProduct" placeholder="Rechercher un produit..."
                     class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
 
-            <div class="grid grid-cols-2 gap-3 p-4 max-h-96 overflow-y-auto" id="productGrid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 max-h-96 overflow-y-auto" id="productGrid">
                 @foreach($products as $product)
                 <button type="button"
                     data-id="{{ $product->id }}"
@@ -39,7 +39,7 @@
                     data-price-grossiste="{{ $product->price_sell_wholesale ?? $product->price_sell }}"
                     onclick="addProductToCart({{ $product->id }})"
                     class="flex items-start gap-3 p-3 border border-slate-100 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition text-left product-card product-card-btn"
-                    data-name="{{ strtolower($product->name) }}">
+                    data-search="{{ strtolower($product->name) }}">
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -58,7 +58,7 @@
     </div>
 
     {{-- Panier + Paiement --}}
-    <div class="col-span-1 space-y-4">
+    <div class="lg:col-span-1 space-y-4">
 
         {{-- Panier --}}
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -430,7 +430,7 @@ document.getElementById('searchProduct').addEventListener('input', function() {
     const q = this.value.toLowerCase();
 
     document.querySelectorAll('.product-card').forEach(card => {
-        card.style.display = card.dataset.name.includes(q) ? 'flex' : 'none';
+        card.style.display = card.dataset.search.includes(q) ? 'flex' : 'none';
     });
 });
 

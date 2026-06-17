@@ -17,10 +17,10 @@
 </div>
 @endif
 
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Formulaire création --}}
-    <div class="col-span-1">
+    <div class="lg:col-span-1">
         <div class="bg-white rounded-xl shadow-sm p-5">
             <h2 class="text-sm font-semibold text-slate-800 mb-4">Nouvel utilisateur</h2>
 
@@ -83,7 +83,7 @@
     </div>
 
     {{-- Liste utilisateurs --}}
-    <div class="col-span-2">
+    <div class="lg:col-span-2">
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-50">
                 <p class="text-sm font-semibold text-slate-800">Tous les utilisateurs</p>
@@ -93,6 +93,7 @@
             @if($users->isEmpty())
             <div class="py-12 text-center text-xs text-slate-400">Aucun utilisateur créé.</div>
             @else
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-slate-50 bg-slate-50">
@@ -177,6 +178,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             @endif
         </div>
     </div>

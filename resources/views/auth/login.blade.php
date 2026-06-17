@@ -60,9 +60,18 @@
             </form>
         </div>
 
-        <p class="text-center text-xs text-slate-600 mt-6">
-            KamerStock v1.0 — Douala, Cameroun
-        </p>
+        <div class="text-center mt-6 flex flex-col items-center gap-3">
+            <a href="{{ url('/') }}" class="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-white transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Retour à l'accueil
+            </a>
+            
+            <p class="text-[10px] text-slate-600 uppercase tracking-wider">
+                KamerStock v1.0 — Douala, Cameroun
+            </p>
+        </div>
     </div>
 
 </body>

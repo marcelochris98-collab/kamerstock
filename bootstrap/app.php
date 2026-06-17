@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'checkauth'  => \App\Http\Middleware\CheckAuth::class,
+            'audit'      => \App\Http\Middleware\AuditRequests::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

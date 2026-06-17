@@ -1,4 +1,4 @@
-<header class="h-12 bg-white border-b border-slate-100 px-6 flex items-center justify-between flex-shrink-0">
+<header class="h-12 bg-white border-b border-slate-100 px-4 sm:px-6 flex items-center justify-between flex-shrink-0">
 
     <div class="flex items-center gap-2">
         <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="md:hidden text-slate-500 hover:text-slate-800 focus:outline-none mr-2" title="Menu">
@@ -12,7 +12,7 @@
     </div>
 
     {{-- Spotlight Search --}}
-    <div class="flex-1 max-w-xs md:max-w-md mx-6 relative" x-data="globalSearch()" @click.outside="open = false" @keydown.escape="open = false">
+    <div class="hidden sm:block flex-1 max-w-xs md:max-w-md mx-6 relative" x-data="globalSearch()" @click.outside="open = false" @keydown.escape="open = false">
         <div class="relative">
             <input type="text" x-model="query" @input.debounce.300ms="performSearch()" @focus="open = true"
                 placeholder="Recherche rapide... (Ctrl + K)"

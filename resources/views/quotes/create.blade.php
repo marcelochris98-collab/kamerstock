@@ -17,17 +17,17 @@
 <form method="POST" action="{{ route('quotes.store') }}" id="quoteForm">
 @csrf
 
-<div class="grid grid-cols-3 gap-5">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
     {{-- Produits disponibles --}}
-    <div class="col-span-2">
+    <div class="lg:col-span-2">
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-50 flex items-center gap-3">
                 <input type="text" id="searchProduct" placeholder="Rechercher un produit..."
                     class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
             </div>
 
-            <div class="grid grid-cols-2 gap-3 p-4 max-h-96 overflow-y-auto" id="productGrid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 max-h-96 overflow-y-auto" id="productGrid">
                 @foreach($products as $product)
                 <button type="button"
                     data-id="{{ $product->id }}"
@@ -58,7 +58,7 @@
     </div>
 
     {{-- Panier + Client --}}
-    <div class="col-span-1 space-y-4">
+    <div class="lg:col-span-1 space-y-4">
 
         {{-- Panier --}}
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">

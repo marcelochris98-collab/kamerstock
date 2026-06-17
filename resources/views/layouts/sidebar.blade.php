@@ -23,7 +23,7 @@
 
     {{-- Navigation --}}
     <nav class="flex-1 px-3 py-4 overflow-y-auto"
-        x-data="{ open: '{{ request()->routeIs('sales.*') || request()->routeIs('quotes.*') ? 'ventes' : (request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'catalogue' : (request()->routeIs('purchases.*') || request()->routeIs('advanced_purchases.*') ? 'achats' : (request()->routeIs('clients.*') || request()->routeIs('credits.*') || request()->routeIs('admin.crm_messages.*') ? 'crm' : (request()->routeIs('admin.*') || request()->routeIs('settings.*') ? 'admin' : '')))) }}' }">
+        x-data="{ open: '{{ request()->routeIs('sales.*') || request()->routeIs('quotes.*') ? 'ventes' : (request()->routeIs('products.*') || request()->routeIs('categories.*') ? 'catalogue' : (request()->routeIs('purchases.*') || request()->routeIs('advanced_purchases.*') ? 'achats' : (request()->routeIs('clients.*') || request()->routeIs('credits.*') || request()->routeIs('admin.crm_messages.*') ? 'crm' : (request()->routeIs('admin.*') || request()->routeIs('settings.*') ? 'admin' : (request()->routeIs('stock.*') ? 'stock' : ''))))) }}' }">
 
         <p class="text-xs font-semibold text-slate-600 uppercase tracking-widest px-2 mb-3">Menu Principal</p>
 
@@ -138,7 +138,7 @@
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
                 </span>
-                <span class="flex-1 text-left">Achats & Fournisseurs</span>
+                <span class="flex-1 text-left">Approvisionnement</span>
                 <svg class="w-3 h-3 transition-transform duration-200" :class="open === 'achats' ? 'rotate-90' : ''"
                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -238,17 +238,36 @@
 
         {{-- Stock mouvements --}}
         @if(auth()->user()->hasPermission('stock.view'))
-        <a href="{{ route('stock.index') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition mb-1
-            {{ request()->routeIs('stock.index') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
-            <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+        <div class="mb-1">
+            <button @click="open = open === 'stock' ? '' : 'stock'"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition
+                {{ request()->routeIs('stock.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                    </svg>
+                </span>
+                <span class="flex-1 text-left">Gestion Stock</span>
+                <svg class="w-3 h-3 transition-transform duration-200" :class="open === 'stock' ? 'rotate-90' : ''"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-            </span>
-            <span class="flex-1">Mouvements Stock</span>
-        </a>
+            </button>
+            <div x-show="open === 'stock'" x-cloak
+                class="mt-1 ml-4 pl-3 border-l border-slate-850 space-y-0.5">
+                <a href="{{ route('stock.index') }}"
+                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+                    {{ request()->routeIs('stock.index') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+                    Tableau de Bord
+                </a>
+                <a href="{{ route('stock.history') }}"
+                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+                    {{ request()->routeIs('stock.history') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+                    Historique
+                </a>
+            </div>
+        </div>
         @endif
 
         {{-- Rapports --}}
@@ -267,7 +286,7 @@
         @endif
 
         {{-- ADMINISTRATION --}}
-        @if(auth()->user()->hasPermission('users.manage') || auth()->user()->hasPermission('roles.manage') || auth()->user()->hasPermission('settings.manage'))
+        @if(auth()->user()->hasPermission('users.manage') || auth()->user()->hasPermission('roles.manage') || auth()->user()->hasPermission('settings.manage') || auth()->user()->hasPermission('logs.view'))
         <p class="text-xs font-semibold text-slate-600 uppercase tracking-widest px-2 mt-5 mb-3">Administration</p>
 
         <div class="mb-1">
@@ -319,6 +338,13 @@
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
                     {{ request()->routeIs('admin.backups.index') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Sauvegardes DB
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('logs.view'))
+                <a href="{{ route('admin.audit-logs.index') }}"
+                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
+                    {{ request()->routeIs('admin.audit-logs.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+                    Journal d'audit
                 </a>
                 @endif
             </div>

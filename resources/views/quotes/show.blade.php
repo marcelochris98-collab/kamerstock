@@ -19,7 +19,7 @@
 </div>
 @endif
 
-<div class="mb-5 flex items-center justify-between">
+<div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
     <a href="{{ route('quotes.index') }}" class="text-xs text-slate-500 hover:text-slate-800">
         ← Retour aux documents
     </a>
@@ -45,9 +45,9 @@
     </div>
 </div>
 
-<div class="grid grid-cols-3 gap-5">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <!-- Fiche principale -->
-    <div class="col-span-2 space-y-4">
+    <div class="lg:col-span-2 space-y-4">
         <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
                 <div>
@@ -61,6 +61,7 @@
             </div>
 
             <!-- Articles -->
+            <div class="overflow-x-auto">
             <table class="w-full mb-6 text-xs text-slate-700">
                 <thead>
                     <tr class="border-b border-slate-100 text-slate-400">
@@ -84,6 +85,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
 
             <!-- Notes -->
             @if($quote->notes)
@@ -96,7 +98,7 @@
     </div>
 
     <!-- Totaux & Client -->
-    <div class="col-span-1 space-y-4">
+    <div class="lg:col-span-1 space-y-4">
         <!-- Client card -->
         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 space-y-3">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Client</h3>
