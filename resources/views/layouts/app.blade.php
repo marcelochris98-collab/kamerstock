@@ -53,6 +53,22 @@
         showToasts(sessionNotifications);
         @endif
 
+        @if(session()->has('success') && !session()->has('toast_notifications'))
+            if (window.userSoundsEnabled) {
+                const audioSuccess = new Audio('/sounds/notification.wav');
+                audioSuccess.volume = window.userSoundVolume;
+                audioSuccess.play().catch(function () {});
+            }
+        @endif
+
+        @if(session()->has('error') && !session()->has('toast_notifications'))
+            if (window.userSoundsEnabled) {
+                const audioError = new Audio('/sounds/notification.wav');
+                audioError.volume = window.userSoundVolume;
+                audioError.play().catch(function () {});
+            }
+        @endif
+
         // 2. Real-time AJAX Polling
         let lastCheckedTime = new Date().toISOString();
 

@@ -8,6 +8,10 @@ use App\Models\Supplier;
 use App\Models\Sale;
 use App\Models\CreditSale;
 use App\Models\SupplierOrder;
+use App\Models\Category;
+use App\Models\Quote;
+use App\Models\Purchase;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class GlobalSearchController extends Controller
@@ -109,6 +113,63 @@ class GlobalSearchController extends Controller
                 'title' => $o->reference,
                 'subtext' => "Fournisseur: {$o->supplier->name} — Total: " . number_format($o->total_amount, 0, ',', ' ') . " FCFA — Statut: {$o->status_label}",
                 'url' => route('advanced_purchases.orders.show', $o->id)
+            ])->toArray();
+        }
+
+        // 7. Catégories
+        $categories = Category::where('name', 'like', "%{$q}%")
+            ->limit(5)
+            ->get();
+        if ($categories->count() > 0) {
+            $results['Catégories'] = $categories->map(fn($c) => [
+                'title' => $c->name,
+                'subtext' => "Description: " . ($c->description ?? 'Aucune'),
+                'url' => route('categories.index')
+            ])->toArray();
+        }
+
+        // 8. Devis
+        $quotes = Quote::with('client')
+            ->where('reference', 'like', "%{$q}%")
+            ->orWhereHas('client', function($cq) use ($q) {
+                $cq->where('name', 'like', "%{$q}%");
+            })
+            ->limit(5)
+            ->get();
+        if ($quotes->count() > 0) {
+            $results['Devis'] = $quotes->map(fn($qt) => [
+                'title' => $qt->reference,
+                'subtext' => "Client: " . ($qt->client?->name ?? '—') . " — Total: " . number_format($qt->total_amount, 0, ',', ' ') . " FCFA",
+                'url' => route('quotes.show', $qt->id)
+            ])->toArray();
+        }
+
+        // 9. Achats (Purchases)
+        $purchases = Purchase::with('supplier')
+            ->where('reference', 'like', "%{$q}%")
+            ->orWhereHas('supplier', function($sq) use ($q) {
+                $sq->where('name', 'like', "%{$q}%");
+            })
+            ->limit(5)
+            ->get();
+        if ($purchases->count() > 0) {
+            $results['Achats'] = $purchases->map(fn($p) => [
+                'title' => $p->reference,
+                'subtext' => "Fournisseur: " . ($p->supplier?->name ?? '—') . " — Total: " . number_format($p->total_amount, 0, ',', ' ') . " FCFA",
+                'url' => route('purchases.show', $p->id)
+            ])->toArray();
+        }
+
+        // 10. Utilisateurs (Users)
+        $users = User::where('name', 'like', "%{$q}%")
+            ->orWhere('email', 'like', "%{$q}%")
+            ->limit(5)
+            ->get();
+        if ($users->count() > 0) {
+            $results['Utilisateurs'] = $users->map(fn($u) => [
+                'title' => $u->name,
+                'subtext' => "Email: {$u->email}",
+                'url' => route('admin.users.index')
             ])->toArray();
         }
 

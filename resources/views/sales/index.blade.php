@@ -83,7 +83,7 @@
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Date</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Caissier</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Client</th>
-                <th class="px-5 py-3 text-center text-xs font-medium text-slate-400">Articles</th>
+                <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Articles</th>
                 <th class="px-5 py-3 text-right text-xs font-medium text-slate-400">Montant</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Paiement</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Statut</th>
@@ -99,7 +99,15 @@
                 <td class="px-5 py-3 text-xs font-medium text-slate-700">
                     {{ $sale->client?->name ?? 'Passager' }}
                 </td>
-                <td class="px-5 py-3 text-center text-xs text-slate-600">{{ $sale->details->count() }}</td>
+                <td class="px-5 py-3 text-xs text-slate-600">
+                    <div class="flex flex-col gap-0.5 max-w-[200px]">
+                        @foreach($sale->details as $detail)
+                            <span class="truncate" title="{{ $detail->product ? $detail->product->name : 'Article inconnu' }}">
+                                <span class="font-medium">{{ $detail->quantity }}x</span> {{ $detail->product ? $detail->product->name : 'Article inconnu' }}
+                            </span>
+                        @endforeach
+                    </div>
+                </td>
                 <td class="px-5 py-3 text-right text-xs font-semibold text-slate-800">
                     {{ number_format($sale->total_amount, 0, ',', ' ') }} F
                 </td>
