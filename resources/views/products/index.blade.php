@@ -18,12 +18,12 @@
 @endif
 
 {{-- Header page --}}
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div>
         <h1 class="text-sm font-semibold text-slate-800">Liste des produits</h1>
         <p class="text-xs text-slate-400 mt-0.5">{{ $products->total() }} produit(s) actif(s)</p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 flex-wrap">
         <a href="{{ route('export', 'products') }}"
             class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition">
             Exporter CSV
@@ -41,10 +41,10 @@
 </div>
 
 {{-- Filtres --}}
-<div class="flex items-center gap-3 mb-4">
-    <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-3">
+<div class="mb-4">
+    <form method="GET" action="{{ route('products.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <select name="category_id" onchange="this.form.submit()"
-            class="px-3 py-2 border border-slate-200 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-400 bg-white">
+            class="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-400 bg-white">
             <option value="">Toutes les categories</option>
             @foreach($categories as $cat)
             <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
@@ -54,23 +54,26 @@
         </select>
         <input type="text" name="search" value="{{ request('search') }}"
             placeholder="Rechercher un produit..."
-            class="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 w-56">
-        <button type="submit"
-            class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium rounded-lg transition">
-            Rechercher
-        </button>
-        @if(request('search') || request('category_id'))
-        <a href="{{ route('products.index') }}"
-            class="px-3 py-2 text-xs text-slate-400 hover:text-slate-600 transition">
-            Reinitialiser
-        </a>
-        @endif
+            class="w-full sm:w-56 px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
+        <div class="flex gap-2">
+            <button type="submit"
+                class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium rounded-lg transition">
+                Rechercher
+            </button>
+            @if(request('search') || request('category_id'))
+            <a href="{{ route('products.index') }}"
+                class="px-3 py-2 text-xs text-slate-400 hover:text-slate-600 transition flex items-center justify-center">
+                Reinitialiser
+            </a>
+            @endif
+        </div>
     </form>
 </div>
 
 {{-- Tableau --}}
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <table class="w-full">
+    <div class="overflow-x-auto">
+    <table class="w-full min-w-[800px]">
         <thead>
             <tr class="border-b border-slate-100 bg-slate-50">
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Produit</th>

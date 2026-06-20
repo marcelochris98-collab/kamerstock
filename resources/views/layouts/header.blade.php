@@ -84,12 +84,14 @@
                 ->whereRaw('quantity <= alert_threshold')
                 ->count();
 
-            $unreadNotifications = \App\Models\Notification::where('is_read', false)
+            $unreadNotifications = \App\Models\Notification::where('user_id', auth()->id())
+                ->where('is_read', false)
                 ->latest()
                 ->limit(5)
                 ->get();
 
-            $unreadNotificationsCount = \App\Models\Notification::where('is_read', false)->count();
+            $unreadNotificationsCount = \App\Models\Notification::where('user_id', auth()->id())
+                ->where('is_read', false)->count();
 
             $totalAlertCount = $stockAlertCount + $unreadNotificationsCount;
         @endphp
