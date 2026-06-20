@@ -24,5 +24,17 @@ class ActivityLog extends Model
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
+
+        if (auth()->check()) {
+            app(\App\Services\NotificationService::class)->notifyUser(
+                auth()->id(),
+                'activity_log',
+                'Nouvelle Activité',
+                $description,
+                route('audit-logs.index'),
+                null,
+                'system'
+            );
+        }
     }
 }

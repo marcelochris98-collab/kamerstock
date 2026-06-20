@@ -91,12 +91,17 @@
                         titleClass = 'text-blue-700';
                     }
 
-                    toast.className = 'fixed right-5 z-[9999] bg-white shadow-lg rounded-xl px-4 py-3 max-w-sm border ' + borderClass;
+                    toast.className = 'fixed right-5 z-[9999] bg-white shadow-lg rounded-xl px-4 py-3 max-w-sm border ' + borderClass + ' flex items-start justify-between gap-3';
                     toast.style.top = (20 + (index * 90)) + 'px';
 
                     toast.innerHTML = `
-                        <p class="text-xs font-bold ${titleClass}">${notification.title}</p>
-                        <p class="text-xs text-slate-500 mt-1">${notification.message}</p>
+                        <div>
+                            <p class="text-xs font-bold ${titleClass}">${notification.title}</p>
+                            <p class="text-xs text-slate-500 mt-1">${notification.message}</p>
+                        </div>
+                        <button class="text-slate-400 hover:text-slate-600 focus:outline-none" onclick="this.parentElement.remove()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
                     `;
 
                     document.body.appendChild(toast);
@@ -110,8 +115,10 @@
                     }
 
                     setTimeout(function () {
-                        toast.remove();
-                    }, 4500);
+                        if (document.body.contains(toast)) {
+                            toast.remove();
+                        }
+                    }, 10000);
                 }, index * 500);
             });
         }

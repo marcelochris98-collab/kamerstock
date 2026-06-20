@@ -142,7 +142,17 @@
 
                 <div class="px-4 py-3 border-b border-slate-50 flex items-center justify-between">
                     <span class="text-xs font-semibold text-slate-700">Notifications</span>
-                    <span class="text-xs text-slate-400">{{ $totalAlertCount }} alerte(s)</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">{{ $totalAlertCount }} alerte(s)</span>
+                        @if($unreadNotificationsCount > 0)
+                        <form method="POST" action="{{ route('notifications.readAll') }}">
+                            @csrf
+                            <button type="submit" class="text-[10px] text-blue-500 hover:text-blue-700 font-medium bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded transition">
+                                Tout lu
+                            </button>
+                        </form>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- Notifications système --}}
