@@ -17,7 +17,7 @@
 
         <div>
             <p class="text-sm font-bold text-white leading-none">{{ $siteSettings->shop_name ?? 'KamerStock' }}</p>
-            <p class="text-xs text-slate-500 leading-none mt-0.5">Quincaillerie</p>
+            <p class="text-xs text-slate-500 leading-none mt-0.5">{{ app(\App\Services\BusinessTypeService::class)->subtitle() }}</p>
         </div>
     </div>
 

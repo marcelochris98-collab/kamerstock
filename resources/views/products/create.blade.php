@@ -59,12 +59,11 @@
                     <label class="block text-xs font-medium text-slate-600 mb-1">Unité <span class="text-red-400">*</span></label>
                     <select name="unit"
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
-                        <option value="piece" {{ old('unit') == 'piece' ? 'selected' : '' }}>Pièce</option>
-                        <option value="metre" {{ old('unit') == 'metre' ? 'selected' : '' }}>Mètre</option>
-                        <option value="kg" {{ old('unit') == 'kg' ? 'selected' : '' }}>Kilogramme</option>
-                        <option value="litre" {{ old('unit') == 'litre' ? 'selected' : '' }}>Litre</option>
-                        <option value="boite" {{ old('unit') == 'boite' ? 'selected' : '' }}>Boîte</option>
-                        <option value="sachet" {{ old('unit') == 'sachet' ? 'selected' : '' }}>Sachet</option>
+                        @foreach(app(\App\Services\BusinessTypeService::class)->proposedUnits() as $val => $label)
+                        <option value="{{ $val }}" {{ old('unit') == $val ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                        @endforeach
                     </select>
                 </div>
             </div>

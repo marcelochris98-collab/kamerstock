@@ -1,0 +1,123 @@
+<?php
+
+return [
+    'quincaillerie' => [
+        'label' => 'Quincaillerie',
+        'subtitle' => 'Matériaux, outillage et articles de construction',
+        'product_label' => 'Article',
+        'product_plural_label' => 'Articles',
+        'category_label' => 'Famille d’articles',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, mètre, kg, litre, boîte, sachet',
+        'default_categories' => ['Ciment', 'Fer', 'Outillage', 'Plomberie', 'Électricité', 'Peinture'],
+        'dashboard_title' => 'Gestion de quincaillerie',
+    ],
+
+    'boutique_generale' => [
+        'label' => 'Boutique générale',
+        'subtitle' => 'Articles divers et produits généraux',
+        'product_label' => 'Article',
+        'product_plural_label' => 'Articles',
+        'category_label' => 'Rayon',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, kg, litre, boîte, paquet, carton',
+        'default_categories' => ['Vêtements', 'Alimentation', 'Maison', 'Divers'],
+        'dashboard_title' => 'Gestion de boutique',
+    ],
+
+    'superette' => [
+        'label' => 'Superette',
+        'subtitle' => 'Produits alimentaires et consommation courante',
+        'product_label' => 'Produit',
+        'product_plural_label' => 'Produits',
+        'category_label' => 'Rayon',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, kg, litre, carton, paquet, boîte',
+        'default_categories' => ['Boissons', 'Épicerie', 'Produits frais', 'Hygiène', 'Entretien'],
+        'dashboard_title' => 'Gestion de superette',
+    ],
+
+    'pieces_detachees' => [
+        'label' => 'Pièces détachées',
+        'subtitle' => 'Vente de pièces et accessoires',
+        'product_label' => 'Pièce',
+        'product_plural_label' => 'Pièces',
+        'category_label' => 'Type de pièce',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, kit, boîte, lot',
+        'default_categories' => ['Moteur', 'Freinage', 'Électricité', 'Accessoires', 'Pneumatiques'],
+        'dashboard_title' => 'Vente de pièces',
+    ],
+
+    'cosmetique' => [
+        'label' => 'Cosmétique',
+        'subtitle' => 'Produits de beauté et soins personnels',
+        'product_label' => 'Produit',
+        'product_plural_label' => 'Produits',
+        'category_label' => 'Gamme',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, boîte, flacon, tube, carton',
+        'default_categories' => ['Soins visage', 'Soins cheveux', 'Parfums', 'Maquillage', 'Accessoires'],
+        'dashboard_title' => 'Gestion de cosmétiques',
+    ],
+
+    'pharmacie_parapharmacie' => [
+        'label' => 'Pharmacie / Parapharmacie',
+        'subtitle' => 'Médicaments, soins et produits de santé',
+        'product_label' => 'Produit',
+        'product_plural_label' => 'Produits',
+        'category_label' => 'Catégorie',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, boîte, flacon, tube, sachet, ampoule',
+        'default_categories' => ['Médicaments', 'Parapharmacie', 'Hygiène', 'Bébé', 'Premiers secours'],
+        'dashboard_title' => 'Gestion de pharmacie',
+    ],
+
+    'informatique' => [
+        'label' => 'Informatique',
+        'subtitle' => 'Matériel informatique et accessoires',
+        'product_label' => 'Produit',
+        'product_plural_label' => 'Produits',
+        'category_label' => 'Catégorie',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, boîte, carton',
+        'default_categories' => ['Ordinateurs', 'Accessoires', 'Réseau', 'Stockage', 'Consommables'],
+        'dashboard_title' => 'Gestion informatique',
+    ],
+
+    'electromenager' => [
+        'label' => 'Électroménager',
+        'subtitle' => 'Appareils ménagers et équipements de maison',
+        'product_label' => 'Appareil',
+        'product_plural_label' => 'Appareils',
+        'category_label' => 'Type d\'appareil',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, boîte, carton, lot',
+        'default_categories' => ['Gros électroménager', 'Petit électroménager', 'Cuisine', 'Entretien'],
+        'dashboard_title' => 'Gestion d\'électroménager',
+    ],
+
+    'depot_grossiste' => [
+        'label' => 'Dépôt / Grossiste',
+        'subtitle' => 'Vente en gros, stock et réapprovisionnement',
+        'product_label' => 'Article',
+        'product_plural_label' => 'Articles',
+        'category_label' => 'Famille',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, carton, palette, kg, litre, sac',
+        'default_categories' => ['Gros stock', 'Cartons', 'Palettes', 'Marchandises diverses'],
+        'dashboard_title' => 'Gestion de dépôt',
+    ],
+
+    'autre' => [
+        'label' => 'Commerce',
+        'subtitle' => 'Gestion de stock, vente et caisse',
+        'product_label' => 'Produit',
+        'product_plural_label' => 'Produits',
+        'category_label' => 'Catégorie',
+        'supplier_label' => 'Fournisseur',
+        'default_units' => 'pièce, kg, litre, boîte, sachet',
+        'default_categories' => ['Général'],
+        'dashboard_title' => 'Gestion de stock, vente et caisse',
+    ],
+];

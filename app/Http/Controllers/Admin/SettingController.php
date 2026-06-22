@@ -19,14 +19,16 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'shop_name'      => 'required|string|max:100',
-            'address'        => 'nullable|string|max:255',
-            'phone'          => 'nullable|string|max:20',
-            'email'          => 'nullable|email|max:100',
-            'currency'       => 'required|string|max:10',
-            'tax_rate'       => 'required|numeric|min:0|max:100',
-            'invoice_prefix' => 'required|string|max:10',
-            'logo'           => 'nullable|image|mimes:png,jpg,jpeg,webp,gif,svg|max:4096',
+            'shop_name'            => 'required|string|max:100',
+            'address'              => 'nullable|string|max:255',
+            'phone'                => 'nullable|string|max:20',
+            'email'                => 'nullable|email|max:100',
+            'currency'             => 'required|string|max:10',
+            'tax_rate'             => 'required|numeric|min:0|max:100',
+            'invoice_prefix'       => 'required|string|max:10',
+            'logo'                 => 'nullable|image|mimes:png,jpg,jpeg,webp,gif,svg|max:4096',
+            'business_type'        => 'nullable|string|in:quincaillerie,boutique_generale,superette,pieces_detachees,cosmetique,pharmacie_parapharmacie,informatique,electromenager,depot_grossiste,autre',
+            'business_type_custom' => 'nullable|required_if:business_type,autre|string|max:100',
         ]);
 
         $settings = Setting::firstOrCreate(['id' => 1]);
@@ -50,5 +52,26 @@ class SettingController extends Controller
         ActivityLog::record('settings.update', 'Paramètres système mis à jour');
 
         return back()->with('success', 'Paramètres mis à jour !');
+    }
+
+    public function createDefaultCategories(Request $request)
+    {
+        $service = app(\App\Services\BusinessTypeService::class);
+        $defaultCategories = $service->defaultCategories();
+        
+        $createdCount = 0;
+        foreach ($defaultCategories as $categoryName) {
+            $exists = \App\Models\Category::whereRaw('LOWER(name) = ?', [mb_strtolower($categoryName)])->exists();
+            if (!$exists) {
+                \App\Models\Category::create([
+                    'name' => $categoryName,
+                ]);
+                $createdCount++;
+            }
+        }
+        
+        ActivityLog::record('settings.default-categories', "Création de {$createdCount} catégories par défaut");
+        
+        return back()->with('success', "{$createdCount} catégories par défaut ont été créées avec succès !");
     }
 }

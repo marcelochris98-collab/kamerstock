@@ -55,7 +55,7 @@ class ProductController extends Controller
             'supplier_phone'       => 'nullable|string|max:50',
             'supplier_email'       => 'nullable|email|max:150',
 
-            'unit'                 => 'required|in:piece,metre,kg,litre,boite,sachet',
+            'unit'                 => 'required|in:piece,metre,kg,litre,boite,sachet,carton,paquet,flacon,tube,kit,lot,palette,sac',
             'price_buy'            => 'required|numeric|min:0',
             'price_sell'           => 'required|numeric|min:0',
             'price_sell_company'   => 'nullable|numeric|min:0',
@@ -211,7 +211,7 @@ class ProductController extends Controller
             'reference'            => 'required|string|max:50|unique:products,reference,' . $product->id,
             'category_id'          => 'nullable|exists:categories,id',
             'supplier_id'          => 'nullable|exists:suppliers,id',
-            'unit'                 => 'required|in:piece,metre,kg,litre,boite,sachet',
+            'unit'                 => 'required|in:piece,metre,kg,litre,boite,sachet,carton,paquet,flacon,tube,kit,lot,palette,sac',
             'price_buy'            => 'required|numeric|min:0',
             'price_sell'           => 'required|numeric|min:0',
             'price_sell_company'   => 'nullable|numeric|min:0',

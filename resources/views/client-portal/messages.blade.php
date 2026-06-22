@@ -27,8 +27,8 @@
         <div class="border-t border-slate-200/60 pt-5 space-y-4">
             <div>
                 <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Boutique</p>
-                <p class="text-xs font-bold text-slate-700 mt-1">KamerStock</p>
-                <p class="text-[11px] text-slate-500 mt-0.5">Votre quincaillerie de confiance</p>
+                <p class="text-xs font-bold text-slate-700 mt-1">{{ \App\Models\Setting::get('shop_name', 'KamerStock') }}</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">{{ app(\App\Services\BusinessTypeService::class)->subtitle() }}</p>
             </div>
 
             @php

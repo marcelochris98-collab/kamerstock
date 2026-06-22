@@ -17,7 +17,7 @@
             <div class="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center font-black text-slate-950 text-lg">K</div>
             <div>
                 <p class="text-base font-bold text-white leading-none">KamerStock</p>
-                <p class="text-xs text-slate-500 leading-none mt-0.5">Gestion de quincaillerie</p>
+                <p class="text-xs text-slate-500 leading-none mt-0.5">{{ app(\App\Services\BusinessTypeService::class)->dashboardTitle() }}</p>
             </div>
         </div>
 

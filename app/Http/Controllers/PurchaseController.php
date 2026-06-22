@@ -55,7 +55,7 @@ class PurchaseController extends Controller
             'items.*.reference' => 'nullable|string|max:50',
             'items.*.category_id' => 'nullable|exists:categories,id',
             'items.*.category_name' => 'nullable|string|max:150',
-            'items.*.unit' => 'nullable|in:piece,metre,kg,litre,boite,sachet',
+            'items.*.unit' => 'nullable|in:piece,metre,kg,litre,boite,sachet,carton,paquet,flacon,tube,kit,lot,palette,sac',
             'items.*.alert_threshold' => 'nullable|integer|min:0',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',

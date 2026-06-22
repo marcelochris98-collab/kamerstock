@@ -72,7 +72,7 @@
                     <label class="block text-xs font-medium text-slate-600 mb-1">Unite</label>
                     <select name="unit"
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-400">
-                        @foreach(['piece' => 'Piece', 'metre' => 'Metre', 'kg' => 'Kilogramme', 'litre' => 'Litre', 'boite' => 'Boite', 'sachet' => 'Sachet'] as $val => $label)
+                        @foreach(app(\App\Services\BusinessTypeService::class)->proposedUnits() as $val => $label)
                         <option value="{{ $val }}" {{ old('unit', $product->unit) == $val ? 'selected' : '' }}>
                             {{ $label }}
                         </option>

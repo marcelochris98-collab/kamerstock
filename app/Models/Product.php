@@ -54,13 +54,21 @@ class Product extends Model
     public function getUnitLabelAttribute(): string
     {
         return match($this->unit) {
-            'piece'  => 'Pièce(s)',
-            'metre'  => 'Mètre(s)',
-            'kg'     => 'Kg',
-            'litre'  => 'Litre(s)',
-            'boite'  => 'Boîte(s)',
-            'sachet' => 'Sachet(s)',
-            default  => $this->unit,
+            'piece'   => 'Pièce(s)',
+            'metre'   => 'Mètre(s)',
+            'kg'      => 'Kg',
+            'litre'   => 'Litre(s)',
+            'boite'   => 'Boîte(s)',
+            'sachet'  => 'Sachet(s)',
+            'carton'  => 'Carton(s)',
+            'paquet'  => 'Paquet(s)',
+            'flacon'  => 'Flacon(s)',
+            'tube'    => 'Tube(s)',
+            'kit'     => 'Kit(s)',
+            'lot'     => 'Lot(s)',
+            'palette' => 'Palette(s)',
+            'sac'     => 'Sac(s)',
+            default   => $this->unit,
         };
     }
 

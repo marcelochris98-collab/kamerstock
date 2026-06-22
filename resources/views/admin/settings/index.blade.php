@@ -6,7 +6,7 @@
     {{-- Header --}}
     <div class="mb-6">
         <p class="text-xs text-slate-400 font-medium">Administration / Paramètres</p>
-        <h1 class="text-xl font-bold text-slate-900 mt-1">Configuration de la Quincaillerie</h1>
+        <h1 class="text-xl font-bold text-slate-900 mt-1">Configuration du commerce ({{ app(\App\Services\BusinessTypeService::class)->label() }})</h1>
     </div>
 
     @if(session('success'))
@@ -56,7 +56,7 @@
 
                 {{-- Zone Upload Logo avec Prévisualisation et Suppression Dynamique --}}
                 <div class="md:col-span-2" x-data="logoUploader()">
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Logo de la quincaillerie</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Logo du commerce</label>
                     <div class="flex items-center gap-4 mt-2">
                         <!-- Preview Container -->
                         <div class="relative group">
@@ -132,6 +132,53 @@
                     @error('invoice_prefix') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
+                </div>
+
+                {{-- Type de Commerce --}}
+                <div class="md:col-span-2 mt-4 pt-4 border-t border-slate-100">
+                    <h2 class="text-sm font-semibold text-slate-800 mb-2">Type de commerce & Activité</h2>
+                    <p class="text-xs text-slate-400 mb-4">Ce choix adapte les libellés, les catégories proposées et certaines unités sans modifier la logique de gestion.</p>
+                </div>
+
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ businessType: '{{ old('business_type', $settings->business_type ?? 'quincaillerie') }}' }">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Type d'activité <span class="text-red-500">*</span></label>
+                        <select name="business_type" x-model="businessType"
+                            class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                            <option value="quincaillerie">Quincaillerie</option>
+                            <option value="boutique_generale">Boutique générale</option>
+                            <option value="superette">Superette</option>
+                            <option value="pieces_detachees">Pièces détachées</option>
+                            <option value="cosmetique">Cosmétique</option>
+                            <option value="pharmacie_parapharmacie">Pharmacie / Parapharmacie</option>
+                            <option value="informatique">Informatique</option>
+                            <option value="electromenager">Électroménager</option>
+                            <option value="depot_grossiste">Dépôt / Grossiste</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                        @error('business_type') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div x-show="businessType === 'autre'">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nom du type d'activité personnalisé</label>
+                        <input type="text" name="business_type_custom" value="{{ old('business_type_custom', $settings->business_type_custom ?? '') }}"
+                            placeholder="Ex: Librairie, Boutique de vêtements"
+                            class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                        @error('business_type_custom') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                {{-- Aperçu du libellé utilisé --}}
+                <div class="md:col-span-2 bg-slate-50 border border-slate-200 rounded-lg p-3.5 mt-2">
+                    <p class="text-[11px] font-semibold text-slate-700 mb-1.5">Aperçu de la configuration active :</p>
+                    <ul class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[10px] text-slate-505">
+                        <li><span class="font-medium text-slate-700">Libellé :</span> {{ app(\App\Services\BusinessTypeService::class)->label() }}</li>
+                        <li><span class="font-medium text-slate-700">Produit :</span> {{ app(\App\Services\BusinessTypeService::class)->productLabel() }}</li>
+                        <li><span class="font-medium text-slate-700">Catégorie :</span> {{ app(\App\Services\BusinessTypeService::class)->categoryLabel() }}</li>
+                        <li><span class="font-medium text-slate-700">Fournisseur :</span> {{ app(\App\Services\BusinessTypeService::class)->supplierLabel() }}</li>
+                    </ul>
+                </div>
+
             </div>
 
             {{-- Bouton de validation --}}
@@ -141,6 +188,24 @@
                 </button>
             </div>
         </form>
+
+        {{-- Section Initialisation du commerce --}}
+        <div class="mt-8 pt-6 border-t border-slate-100">
+            <h2 class="text-sm font-semibold text-slate-800 mb-1">Initialisation du commerce</h2>
+            <p class="text-xs text-slate-400 mb-4">
+                Vous pouvez créer automatiquement les catégories recommandées pour votre type d'activité.
+                Cette action n'effacera pas vos catégories existantes et évitera les doublons.
+            </p>
+            <form action="{{ route('admin.settings.default-categories') }}" method="POST">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Créer les catégories par défaut
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

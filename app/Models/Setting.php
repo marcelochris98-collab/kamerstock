@@ -8,7 +8,8 @@ class Setting extends Model
 {
     protected $fillable = [
         'shop_name', 'address', 'phone', 'email',
-        'currency', 'tax_rate', 'logo', 'invoice_prefix'
+        'currency', 'tax_rate', 'logo', 'invoice_prefix',
+        'business_type', 'business_type_custom'
     ];
 
     protected $casts = [

@@ -22,7 +22,7 @@
 
         <div x-show="!sidebarCollapsed || mobileSidebarOpen" x-transition class="min-w-0">
             <p class="text-sm font-bold text-white leading-none truncate">{{ $siteSettings->shop_name ?? 'KamerStock' }}</p>
-            <p class="text-xs text-slate-500 leading-none mt-0.5 truncate">Quincaillerie</p>
+            <p class="text-xs text-slate-500 leading-none mt-0.5 truncate">{{ app(\App\Services\BusinessTypeService::class)->subtitle() }}</p>
         </div>
     </div>
 
