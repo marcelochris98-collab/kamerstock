@@ -27,7 +27,9 @@ class NotificationController extends Controller
             'read_at' => now(),
         ]);
 
-        return redirect($notification->link ?? route('notifications.index'));
+        return redirect()
+            ->route('notifications.index')
+            ->with('success', 'Notification marquée comme lue.');
     }
 
     public function markAllAsRead()

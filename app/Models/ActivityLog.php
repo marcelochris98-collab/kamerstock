@@ -31,7 +31,7 @@ class ActivityLog extends Model
                 'activity_log',
                 'Nouvelle Activité',
                 $description,
-              \Route::has('audit-logs.index') ? route('audit-logs.index') : route('dashboard'),
+                \Route::has('admin.audit-logs.index') ? route('admin.audit-logs.index') : route('dashboard'),
                 null,
                 'system'
             );

@@ -156,13 +156,11 @@
                     {{ request()->routeIs('advanced_purchases.orders.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Bons de Commande
                 </a>
-                @if(Route::has('advanced_purchases.receptions.index'))
-                <a href="{{ route('advanced_purchases.receptions.index') }}"
+                <a href="{{ route('advanced_purchases.orders.index') }}"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
                     {{ request()->routeIs('advanced_purchases.receptions.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Réceptions livraisons
                 </a>
-                @endif
                 <a href="{{ route('advanced_purchases.returns.index') }}"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
                     {{ request()->routeIs('advanced_purchases.returns.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
