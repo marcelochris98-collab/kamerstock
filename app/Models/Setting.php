@@ -9,11 +9,15 @@ class Setting extends Model
     protected $fillable = [
         'shop_name', 'address', 'phone', 'email',
         'currency', 'tax_rate', 'logo', 'invoice_prefix',
-        'business_type', 'business_type_custom'
+        'business_type', 'business_type_custom',
+        'setup_completed', 'setup_completed_at', 'enabled_units', 'setup_step'
     ];
 
     protected $casts = [
         'tax_rate' => 'decimal:2',
+        'setup_completed' => 'boolean',
+        'enabled_units' => 'array',
+        'setup_completed_at' => 'datetime',
     ];
 
     public static function get(string $key, $default = null)

@@ -164,6 +164,23 @@ class BusinessTypeService
             'sac'     => 'Sac(s)',
         ];
 
+        try {
+            $setting = Setting::first();
+            if ($setting && is_array($setting->enabled_units) && count($setting->enabled_units) > 0) {
+                $enabled = [];
+                foreach ($setting->enabled_units as $unitKey) {
+                    if (isset($all[$unitKey])) {
+                        $enabled[$unitKey] = $all[$unitKey];
+                    }
+                }
+                if (count($enabled) > 0) {
+                    return $enabled;
+                }
+            }
+        } catch (\Exception $e) {
+            // Fallback
+        }
+
         $unitsStr = $this->defaultUnits();
         $unitsArr = array_map('trim', explode(',', $unitsStr));
         

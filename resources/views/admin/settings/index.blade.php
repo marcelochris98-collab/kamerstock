@@ -194,19 +194,41 @@
             </div>
         </form>
 
-        {{-- Section Initialisation du commerce --}}
-        <div class="mt-8 pt-6 border-t border-slate-100">
-            <h2 class="text-sm font-semibold text-slate-800 mb-1">Initialisation du commerce</h2>
-            <p class="text-xs text-slate-400 mb-4">
-                Vous pouvez configurer les catégories recommandées pour votre type d'activité.
-                Cette action n'effacera pas vos catégories existantes et évitera les doublons.
-            </p>
-            <a href="{{ route('admin.settings.default-categories') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Proposer les catégories par défaut
-            </a>
+        {{-- Section Initialisation du commerce et Assistant --}}
+        <div class="mt-8 pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-sm font-semibold text-slate-800 mb-1">Initialisation du commerce</h2>
+                <p class="text-xs text-slate-400 mb-4">
+                    Vous pouvez configurer les catégories recommandées pour votre type d'activité.
+                    Cette action n'effacera pas vos catégories existantes et évitera les doublons.
+                </p>
+                <a href="{{ route('admin.settings.default-categories') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Proposer les catégories par défaut
+                </a>
+            </div>
+
+            <div>
+                <h2 class="text-sm font-semibold text-slate-800 mb-1">Assistant de configuration</h2>
+                <p class="text-xs text-slate-400 mb-4">
+                    Utilisez l'assistant guidé pour configurer rapidement votre commerce, activer les unités de stock et initialiser vos données.
+                </p>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('admin.setup.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-bold rounded-lg transition shadow-sm select-none">
+                        Ouvrir l'assistant
+                    </a>
+                    @if($settings->setup_completed)
+                        <form action="{{ route('admin.setup.reset') }}" method="POST" class="inline" onsubmit="return confirm('Voulez-vous vraiment réinitialiser l\'assistant de configuration ?')">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 border border-red-200 text-red-500 hover:bg-red-50 text-xs font-semibold rounded-lg transition">
+                                Réinitialiser
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 </div>

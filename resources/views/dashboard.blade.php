@@ -5,6 +5,10 @@
 
 @section('content')
 
+@php
+    $siteSetting = \App\Models\Setting::first();
+@endphp
+
 <div class="flex items-center justify-between mb-6">
     <div>
         <h2 class="text-base font-semibold text-slate-800"> {{ auth()->user()->name }}</h2>
@@ -20,6 +24,25 @@
     </a>
     @endif
 </div>
+
+@if($siteSetting && !$siteSetting->setup_completed && auth()->user()->hasPermission('settings.manage'))
+    <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-900">Configuration de la boutique non terminée</p>
+                <p class="text-[10px] text-slate-500">Personnalisez votre logiciel de gestion en renseignant les détails de votre commerce.</p>
+            </div>
+        </div>
+        <a href="{{ route('admin.setup.index') }}" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none flex-shrink-0 text-center">
+            Configurer maintenant
+        </a>
+    </div>
+@endif
 
 {{-- STATS --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

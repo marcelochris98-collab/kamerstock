@@ -68,6 +68,12 @@ Route::middleware(['checkauth', 'audit'])->group(function () {
             Route::get('settings/default-categories', [SettingController::class, 'showDefaultCategories'])->name('settings.default-categories');
             Route::post('settings/default-categories', [SettingController::class, 'storeDefaultCategories'])->name('settings.default-categories.store');
 
+            // Assistant de configuration initiale
+            Route::get('setup', [\App\Http\Controllers\Admin\SetupWizardController::class, 'index'])->name('setup.index');
+            Route::post('setup', [\App\Http\Controllers\Admin\SetupWizardController::class, 'store'])->name('setup.store');
+            Route::post('setup/finish', [\App\Http\Controllers\Admin\SetupWizardController::class, 'finish'])->name('setup.finish');
+            Route::post('setup/reset', [\App\Http\Controllers\Admin\SetupWizardController::class, 'reset'])->name('setup.reset');
+
             Route::get('backups', [App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups.index');
             Route::post('backups', [App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backups.create');
             Route::get('backups/{filename}/download', [App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backups.download');
