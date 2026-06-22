@@ -169,9 +169,14 @@
                 </div>
 
                 {{-- Aperçu du libellé utilisé --}}
-                <div class="md:col-span-2 bg-slate-50 border border-slate-200 rounded-lg p-3.5 mt-2">
-                    <p class="text-[11px] font-semibold text-slate-700 mb-1.5">Aperçu de la configuration active :</p>
-                    <ul class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[10px] text-slate-505">
+                <div class="md:col-span-2 bg-slate-50 border border-slate-200 rounded-lg p-4 mt-2">
+                    <p class="text-xs font-bold text-slate-800 mb-2">Aperçu de la configuration active :</p>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 mb-3">
+                        <li>Votre logiciel est configuré pour : <span class="font-bold text-slate-800">{{ app(\App\Services\BusinessTypeService::class)->label() }}</span></li>
+                        <li>Les catégories proposées seront : <span class="font-bold text-slate-800">{{ implode(', ', app(\App\Services\BusinessTypeService::class)->defaultCategories()) }}</span></li>
+                    </ul>
+                    <hr class="border-slate-250/60 my-2">
+                    <ul class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[10px] text-slate-500">
                         <li><span class="font-medium text-slate-700">Libellé :</span> {{ app(\App\Services\BusinessTypeService::class)->label() }}</li>
                         <li><span class="font-medium text-slate-700">Produit :</span> {{ app(\App\Services\BusinessTypeService::class)->productLabel() }}</li>
                         <li><span class="font-medium text-slate-700">Catégorie :</span> {{ app(\App\Services\BusinessTypeService::class)->categoryLabel() }}</li>
@@ -193,18 +198,15 @@
         <div class="mt-8 pt-6 border-t border-slate-100">
             <h2 class="text-sm font-semibold text-slate-800 mb-1">Initialisation du commerce</h2>
             <p class="text-xs text-slate-400 mb-4">
-                Vous pouvez créer automatiquement les catégories recommandées pour votre type d'activité.
+                Vous pouvez configurer les catégories recommandées pour votre type d'activité.
                 Cette action n'effacera pas vos catégories existantes et évitera les doublons.
             </p>
-            <form action="{{ route('admin.settings.default-categories') }}" method="POST">
-                @csrf
-                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Créer les catégories par défaut
-                </button>
-            </form>
+            <a href="{{ route('admin.settings.default-categories') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Proposer les catégories par défaut
+            </a>
         </div>
     </div>
 </div>

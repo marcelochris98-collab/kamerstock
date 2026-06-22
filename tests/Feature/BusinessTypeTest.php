@@ -103,8 +103,18 @@ class BusinessTypeTest extends TestCase
         // Set to superette
         $this->settings->update(['business_type' => 'superette']);
 
-        $response = $this->post(route('admin.settings.default-categories'));
+        // 1. Visit the selection page (GET)
+        $response = $this->get(route('admin.settings.default-categories'));
+        $response->assertStatus(200);
+        $response->assertSee('Boissons');
+        $response->assertSee('Épicerie');
+
+        // 2. Submit the form (POST) selecting all categories
+        $response = $this->post(route('admin.settings.default-categories.store'), [
+            'categories' => ['Boissons', 'Épicerie', 'Produits frais', 'Hygiène', 'Entretien'],
+        ]);
         $response->assertStatus(302);
+        $response->assertRedirect(route('admin.settings.index'));
         $response->assertSessionHas('success');
 
         // Check categories created: Boissons, Épicerie, Produits frais, Hygiène, Entretien

@@ -65,7 +65,8 @@ Route::middleware(['checkauth', 'audit'])->group(function () {
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
             Route::match(['put', 'post'], 'settings', [SettingController::class, 'update'])->name('settings.update');
-            Route::post('settings/default-categories', [SettingController::class, 'createDefaultCategories'])->name('settings.default-categories');
+            Route::get('settings/default-categories', [SettingController::class, 'showDefaultCategories'])->name('settings.default-categories');
+            Route::post('settings/default-categories', [SettingController::class, 'storeDefaultCategories'])->name('settings.default-categories.store');
 
             Route::get('backups', [App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups.index');
             Route::post('backups', [App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backups.create');
