@@ -20,10 +20,9 @@ class LandlordAdminTest extends TestCase
     {
         parent::setUp();
 
-        // Migrate landlord tables specifically for testing
+        // Migrate landlord connection dynamically
         Artisan::call('migrate', [
             '--database' => 'landlord',
-            '--path' => 'database/migrations/2026_06_22_170000_create_platform_tables.php'
         ]);
 
         // Seed plans
@@ -81,6 +80,12 @@ class LandlordAdminTest extends TestCase
         $response->assertRedirect(route('landlord.login'));
     }
 
+    public function test_authenticated_landlord_visiting_login_is_redirected_to_dashboard()
+    {
+        $response = $this->actingAs($this->landlordUser, 'landlord')->get(route('landlord.login'));
+        $response->assertRedirect(route('landlord.dashboard'));
+    }
+
     public function test_authenticated_landlord_can_access_dashboard()
     {
         $response = $this->actingAs($this->landlordUser, 'landlord')->get(route('landlord.dashboard'));
@@ -102,11 +107,14 @@ class LandlordAdminTest extends TestCase
             'business_type' => 'quincaillerie',
             'status' => 'trial',
             'plan_id' => $plan->id,
-            'trial_ends_at' => now()->addDays(14)->format('Y-m-d'),
+            'trial_days' => 14,
         ]);
 
-        $response->assertRedirect(route('landlord.tenants.index'));
-        $this->assertTrue(Tenant::where('slug', 'boutique-alpha')->exists());
+        $tenant = Tenant::where('slug', 'boutique-alpha')->first();
+        $response->assertRedirect(route('landlord.tenants.show', $tenant));
+        $this->assertNotNull($tenant);
+        $this->assertNotNull($tenant->owner_password_plain);
+        $this->assertEquals('prepared', $tenant->provisioning_status);
         $this->assertTrue(LandlordAuditLog::where('action', 'tenant_create')->exists());
     }
 
@@ -163,5 +171,24 @@ class LandlordAdminTest extends TestCase
         $this->assertEquals('read_only', $tenant->status);
         $this->assertNotNull($tenant->read_only_at);
         $this->assertTrue(LandlordAuditLog::where('action', 'tenant_readonly')->exists());
+    }
+
+    public function test_landlord_can_regenerate_owner_password()
+    {
+        $tenant = Tenant::create([
+            'name' => 'Boutique Pass',
+            'slug' => 'boutique-pass',
+            'owner_email' => 'owner@pass.com',
+            'status' => 'active',
+            'owner_password_plain' => 'initial_pass',
+        ]);
+
+        $response = $this->actingAs($this->landlordUser, 'landlord')->post(route('landlord.tenants.regenerate_owner_password', $tenant));
+        
+        $response->assertStatus(302);
+        $tenant->refresh();
+        $this->assertNotEquals('initial_pass', $tenant->owner_password_plain);
+        $this->assertNotNull($tenant->owner_password_plain);
+        $this->assertTrue(LandlordAuditLog::where('action', 'tenant_regenerate_password')->exists());
     }
 }

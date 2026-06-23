@@ -4,12 +4,26 @@
 <div class="p-6 bg-slate-50 min-h-screen text-slate-800">
     
     {{-- Header --}}
+    @php
+        $legacyExists = \App\Models\Platform\Tenant::where('slug', 'boutique-actuelle')->exists();
+    @endphp
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-xl font-bold text-slate-900">Boutiques (Tenants)</h1>
             <p class="text-xs text-slate-400 font-medium mt-1">Gestion de toutes les instances boutiques de KamerStock</p>
         </div>
-        <div>
+        <div class="flex items-center gap-2">
+            @if(!$legacyExists)
+                <form action="{{ route('landlord.tenants.register_legacy') }}" method="POST" class="inline-block" onsubmit="return confirm('Enregistrer la boutique actuelle avec sa base de données existante ?')">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl shadow-md transition select-none">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        Enregistrer boutique actuelle
+                    </button>
+                </form>
+            @endif
             <a href="{{ route('landlord.tenants.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white rounded-xl shadow-md shadow-indigo-650/10 transition select-none">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -22,6 +36,12 @@
     @if(session('success'))
         <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-semibold shadow-sm">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold shadow-sm">
+            {{ session('error') }}
         </div>
     @endif
 

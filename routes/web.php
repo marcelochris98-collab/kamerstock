@@ -308,12 +308,14 @@ Route::prefix('landlord')->name('landlord.')->group(function () {
         Route::get('tenants', [\App\Http\Controllers\Landlord\TenantController::class, 'index'])->name('tenants.index');
         Route::get('tenants/create', [\App\Http\Controllers\Landlord\TenantController::class, 'create'])->name('tenants.create');
         Route::post('tenants', [\App\Http\Controllers\Landlord\TenantController::class, 'store'])->name('tenants.store');
+        Route::post('tenants/register-legacy', [\App\Http\Controllers\Landlord\TenantController::class, 'registerLegacy'])->name('tenants.register_legacy');
         Route::get('tenants/{tenant}', [\App\Http\Controllers\Landlord\TenantController::class, 'show'])->name('tenants.show');
         Route::get('tenants/{tenant}/edit', [\App\Http\Controllers\Landlord\TenantController::class, 'edit'])->name('tenants.edit');
         Route::put('tenants/{tenant}', [\App\Http\Controllers\Landlord\TenantController::class, 'update'])->name('tenants.update');
         Route::post('tenants/{tenant}/suspend', [\App\Http\Controllers\Landlord\TenantController::class, 'suspend'])->name('tenants.suspend');
         Route::post('tenants/{tenant}/activate', [\App\Http\Controllers\Landlord\TenantController::class, 'activate'])->name('tenants.activate');
         Route::post('tenants/{tenant}/read-only', [\App\Http\Controllers\Landlord\TenantController::class, 'readOnly'])->name('tenants.read_only');
+        Route::post('tenants/{tenant}/regenerate-owner-password', [\App\Http\Controllers\Landlord\TenantController::class, 'regenerateOwnerPassword'])->name('tenants.regenerate_owner_password');
 
         // Plans CRUD
         Route::get('plans', [\App\Http\Controllers\Landlord\PlanController::class, 'index'])->name('plans.index');
@@ -330,3 +332,53 @@ Route::prefix('landlord')->name('landlord.')->group(function () {
         Route::get('audit-logs', [\App\Http\Controllers\Landlord\AuditLogController::class, 'index'])->name('audit_logs.index');
     });
 });
+
+// =========================================================================
+// Routes de Résolution Multi-Tenant
+// =========================================================================
+Route::get('/tenant/pending', function (\Illuminate\Http\Request $request) {
+    $tenantSlug = $request->query('tenant');
+    $tenant = null;
+    if ($tenantSlug) {
+        $tenant = \App\Models\Platform\Tenant::on('landlord')->where('slug', $tenantSlug)->first();
+    }
+    return view('tenant.pending', [
+        'tenant' => $tenant,
+        'tenant_name' => $tenant ? $tenant->name : 'Boutique'
+    ]);
+})->name('tenant.pending');
+
+if (app()->environment('local') || app()->environment('testing')) {
+    Route::get('/tenant-debug', function () {
+        $context = app(\App\Services\Tenancy\TenantContext::class);
+        $tenant = $context->tenant();
+        $defaultConnection = config('database.default', 'mysql');
+
+        return response()->json([
+            'tenant_resolved' => $context->hasTenant(),
+            'tenant' => $tenant ? [
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+                'slug' => $tenant->slug,
+                'status' => $tenant->status,
+                'provisioning_status' => $tenant->provisioning_status,
+                'database_name' => $tenant->database_name,
+                'database_host' => $tenant->database_host,
+                'database_port' => $tenant->database_port,
+                'domain' => $tenant->domain,
+                'subdomain' => $tenant->subdomain,
+            ] : null,
+            'tenancy_enabled' => config('platform.tenancy_enabled'),
+            'tenant_resolution_enabled' => config('platform.tenant_resolution_enabled'),
+            'connection_actuelle' => \Illuminate\Support\Facades\DB::getDefaultConnection(),
+            'connection_tenant_config' => [
+                'driver' => config('database.connections.tenant.driver'),
+                'host' => config('database.connections.tenant.host'),
+                'port' => config('database.connections.tenant.port'),
+                'database' => config('database.connections.tenant.database'),
+                'username' => config('database.connections.tenant.username'),
+            ]
+        ]);
+    })->name('tenant.debug');
+}
+

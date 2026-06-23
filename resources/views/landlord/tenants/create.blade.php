@@ -80,6 +80,8 @@
                     </div>
                 </div>
 
+
+
                 {{-- Owner Info --}}
                 <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
                     <div class="flex items-center gap-2 pb-4 mb-5 border-b border-slate-100">
@@ -103,6 +105,49 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-655 mb-1.5">Téléphone</label>
                             <input type="text" name="owner_phone"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Technical Config --}}
+                <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                    <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-bold text-xs">3</span>
+                            <h2 class="text-sm font-bold text-slate-800">Configuration Technique</h2>
+                        </div>
+                        @if(!config('platform.enable_database_provisioning'))
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-205">
+                                Mode préparation uniquement
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-205">
+                                Provisionnement réel activé
+                            </span>
+                        @endif
+                    </div>
+
+                    <p class="text-xs text-slate-500 mb-4">
+                        Le provisionnement réel de la base boutique sera activé dans une étape suivante. Pour l’instant, le système prépare les informations de la boutique.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Sous-domaine</label>
+                            <input type="text" name="subdomain" placeholder="Ex: ma-boutique"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Domaine personnalisé</label>
+                            <input type="text" name="domain" placeholder="Ex: maboutique.com"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Nom de la base de données</label>
+                            <input type="text" name="database_name" placeholder="Ex: kamerstock_boutique"
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         </div>
                     </div>
@@ -140,13 +185,19 @@
                         </div>
 
                         <div x-show="status === 'trial'">
-                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Fin de l'essai gratuit</label>
-                            <input type="date" name="trial_ends_at" value="{{ now()->addDays(14)->format('Y-m-d') }}"
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Nombre de jours d'essai</label>
+                            <input type="number" name="trial_days" value="14" min="0"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+
+                        <div x-show="status === 'active'">
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Nombre de mois d'abonnement</label>
+                            <input type="number" name="subscription_months" value="1" min="1"
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Fin d'abonnement</label>
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Date de fin précise (Optionnel)</label>
                             <input type="date" name="subscription_ends_at"
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         </div>

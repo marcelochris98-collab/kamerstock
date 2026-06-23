@@ -16,11 +16,21 @@
                 </svg>
                 Modifier
             </a>
+            
             @if($tenant->status !== 'suspended')
+                @if($tenant->status !== 'read_only')
+                    <form action="{{ route('landlord.tenants.read_only', $tenant) }}" method="POST" class="inline-block" onsubmit="return confirm('Passer cette boutique en lecture seule ?')">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-xs font-bold text-white rounded-xl shadow-md shadow-amber-550/10 transition">
+                            Lecture Seule
+                        </button>
+                    </form>
+                @endif
+                
                 <form action="{{ route('landlord.tenants.suspend', $tenant) }}" method="POST" class="inline-block" onsubmit="return confirm('Confirmer la suspension de cette boutique ?')">
                     @csrf
-                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-xl shadow-md shadow-red-650/10 transition">
-                        Suspendre la Boutique
+                    <button type="submit" class="px-4 py-2 bg-red-650 hover:bg-red-700 text-xs font-bold text-white rounded-xl shadow-md shadow-red-655/10 transition">
+                        Suspendre
                     </button>
                 </form>
             @else
@@ -39,6 +49,41 @@
             {{ session('success') }}
         </div>
     @endif
+
+    {{-- Credentials success banner --}}
+    @if(session('show_credentials') || request()->has('show_credentials'))
+        <div class="mb-6 p-5 bg-indigo-950/40 border border-indigo-700/50 text-indigo-200 rounded-2xl shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    Boutique créée et prête à être partagée !
+                </h4>
+                <p class="text-xs text-indigo-300">Les accès d'administration ont été configurés en mode préparé. Copiez le message ci-dessous pour l'envoyer au propriétaire.</p>
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <button type="button" onclick="copyAccessMessage()" class="px-4 py-2 bg-indigo-650 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition select-none flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    Copier les accès
+                </button>
+            </div>
+        </div>
+    @endif
+
+    {{-- Confidentiality Disclaimer --}}
+    <div class="mb-6 p-4 bg-slate-900 border border-slate-800 text-slate-400 rounded-xl text-xs flex items-center justify-between shadow-sm select-none">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <span><strong>Confidentialité des données</strong> : Les données métier de la boutique (ventes, produits, clients) ne sont pas accessibles depuis cet espace.</span>
+        </div>
+        <span class="text-[10px] text-slate-550 uppercase tracking-widest font-bold font-mono">KamerStock Platform</span>
+    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -112,6 +157,159 @@
                         <span class="font-semibold text-slate-800 select-all">{{ $tenant->owner_phone ?? 'N/A' }}</span>
                     </li>
                 </ul>
+            </div>
+
+            {{-- Provisioning Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Provisionnement</h3>
+
+                <ul class="space-y-3.5 text-xs">
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Mode de déploiement</span>
+                        <span class="font-semibold text-slate-850">
+                            @if(config('platform.enable_database_provisioning'))
+                                <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-bold">Réel</span>
+                            @else
+                                <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 font-bold">Préparation seule</span>
+                            @endif
+                        </span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Nom de la base</span>
+                        <span class="font-mono text-slate-700 select-all">{{ $tenant->database_name ?? 'Non définie' }}</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Statut technique</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold
+                            @if($tenant->provisioning_status === 'migrated') bg-emerald-50 text-emerald-700
+                            @elseif($tenant->provisioning_status === 'database_created') bg-blue-50 text-blue-750
+                            @elseif($tenant->provisioning_status === 'legacy_current_db') bg-indigo-50 text-indigo-750 border border-indigo-150
+                            @elseif($tenant->provisioning_status === 'failed') bg-rose-50 text-rose-700 border border-rose-100
+                            @else bg-slate-150 text-slate-600 @endif">
+                            {{ config("platform.provisioning_modes.{$tenant->provisioning_status}", $tenant->provisioning_status) }}
+                        </span>
+                    </li>
+                    @if($tenant->provisioning_error)
+                        <li class="flex flex-col gap-1.5 mt-2">
+                            <span class="text-slate-400">Erreur de provisionnement</span>
+                            <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-3 font-mono text-[10px] text-rose-700 break-words">
+                                {{ $tenant->provisioning_error }}
+                            </div>
+                        </li>
+                    @endif
+                </ul>
+            </div>
+
+            {{-- Routage / Connexion Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Routage / Connexion</h3>
+
+                <ul class="space-y-3.5 text-xs">
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Slug</span>
+                        <span class="font-mono text-slate-700 font-semibold select-all">{{ $tenant->slug }}</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Domaine</span>
+                        <span class="font-semibold text-slate-850 select-all">{{ $tenant->domain ?? 'Aucun' }}</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Sous-domaine</span>
+                        <span class="font-semibold text-slate-850 select-all">{{ $tenant->subdomain ?? 'Aucun' }}</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Base de données</span>
+                        <span class="font-mono text-slate-700 select-all">{{ $tenant->database_name ?? 'N/A' }}</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-slate-400">Mode</span>
+                        <span class="font-semibold text-slate-850">
+                            @if($tenant->provisioning_status === 'legacy_current_db')
+                                Boutique actuelle legacy
+                            @elseif($tenant->provisioning_status === 'prepared')
+                                Préparation uniquement
+                            @elseif($tenant->provisioning_status === 'database_created')
+                                Base créée
+                            @elseif($tenant->provisioning_status === 'migrated')
+                                Migrée
+                            @else
+                                {{ ucfirst($tenant->provisioning_status) }}
+                            @endif
+                        </span>
+                    </li>
+                </ul>
+
+                <div class="mt-4 pt-4 border-t border-slate-150 space-y-2.5">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">URLs de test local</span>
+                    <div class="flex flex-col gap-1.5 font-mono text-[10px]">
+                        <a href="http://127.0.0.1:8000/tenant-debug?tenant={{ $tenant->slug }}" target="_blank" class="text-indigo-650 hover:text-indigo-850 underline break-all">
+                            Debug: /tenant-debug?tenant={{ $tenant->slug }}
+                        </a>
+                        <a href="http://127.0.0.1:8000/dashboard?tenant={{ $tenant->slug }}" target="_blank" class="text-indigo-650 hover:text-indigo-850 underline break-all">
+                            Dashboard: /dashboard?tenant={{ $tenant->slug }}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-150 text-[10px] text-slate-400 leading-relaxed">
+                    <svg class="w-3.5 h-3.5 text-indigo-500 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Le routage par sous-domaine sera activé dans une étape suivante.
+                </div>
+            </div>
+
+            {{-- Owner Access Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Accès Propriétaire</h3>
+
+                <div class="space-y-4 text-xs">
+                    <div>
+                        <span class="block text-slate-400 mb-1">E-mail de connexion</span>
+                        <span class="font-semibold text-slate-800 font-mono select-all">{{ $tenant->owner_login_email ?? 'N/A' }}</span>
+                    </div>
+
+                    @if($tenant->owner_password_plain)
+                        <div>
+                            <span class="block text-slate-400 mb-1">Mot de passe temporaire</span>
+                            <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-mono text-slate-800">
+                                <span class="select-all">{{ $tenant->owner_password_plain }}</span>
+                                <span class="text-[9px] text-slate-400 font-semibold uppercase">Généré</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="pt-2">
+                        <form action="{{ route('landlord.tenants.regenerate_owner_password', $tenant) }}" method="POST" onsubmit="return confirm('Confirmer la régénération du mot de passe temporaire ?')">
+                            @csrf
+                            <button type="submit" class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-xl transition text-[11px] border border-indigo-200">
+                                Régénérer le mot de passe
+                            </button>
+                        </form>
+                    </div>
+
+                    @php
+                        $future_url = $tenant->subdomain 
+                            ? "https://{$tenant->subdomain}.kamerstock.cm" 
+                            : "https://kamerstock.cm/{$tenant->slug}";
+                        
+                        $messageText = "Bonjour,\n\nVotre espace KamerStock est en préparation.\n\nBoutique : {$tenant->name}\nLien : {$future_url}\nEmail : {$tenant->owner_login_email}\nMot de passe temporaire : " . ($tenant->owner_password_plain ?? 'N/A') . "\n\nVous devrez changer votre mot de passe à la première connexion.\n\nCordialement,\nKamerStock";
+                    @endphp
+
+                    <div class="pt-4 border-t border-slate-100">
+                        <span class="block text-slate-400 mb-2">Message d'accès copiable</span>
+                        <textarea id="accessMessageText" readonly rows="7" 
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-mono text-[10px] text-slate-600 focus:outline-none resize-none">{{ $messageText }}</textarea>
+                        
+                        <button type="button" onclick="copyAccessMessage()" 
+                            class="w-full mt-2 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition text-[11px] flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Copier le message
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -279,3 +477,19 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function copyAccessMessage() {
+        const copyText = document.getElementById("accessMessageText");
+        if (copyText) {
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* For mobile devices */
+            navigator.clipboard.writeText(copyText.value);
+            
+            // Show alert or visual feedback
+            alert("Message d'accès copié dans le presse-papier !");
+        }
+    }
+</script>
+@endpush

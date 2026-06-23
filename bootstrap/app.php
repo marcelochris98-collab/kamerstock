@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'checkauth'  => \App\Http\Middleware\CheckAuth::class,
             'audit'      => \App\Http\Middleware\AuditRequests::class,
+            'identify.tenant' => \App\Http\Middleware\IdentifyTenant::class,
+        ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\IdentifyTenant::class,
         ]);
 
         $middleware->redirectGuestsTo(function ($request) {
@@ -22,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('landlord.login');
             }
             return route('login');
+        });
+
+        $middleware->redirectUsersTo(function ($request) {
+            if (auth()->guard('landlord')->check()) {
+                return route('landlord.dashboard');
+            }
+            return route('dashboard');
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
