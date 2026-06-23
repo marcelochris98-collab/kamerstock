@@ -142,6 +142,84 @@
 
     </div>
 
+    {{-- Backup Stats Section --}}
+    <div class="mb-6">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Statistiques de Sauvegarde</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            
+            {{-- Completed --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Complétées</p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $completedBackupsCount }}</p>
+                </div>
+            </div>
+
+            {{-- Failed --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Échouées</p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $failedBackupsCount }}</p>
+                </div>
+            </div>
+
+            {{-- Pending --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">En attente</p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $pendingBackupsCount }}</p>
+                </div>
+            </div>
+
+            {{-- Last Backup --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-655 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Dernière</p>
+                    @if($lastBackup)
+                        <p class="text-xs font-bold text-slate-900 mt-0.5 truncate" title="{{ $lastBackup->filename }}">{{ $lastBackup->finished_at->format('d/m H:i') }}</p>
+                        <p class="text-[9px] text-slate-450 truncate">{{ $lastBackup->tenant?->name }}</p>
+                    @else
+                        <p class="text-xs font-bold text-slate-400 mt-0.5">Aucune</p>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Without backup --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Sans backup</p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $tenantsWithoutBackupCount }}</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     {{-- Details Sections --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

@@ -464,10 +464,7 @@
                                             {{ $pay->status }}
                                         </span>
                                     </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="py-4 text-center text-slate-400">Aucun paiement enregistré.</td>
+                                <                                    <td colspan="4" class="py-4 text-center text-slate-400">Aucun paiement enregistré.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -477,33 +474,85 @@
 
             {{-- Backups --}}
             <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
-                <h3 class="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Historique des sauvegardes</h3>
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                    <h3 class="text-sm font-bold text-slate-800">Historique des sauvegardes</h3>
+                    <a href="{{ route('landlord.backups.index', ['tenant_id' => $tenant->id]) }}" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800">
+                        Voir toutes les sauvegardes
+                    </a>
+                </div>
+
+                @if($tenant->provisioning_status === 'prepared')
+                    <div class="mb-4 p-4 bg-amber-50 border border-amber-100 text-amber-800 rounded-xl text-xs">
+                        <p class="font-semibold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            La base de données de cette boutique n’est pas encore active. La sauvegarde réelle sera disponible après provisionnement.
+                        </p>
+                    </div>
+                @else
+                    {{-- Action Card --}}
+                    <div class="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <p class="text-xs font-semibold text-slate-900">Sauvegardes de bases de données</p>
+                            @php
+                                $lastTenantBackup = $tenant->backups()->where('status', 'completed')->latest('finished_at')->first();
+                            @endphp
+                            @if($lastTenantBackup)
+                                <p class="text-[11px] text-slate-500">
+                                    Dernière sauvegarde : <span class="font-bold font-mono text-slate-700">{{ $lastTenantBackup->filename }}</span> ({{ $lastTenantBackup->sizeForHumans() }}) le {{ $lastTenantBackup->finished_at->format('d/m/Y H:i') }}
+                                </p>
+                            @else
+                                <p class="text-[11px] text-slate-400 font-medium">Aucune sauvegarde complétée pour cette boutique.</p>
+                            @endif
+                        </div>
+                        <div>
+                            @if(config('platform.backups.allow_manual_backup', true))
+                                <form action="{{ route('landlord.tenants.backups.store', $tenant) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-xs font-bold text-white rounded-xl shadow-md shadow-indigo-650/10 transition select-none flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                        </svg>
+                                        Lancer une sauvegarde
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endif
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="border-b border-slate-150 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                 <th class="py-2">Fichier</th>
+                                <th class="py-2">Type</th>
                                 <th class="py-2">Taille</th>
                                 <th class="py-2">Date de création</th>
                                 <th class="py-2 text-right">Statut</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @forelse($tenant->backups as $backup)
-                                <tr>
-                                    <td class="py-3 font-mono text-[10px] text-slate-700">{{ $backup->filename }}</td>
-                                    <td class="py-3 font-semibold text-slate-800">{{ number_format($backup->size_bytes / 1024 / 1024, 2) }} Mo</td>
-                                    <td class="py-3 text-slate-650">{{ $backup->created_at->format('d/m/Y H:i') }}</td>
+                            @forelse($tenant->backups()->latest()->limit(5)->get() as $backup)
+                                <tr class="hover:bg-slate-50/50 transition">
+                                    <td class="py-3 font-mono text-[10px] text-slate-750 select-all">
+                                        <a href="{{ route('landlord.backups.show', $backup) }}" class="hover:underline font-bold text-indigo-650">
+                                            {{ $backup->filename }}
+                                        </a>
+                                    </td>
+                                    <td class="py-3 text-slate-650">{{ $backup->backupTypeLabel() }}</td>
+                                    <td class="py-3 font-semibold text-slate-800">{{ $backup->sizeForHumans() }}</td>
+                                    <td class="py-3 text-slate-600">{{ $backup->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="py-3 text-right">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
-                                            {{ $backup->status }}
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold {{ $backup->statusBadgeClass() }}">
+                                            {{ $backup->statusLabel() }}
                                         </span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-4 text-center text-slate-400">Aucune sauvegarde trouvée.</td>
+                                    <td colspan="5" class="py-4 text-center text-slate-450">Aucune sauvegarde trouvée.</td>
                                 </tr>
                             @endforelse
                         </tbody>

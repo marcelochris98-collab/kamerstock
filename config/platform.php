@@ -81,5 +81,16 @@ return [
         'block_prepared_tenants_when_enabled' => true,
         'log_tenant_resolution' => true,
     ],
+
+    'backups' => [
+        'enabled' => env('PLATFORM_BACKUPS_ENABLED', false),
+        'disk' => env('PLATFORM_BACKUPS_DISK', 'local'),
+        'path' => env('PLATFORM_BACKUPS_PATH', 'platform-backups'),
+        'keep_last' => env('PLATFORM_BACKUPS_KEEP_LAST', 10),
+        'allow_manual_backup' => true,
+        'allow_download' => env('PLATFORM_BACKUPS_ALLOW_DOWNLOAD', false),
+        'allow_restore' => env('PLATFORM_BACKUPS_ALLOW_RESTORE', false),
+        'mysqldump_path' => env('MYSQLDUMP_PATH', 'mysqldump'),
+    ],
 ];
 

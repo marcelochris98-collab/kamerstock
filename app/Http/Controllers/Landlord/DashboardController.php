@@ -73,6 +73,12 @@ class DashboardController extends Controller
         $recentTenants = Tenant::latest()->limit(5)->get();
         $recentPayments = SubscriptionPayment::with('tenant')->latest()->limit(5)->get();
 
+        $completedBackupsCount = TenantBackup::where('status', 'completed')->count();
+        $failedBackupsCount = TenantBackup::where('status', 'failed')->count();
+        $pendingBackupsCount = TenantBackup::whereIn('status', ['pending', 'running'])->count();
+        $lastBackup = TenantBackup::with('tenant')->whereNotNull('finished_at')->latest('finished_at')->first();
+        $tenantsWithoutBackupCount = Tenant::whereDoesntHave('backups')->count();
+
         return view('landlord.dashboard', compact(
             'tenantsCount',
             'activeTenantsCount',
@@ -86,7 +92,12 @@ class DashboardController extends Controller
             'recentlyExpiredSupportAccesses',
             'recentBackups',
             'recentTenants',
-            'recentPayments'
+            'recentPayments',
+            'completedBackupsCount',
+            'failedBackupsCount',
+            'pendingBackupsCount',
+            'lastBackup',
+            'tenantsWithoutBackupCount'
         ));
     }
 }
