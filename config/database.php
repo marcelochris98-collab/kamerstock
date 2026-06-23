@@ -32,6 +32,29 @@ return [
 
     'connections' => [
 
+        'landlord' => env('LANDLORD_DB_CONNECTION', env('DB_CONNECTION', 'mysql')) === 'sqlite' ? [
+            'driver' => 'sqlite',
+            'url' => env('LANDLORD_DB_URL', env('DB_URL')),
+            'database' => env('LANDLORD_DB_DATABASE', env('DB_DATABASE', database_path('database.sqlite'))),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ] : [
+            'driver' => env('LANDLORD_DB_CONNECTION', env('DB_CONNECTION', 'mysql')),
+            'url' => env('LANDLORD_DB_URL', env('DB_URL')),
+            'host' => env('LANDLORD_DB_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('LANDLORD_DB_PORT', env('DB_PORT', '3306')),
+            'database' => env('LANDLORD_DB_DATABASE', env('DB_DATABASE', 'forge')),
+            'username' => env('LANDLORD_DB_USERNAME', env('DB_USERNAME', 'forge')),
+            'password' => env('LANDLORD_DB_PASSWORD', env('DB_PASSWORD', '')),
+            'unix_socket' => env('LANDLORD_DB_SOCKET', env('DB_SOCKET', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),

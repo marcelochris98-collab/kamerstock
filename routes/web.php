@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\PlatformController;
 use App\Http\Controllers\ClientPortalController;
 
 // Redirection racine ou landing page
@@ -68,17 +69,18 @@ Route::middleware(['checkauth', 'audit'])->group(function () {
             Route::get('settings/default-categories', [SettingController::class, 'showDefaultCategories'])->name('settings.default-categories');
             Route::post('settings/default-categories', [SettingController::class, 'storeDefaultCategories'])->name('settings.default-categories.store');
 
-            // Assistant de configuration initiale
-            Route::get('setup', [\App\Http\Controllers\Admin\SetupWizardController::class, 'index'])->name('setup.index');
-            Route::post('setup', [\App\Http\Controllers\Admin\SetupWizardController::class, 'store'])->name('setup.store');
-            Route::post('setup/finish', [\App\Http\Controllers\Admin\SetupWizardController::class, 'finish'])->name('setup.finish');
-            Route::post('setup/reset', [\App\Http\Controllers\Admin\SetupWizardController::class, 'reset'])->name('setup.reset');
+            Route::post('settings/finish', [SettingController::class, 'finish'])->name('settings.finish');
+            Route::post('settings/reset', [SettingController::class, 'reset'])->name('settings.reset');
 
             Route::get('backups', [App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups.index');
             Route::post('backups', [App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backups.create');
             Route::get('backups/{filename}/download', [App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backups.download');
             Route::delete('backups/{filename}', [App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('backups.destroy');
             Route::post('backups/{filename}/restore', [App\Http\Controllers\Admin\BackupController::class, 'restore'])->name('backups.restore');
+
+            Route::get('platform/overview', function () {
+                return redirect()->route('landlord.dashboard');
+            })->name('platform.overview');
         });
 
         Route::middleware(['permission:logs.view'])->group(function () {
@@ -284,3 +286,47 @@ Route::get('/client/messages/json', [ClientPortalController::class, 'getMessages
 Route::post('/client/messages/send-ajax', [ClientPortalController::class, 'sendMessageAjax'])->name('client.portal.messages.send_ajax');
 Route::post('/client/settings/notifications', [ClientPortalController::class, 'updateNotificationSettings'])->name('client.portal.settings.notifications');
 Route::get('/client/notifications/poll', [ClientPortalController::class, 'pollNotifications'])->name('client.portal.notifications.poll');
+
+// =========================================================================
+// Landlord / Super Admin Area
+// =========================================================================
+Route::prefix('landlord')->name('landlord.')->group(function () {
+    
+    // Public routes (Guest landlord)
+    Route::middleware('guest:landlord')->group(function () {
+        Route::get('login', [\App\Http\Controllers\Landlord\AuthController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [\App\Http\Controllers\Landlord\AuthController::class, 'login'])->name('login.store');
+    });
+
+    // Protected routes (Auth landlord)
+    Route::middleware('auth:landlord')->group(function () {
+        Route::post('logout', [\App\Http\Controllers\Landlord\AuthController::class, 'logout'])->name('logout');
+        
+        Route::get('dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Tenants CRUD & Actions
+        Route::get('tenants', [\App\Http\Controllers\Landlord\TenantController::class, 'index'])->name('tenants.index');
+        Route::get('tenants/create', [\App\Http\Controllers\Landlord\TenantController::class, 'create'])->name('tenants.create');
+        Route::post('tenants', [\App\Http\Controllers\Landlord\TenantController::class, 'store'])->name('tenants.store');
+        Route::get('tenants/{tenant}', [\App\Http\Controllers\Landlord\TenantController::class, 'show'])->name('tenants.show');
+        Route::get('tenants/{tenant}/edit', [\App\Http\Controllers\Landlord\TenantController::class, 'edit'])->name('tenants.edit');
+        Route::put('tenants/{tenant}', [\App\Http\Controllers\Landlord\TenantController::class, 'update'])->name('tenants.update');
+        Route::post('tenants/{tenant}/suspend', [\App\Http\Controllers\Landlord\TenantController::class, 'suspend'])->name('tenants.suspend');
+        Route::post('tenants/{tenant}/activate', [\App\Http\Controllers\Landlord\TenantController::class, 'activate'])->name('tenants.activate');
+        Route::post('tenants/{tenant}/read-only', [\App\Http\Controllers\Landlord\TenantController::class, 'readOnly'])->name('tenants.read_only');
+
+        // Plans CRUD
+        Route::get('plans', [\App\Http\Controllers\Landlord\PlanController::class, 'index'])->name('plans.index');
+        Route::get('plans/create', [\App\Http\Controllers\Landlord\PlanController::class, 'create'])->name('plans.create');
+        Route::post('plans', [\App\Http\Controllers\Landlord\PlanController::class, 'store'])->name('plans.store');
+        Route::get('plans/{plan}/edit', [\App\Http\Controllers\Landlord\PlanController::class, 'edit'])->name('plans.edit');
+        Route::put('plans/{plan}', [\App\Http\Controllers\Landlord\PlanController::class, 'update'])->name('plans.update');
+
+        // Consultations
+        Route::get('subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');
+        Route::get('payments', [\App\Http\Controllers\Landlord\PaymentController::class, 'index'])->name('payments.index');
+        Route::get('support-accesses', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'index'])->name('support.index');
+        Route::get('backups', [\App\Http\Controllers\Landlord\BackupController::class, 'index'])->name('backups.index');
+        Route::get('audit-logs', [\App\Http\Controllers\Landlord\AuditLogController::class, 'index'])->name('audit_logs.index');
+    });
+});

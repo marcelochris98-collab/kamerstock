@@ -38,7 +38,7 @@
                 <p class="text-[10px] text-slate-500">Personnalisez votre logiciel de gestion en renseignant les détails de votre commerce.</p>
             </div>
         </div>
-        <a href="{{ route('admin.setup.index') }}" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none flex-shrink-0 text-center">
+        <a href="{{ route('admin.settings.index') }}" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none flex-shrink-0 text-center">
             Configurer maintenant
         </a>
     </div>

@@ -327,13 +327,6 @@
                     {{ request()->routeIs('admin.settings.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Paramètres Shop
                 </a>
-                @if(Route::has('admin.setup.index'))
-                <a href="{{ route('admin.setup.index') }}"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
-                    {{ request()->routeIs('admin.setup.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
-                    Configuration boutique
-                </a>
-                @endif
                 <a href="{{ route('settings.credit.edit') }}"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
                     {{ request()->routeIs('settings.credit.edit') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">

@@ -58,36 +58,36 @@ class SetupWizardTest extends TestCase
         ]);
     }
 
-    public function test_guest_cannot_access_setup_wizard()
+    public function test_guest_cannot_access_settings()
     {
-        $response = $this->get(route('admin.setup.index'));
+        $response = $this->get(route('admin.settings.index'));
         $response->assertStatus(302);
     }
 
-    public function test_user_without_permission_cannot_access_setup_wizard()
+    public function test_user_without_permission_cannot_access_settings()
     {
         $this->actingAs($this->userWithoutPermission);
-        $response = $this->get(route('admin.setup.index'));
+        $response = $this->get(route('admin.settings.index'));
         $response->assertStatus(403);
     }
 
-    public function test_admin_can_access_setup_wizard()
+    public function test_admin_can_access_settings()
     {
         $this->actingAs($this->admin);
-        $response = $this->get(route('admin.setup.index'));
+        $response = $this->get(route('admin.settings.index'));
         $response->assertStatus(200);
         $response->assertSee('Initial Shop');
         $response->assertSee('Quincaillerie');
     }
 
-    public function test_admin_can_save_setup_wizard_general_and_business_type()
+    public function test_admin_can_save_settings_general_and_business_type()
     {
         $this->actingAs($this->admin);
 
         // Pre-create 'Boissons' to test duplicate verification
         Category::create(['name' => 'Boissons']);
 
-        $response = $this->post(route('admin.setup.store'), [
+        $response = $this->post(route('admin.settings.update'), [
             'shop_name' => 'Wizard Shop',
             'currency' => 'EUR',
             'tax_rate' => 20,
@@ -113,11 +113,11 @@ class SetupWizardTest extends TestCase
         $this->assertTrue(Category::where('name', 'Hygiène')->exists());
     }
 
-    public function test_admin_can_finish_setup_wizard()
+    public function test_admin_can_finish_settings_setup()
     {
         $this->actingAs($this->admin);
 
-        $response = $this->post(route('admin.setup.finish'));
+        $response = $this->post(route('admin.settings.finish'));
         $response->assertStatus(302);
         $response->assertRedirect(route('dashboard'));
 
@@ -127,7 +127,7 @@ class SetupWizardTest extends TestCase
         $this->assertNotNull($this->settings->setup_completed_at);
     }
 
-    public function test_admin_can_reset_setup_wizard()
+    public function test_admin_can_reset_settings_setup()
     {
         $this->actingAs($this->admin);
 
@@ -138,9 +138,9 @@ class SetupWizardTest extends TestCase
             'setup_step' => 'completed',
         ]);
 
-        $response = $this->post(route('admin.setup.reset'));
+        $response = $this->post(route('admin.settings.reset'));
         $response->assertStatus(302);
-        $response->assertRedirect(route('admin.setup.index'));
+        $response->assertRedirect(route('admin.settings.index'));
 
         $this->settings->refresh();
         $this->assertFalse($this->settings->setup_completed);

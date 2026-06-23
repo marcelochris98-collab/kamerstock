@@ -16,6 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkauth'  => \App\Http\Middleware\CheckAuth::class,
             'audit'      => \App\Http\Middleware\AuditRequests::class,
         ]);
+
+        $middleware->redirectGuestsTo(function ($request) {
+            if ($request->is('landlord/*') || $request->is('landlord')) {
+                return route('landlord.login');
+            }
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
