@@ -8,6 +8,7 @@ use App\Services\Tenancy\TenantContext;
 use App\Services\Tenancy\TenantResolver;
 use App\Services\Tenancy\TenantDatabaseManager;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
 
 class IdentifyTenant
 {
@@ -28,9 +29,7 @@ class IdentifyTenant
     public function handle(Request $request, Closure $next): Response
     {
         // 1. Skip if request is landlord, static assets or system paths
-        if ($request->is('landlord/*') || $request->is('landlord') ||
-            $request->is('assets/*') || $request->is('build/*') ||
-            $request->is('storage/*') || $request->path() === 'favicon.ico') {
+        if ($this->resolver->shouldIgnoreRequest($request)) {
             return $next($request);
         }
 
@@ -39,6 +38,9 @@ class IdentifyTenant
             return $next($request);
         }
 
+        $tenantParam = config('platform.tenant_query_parameter', 'tenant');
+        $hasTenantParam = $request->has($tenantParam);
+
         // 3. Attempt to resolve tenant
         $tenant = $this->resolver->resolveFromRequest($request);
 
@@ -46,17 +48,33 @@ class IdentifyTenant
             // 4. Save resolved tenant in context
             $this->context->setTenant($tenant);
 
-            // 5. Redirect pending/prepared tenants to pending page
-            $pendingStatuses = config('platform.tenant_pending_statuses', ['prepared', 'pending']);
-            if (in_array($tenant->provisioning_status, $pendingStatuses, true)) {
-                if (!$request->routeIs('tenant.pending') && !$request->routeIs('tenant.debug')) {
-                    return redirect()->route('tenant.pending', ['tenant' => $tenant->slug]);
+            if (config('platform.security.log_tenant_resolution', true)) {
+                Log::info('Tenant resolved', [
+                    'tenant_id' => $tenant->id,
+                    'slug' => $tenant->slug,
+                    'status' => $tenant->status,
+                    'provisioning_status' => $tenant->provisioning_status,
+                ]);
+            }
+
+            // 5. Redirect pending/prepared tenants to pending page if tenancy is enabled
+            if (config('platform.tenancy_enabled', false)) {
+                $pendingStatuses = config('platform.tenant_pending_statuses', ['prepared', 'pending']);
+                if (in_array($tenant->provisioning_status, $pendingStatuses, true)) {
+                    if (!$request->routeIs('tenant.pending') && !$request->routeIs('tenant.debug')) {
+                        return redirect()->route('tenant.pending', ['tenant' => $tenant->slug]);
+                    }
                 }
             }
 
             // 6. Configure database connection if tenancy is enabled
             if (config('platform.tenancy_enabled', false)) {
                 $this->dbManager->configureForTenant($tenant);
+            }
+        } else {
+            // If tenant parameter is supplied but no tenant resolved, and tenancy is enabled, show 404
+            if ($hasTenantParam && config('platform.tenancy_enabled', false)) {
+                abort(404, 'Boutique introuvable');
             }
         }
 

@@ -24,7 +24,7 @@
             <span class="font-black text-xl text-white z-10">K</span>
         </div>
 
-        <h2 class="mt-6 text-2xl font-black tracking-tight text-white">Espace en préparation</h2>
+        <h2 class="mt-6 text-2xl font-black tracking-tight text-white">Espace boutique en préparation</h2>
         <p class="mt-2 text-xs text-slate-400 font-semibold uppercase tracking-wider">
             Boutique : <span class="text-indigo-400 font-bold">{{ $tenant_name }}</span>
         </p>
@@ -40,11 +40,7 @@
             </div>
 
             <p class="text-sm font-semibold text-slate-350">
-                Votre espace boutique est en cours d'initialisation.
-            </p>
-            
-            <p class="text-xs text-slate-450 mt-2 leading-relaxed">
-                La base de données de cette boutique n’est pas encore activée. Dès que le provisionnement sera terminé, cette page se débloquera automatiquement.
+                Votre espace KamerStock est en cours de préparation. Veuillez patienter ou contacter l’administrateur de la plateforme.
             </p>
 
             <div class="mt-6 border-t border-slate-700/60 pt-4 flex flex-col gap-2.5">
@@ -54,13 +50,6 @@
                         {{ $tenant ? $tenant->provisioning_status : 'prepared' }}
                     </span>
                 </div>
-                
-                @if($tenant && $tenant->database_name)
-                <div class="flex justify-between items-center text-[10px] px-2 text-slate-500 font-semibold">
-                    <span>BASE DE DONNÉES</span>
-                    <span class="font-mono text-slate-400">{{ $tenant->database_name }}</span>
-                </div>
-                @endif
             </div>
 
             <div class="mt-8">

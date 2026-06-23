@@ -6,7 +6,7 @@ use App\Models\Platform\Tenant;
 use App\Services\Tenancy\TenantContext;
 use App\Services\Tenancy\TenantDatabaseManager;
 use App\Services\Tenancy\TenantResolver;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class TenantResolutionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     private Tenant $legacyTenant;
     private Tenant $preparedTenant;
@@ -66,6 +66,9 @@ class TenantResolutionTest extends TestCase
 
     protected function tearDown(): void
     {
+        // Restore config to default state
+        Config::set('platform.tenancy_enabled', false);
+
         // Restore default connection to avoid affecting subsequent tests
         DB::setDefaultConnection(config('database.default'));
 
@@ -122,6 +125,8 @@ class TenantResolutionTest extends TestCase
 
     public function test_middleware_redirects_prepared_tenant_to_pending_page()
     {
+        Config::set('platform.tenancy_enabled', true);
+
         $response = $this->get('/dashboard?tenant=boutique-prepared');
 
         // Should redirect to tenant.pending

@@ -75,4 +75,11 @@ return [
         '1h'  => '1 heure',
         '24h' => '24 heures',
     ],
+
+    'security' => [
+        'hide_sensitive_fields' => true,
+        'block_prepared_tenants_when_enabled' => true,
+        'log_tenant_resolution' => true,
+    ],
 ];
+

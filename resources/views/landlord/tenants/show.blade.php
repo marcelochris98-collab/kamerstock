@@ -270,12 +270,18 @@
                     </div>
 
                     @if($tenant->owner_password_plain)
-                        <div>
-                            <span class="block text-slate-400 mb-1">Mot de passe temporaire</span>
-                            <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-mono text-slate-800">
+                        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+                            <span class="block text-[10px] font-bold text-indigo-750 uppercase tracking-wider mb-1">Accès Propriétaire</span>
+                            <div class="flex items-center justify-between bg-white border border-indigo-150 rounded-lg px-2.5 py-1.5 font-mono text-slate-900 text-xs">
                                 <span class="select-all">{{ $tenant->owner_password_plain }}</span>
-                                <span class="text-[9px] text-slate-400 font-semibold uppercase">Généré</span>
+                                <span class="text-[9px] text-slate-400 font-semibold uppercase">Temporaire</span>
                             </div>
+                            <p class="text-[10px] text-indigo-650 mt-1.5 leading-tight font-medium">
+                                <svg class="w-3.5 h-3.5 text-indigo-600 inline mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                À transmettre une seule fois au propriétaire.
+                            </p>
                         </div>
                     @endif
 

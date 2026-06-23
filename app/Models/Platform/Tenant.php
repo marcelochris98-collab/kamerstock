@@ -13,6 +13,11 @@ class Tenant extends Model
     protected $connection = 'landlord';
     protected $table = 'platform_tenants';
 
+    protected $hidden = [
+        'database_password',
+        'owner_password_plain',
+    ];
+
     protected $fillable = [
         'uuid',
         'name',

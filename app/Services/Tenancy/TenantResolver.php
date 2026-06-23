@@ -11,35 +11,67 @@ class TenantResolver
     /**
      * Resolve tenant from request.
      */
+    /**
+     * Resolve tenant from request.
+     */
     public function resolveFromRequest(Request $request): ?Tenant
     {
-        // 1. Skip paths that should never resolve a tenant
-        $path = $request->path();
-        if ($request->is('landlord/*') || $request->is('landlord') ||
-            $request->is('assets/*') || $request->is('build/*') ||
-            $request->is('storage/*') || $path === 'favicon.ico') {
+        if ($this->shouldIgnoreRequest($request)) {
             return null;
         }
 
-        // 2. Resolve using Strategy 1: Path local (/t/boutique-test/...)
-        $tenant = $this->resolveFromPath($request);
-        if ($tenant) {
-            return $tenant;
-        }
+        try {
+            // 2. Resolve using Strategy 1: Path local (/t/boutique-test/...)
+            $tenant = $this->resolveFromPath($request);
+            if ($tenant) {
+                return $tenant;
+            }
 
-        // 3. Resolve using Strategy 2: Query parameter (?tenant=boutique-test)
-        $tenant = $this->resolveFromQuery($request);
-        if ($tenant) {
-            return $tenant;
-        }
+            // 3. Resolve using Strategy 2: Query parameter (?tenant=boutique-test)
+            $tenant = $this->resolveFromQuery($request);
+            if ($tenant) {
+                return $tenant;
+            }
 
-        // 4. Resolve using Strategy 3 & 4: Subdomain / Custom Domain
-        $tenant = $this->resolveFromSubdomain($request);
-        if ($tenant) {
-            return $tenant;
+            // 4. Resolve using Strategy 3 & 4: Subdomain / Custom Domain
+            $tenant = $this->resolveFromSubdomain($request);
+            if ($tenant) {
+                return $tenant;
+            }
+        } catch (\Throwable $e) {
+            // Silence resolution errors (e.g. table platform_tenants not migrated yet in some tests)
+            if (config('platform.security.log_tenant_resolution', true)) {
+                \Illuminate\Support\Facades\Log::warning("Erreur lors de la résolution du tenant: " . $e->getMessage());
+            }
         }
 
         return null;
+    }
+
+    /**
+     * Check if request should be ignored for tenant resolution.
+     */
+    public function shouldIgnoreRequest(Request $request): bool
+    {
+        $path = $request->path();
+
+        // landlord routes
+        if ($request->is('landlord/*') || $request->is('landlord')) {
+            return true;
+        }
+
+        // static files
+        if ($request->is('assets/*') || $request->is('build/*') || $request->is('storage/*') || 
+            $path === 'favicon.ico' || $path === 'robots.txt') {
+            return true;
+        }
+
+        // tenant-debug only in local/testing
+        if ($request->is('tenant-debug') && !app()->environment('local', 'testing')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

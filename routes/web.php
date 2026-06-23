@@ -348,37 +348,38 @@ Route::get('/tenant/pending', function (\Illuminate\Http\Request $request) {
     ]);
 })->name('tenant.pending');
 
-if (app()->environment('local') || app()->environment('testing')) {
-    Route::get('/tenant-debug', function () {
-        $context = app(\App\Services\Tenancy\TenantContext::class);
-        $tenant = $context->tenant();
-        $defaultConnection = config('database.default', 'mysql');
+Route::get('/tenant-debug', function () {
+    abort_unless(app()->environment('local', 'testing'), 404);
 
-        return response()->json([
-            'tenant_resolved' => $context->hasTenant(),
-            'tenant' => $tenant ? [
-                'id' => $tenant->id,
-                'name' => $tenant->name,
-                'slug' => $tenant->slug,
-                'status' => $tenant->status,
-                'provisioning_status' => $tenant->provisioning_status,
-                'database_name' => $tenant->database_name,
-                'database_host' => $tenant->database_host,
-                'database_port' => $tenant->database_port,
-                'domain' => $tenant->domain,
-                'subdomain' => $tenant->subdomain,
-            ] : null,
-            'tenancy_enabled' => config('platform.tenancy_enabled'),
-            'tenant_resolution_enabled' => config('platform.tenant_resolution_enabled'),
-            'connection_actuelle' => \Illuminate\Support\Facades\DB::getDefaultConnection(),
-            'connection_tenant_config' => [
-                'driver' => config('database.connections.tenant.driver'),
-                'host' => config('database.connections.tenant.host'),
-                'port' => config('database.connections.tenant.port'),
-                'database' => config('database.connections.tenant.database'),
-                'username' => config('database.connections.tenant.username'),
-            ]
-        ]);
-    })->name('tenant.debug');
-}
+    $context = app(\App\Services\Tenancy\TenantContext::class);
+    $tenant = $context->tenant();
+    $dbManager = app(\App\Services\Tenancy\TenantDatabaseManager::class);
+
+    return response()->json([
+        'tenant_resolved' => $context->hasTenant(),
+        'tenant' => $tenant ? [
+            'id' => $tenant->id,
+            'name' => $tenant->name,
+            'slug' => $tenant->slug,
+            'status' => $tenant->status,
+            'provisioning_status' => $tenant->provisioning_status,
+            'database_name' => $tenant->database_name,
+            'database_host' => $tenant->database_host,
+            'database_port' => $tenant->database_port,
+            'domain' => $tenant->domain,
+            'subdomain' => $tenant->subdomain,
+        ] : null,
+        'tenancy_enabled' => config('platform.tenancy_enabled'),
+        'tenant_resolution_enabled' => config('platform.tenant_resolution_enabled'),
+        'default_connection' => \Illuminate\Support\Facades\DB::getDefaultConnection(),
+        'can_use_tenant_database' => $tenant ? $dbManager->canUseTenantDatabase($tenant) : false,
+        'connection_tenant_config' => [
+            'driver' => config('database.connections.tenant.driver'),
+            'host' => config('database.connections.tenant.host'),
+            'port' => config('database.connections.tenant.port'),
+            'database' => config('database.connections.tenant.database'),
+            'username' => config('database.connections.tenant.username'),
+        ]
+    ]);
+})->name('tenant.debug');
 
