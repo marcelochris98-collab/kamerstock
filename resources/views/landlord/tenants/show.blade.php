@@ -318,6 +318,72 @@
                 </div>
             </div>
 
+            {{-- Support Access Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Accès Support Sécurisé</h3>
+
+                @php
+                    $supportService = app(\App\Services\Platform\SupportAccessService::class);
+                    $activeAccess = $supportService->activeAccessForTenant($tenant);
+                @endphp
+
+                @if($activeAccess)
+                    <div class="space-y-4">
+                        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-emerald-850">Accès Support Actif</span>
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold uppercase text-[9px]">Actif</span>
+                            </div>
+                            <p class="text-slate-650 mb-1"><strong>Raison :</strong> {{ $activeAccess->reason }}</p>
+                            <p class="text-slate-650 mb-1"><strong>Début :</strong> {{ $activeAccess->starts_at->format('d/m/Y H:i') }}</p>
+                            <p class="text-slate-650"><strong>Fin :</strong> {{ $activeAccess->ends_at->format('d/m/Y H:i') }}</p>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <a href="{{ route('landlord.support.enter', $activeAccess) }}" class="w-full py-2 bg-indigo-650 hover:bg-indigo-700 text-white font-bold rounded-xl text-center transition text-xs shadow-md shadow-indigo-650/10 select-none">
+                                Entrer en support
+                            </a>
+                            <form action="{{ route('landlord.support.revoke', $activeAccess) }}" method="POST" onsubmit="return confirm('Confirmer la révocation immédiate de cet accès support ?')">
+                                @csrf
+                                <button type="submit" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-650 font-bold rounded-xl transition text-xs border border-red-200 select-none">
+                                    Révoquer l'accès
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <form action="{{ route('landlord.tenants.support.store', $tenant) }}" method="POST" class="space-y-4 text-xs">
+                        @csrf
+                        <div>
+                            <label for="reason" class="block text-slate-400 mb-1">Motif de l'intervention</label>
+                            <input type="text" id="reason" name="reason" required placeholder="Ex: Résolution bug affichage dashboard" 
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="duration" class="block text-slate-400 mb-1">Durée de l'accès</label>
+                            <select id="duration" name="duration" required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-850 focus:outline-none focus:border-indigo-500">
+                                <option value="30_minutes">30 minutes</option>
+                                <option value="1_hour">1 heure</option>
+                                <option value="24_hours">24 heures</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-850 text-white font-bold rounded-xl transition select-none">
+                            Créer et Activer l'accès
+                        </button>
+                    </form>
+                @endif
+
+                <div class="mt-4 pt-4 border-t border-slate-100 text-[10px] text-slate-450 leading-relaxed">
+                    <svg class="w-3.5 h-3.5 text-slate-400 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Cet accès est temporaire et journalisé. Il ne donne pas un droit permanent sur les données de la boutique.
+                </div>
+            </div>
+
         </div>
 
         {{-- Right: Subscriptions, Payments, Backups & Audit Logs --}}

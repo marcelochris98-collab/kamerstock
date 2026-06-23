@@ -16,10 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkauth'  => \App\Http\Middleware\CheckAuth::class,
             'audit'      => \App\Http\Middleware\AuditRequests::class,
             'identify.tenant' => \App\Http\Middleware\IdentifyTenant::class,
+            'identify.support' => \App\Http\Middleware\IdentifySupportAccess::class,
         ]);
 
         $middleware->web(append: [
             \App\Http\Middleware\IdentifyTenant::class,
+            \App\Http\Middleware\IdentifySupportAccess::class,
         ]);
 
         $middleware->redirectGuestsTo(function ($request) {

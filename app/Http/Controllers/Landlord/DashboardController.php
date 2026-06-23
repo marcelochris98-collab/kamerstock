@@ -34,9 +34,40 @@ class DashboardController extends Controller
 
         $pendingPaymentsCount = SubscriptionPayment::where('status', 'pending')->count();
 
-        $activeSupportCount = SupportAccess::where('status', 'approved')
+        $activeSupportCount = SupportAccess::where('status', 'active')
+            ->where('starts_at', '<=', Carbon::now())
             ->where('ends_at', '>', Carbon::now())
+            ->whereNull('revoked_at')
             ->count();
+
+        // Accès support actifs
+        $activeSupportAccesses = SupportAccess::with('tenant')
+            ->where('status', 'active')
+            ->where('starts_at', '<=', Carbon::now())
+            ->where('ends_at', '>', Carbon::now())
+            ->whereNull('revoked_at')
+            ->orderBy('ends_at')
+            ->get();
+
+        // Accès en attente
+        $pendingSupportAccesses = SupportAccess::with('tenant')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Accès expirés ou révoqués récemment
+        $recentlyExpiredSupportAccesses = SupportAccess::with('tenant')
+            ->where(function ($query) {
+                $query->where('status', 'expired')
+                    ->orWhere('status', 'revoked')
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'active')
+                          ->where('ends_at', '<=', Carbon::now());
+                    });
+            })
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
 
         $recentBackups = TenantBackup::with('tenant')->latest()->limit(5)->get();
         $recentTenants = Tenant::latest()->limit(5)->get();
@@ -50,6 +81,9 @@ class DashboardController extends Controller
             'expiringSubscriptionsCount',
             'pendingPaymentsCount',
             'activeSupportCount',
+            'activeSupportAccesses',
+            'pendingSupportAccesses',
+            'recentlyExpiredSupportAccesses',
             'recentBackups',
             'recentTenants',
             'recentPayments'

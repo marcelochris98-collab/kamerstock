@@ -233,5 +233,146 @@
 
     </div>
 
+    {{-- Section Accès Support Sécurisé --}}
+    <div class="mt-8 border-t border-slate-200 pt-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <svg class="w-4.5 h-4.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    Maintenance & Support Sécurisé
+                </h2>
+                <p class="text-xs text-slate-400 font-medium mt-0.5">Suivi des sessions d'intervention et des demandes d'accès temporaires</p>
+            </div>
+            <a href="{{ route('landlord.support.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-bold text-slate-700 rounded-xl transition">
+                Gérer tous les accès
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Accès Actifs --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 flex-shrink-0">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        Sessions Actives ({{ $activeSupportAccesses->count() }})
+                    </h3>
+                </div>
+
+                <div class="flex-1 overflow-y-auto max-h-[280px] space-y-3 pr-1">
+                    @forelse($activeSupportAccesses as $access)
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs relative group/item">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <span class="font-bold text-slate-900 truncate max-w-[140px]">{{ $access->tenant?->name ?? 'Boutique' }}</span>
+                                <span class="inline-flex items-center gap-1 text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 uppercase font-mono">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                                    Actif
+                                </span>
+                            </div>
+                            <p class="text-slate-500 text-[10px] truncate mb-2">Motif: {{ $access->reason }}</p>
+                            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-2">
+                                <span>Temps restant :</span>
+                                <span class="font-bold text-indigo-650 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 font-mono">{{ $access->remainingDurationLabel() }}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="{{ route('landlord.support.enter', $access) }}" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-center transition text-[10px]">
+                                    Entrer
+                                </a>
+                                <form action="{{ route('landlord.support.revoke', $access) }}" method="POST" class="inline-block" onsubmit="return confirm('Révoquer immédiatement cet accès ?')">
+                                    @csrf
+                                    <button type="submit" class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg transition text-[10px]" title="Révoquer">
+                                        Révoquer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center h-full">
+                            <span class="text-slate-300 mb-1">Aucune session active</span>
+                            <a href="{{ route('landlord.support.create') }}" class="text-[10px] text-indigo-650 font-bold hover:underline">Créer une demande d'accès →</a>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Accès en Attente --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 flex-shrink-0">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        En Attente ({{ $pendingSupportAccesses->count() }})
+                    </h3>
+                </div>
+
+                <div class="flex-1 overflow-y-auto max-h-[280px] space-y-3 pr-1">
+                    @forelse($pendingSupportAccesses as $access)
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <span class="font-bold text-slate-900 truncate max-w-[140px]">{{ $access->tenant?->name ?? 'Boutique' }}</span>
+                                <span class="text-[9px] font-bold bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200 uppercase font-mono">Attente</span>
+                            </div>
+                            <p class="text-slate-500 text-[10px] truncate mb-2">Motif: {{ $access->reason }}</p>
+                            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-2">
+                                <span>Durée demandée :</span>
+                                <span class="font-bold text-slate-650">{{ $access->metadata['duration'] ?? '30 mins' }}</span>
+                            </div>
+                            <form action="{{ route('landlord.support.activate', $access) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-center transition text-[10px]">
+                                    Activer l'accès
+                                </button>
+                            </form>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center h-full">
+                            <span class="text-slate-300">Aucune demande en attente</span>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Expirés Récemment --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 flex-shrink-0">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-450" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Expirés récemment
+                    </h3>
+                </div>
+
+                <div class="flex-1 overflow-y-auto max-h-[280px] space-y-3 pr-1">
+                    @forelse($recentlyExpiredSupportAccesses as $access)
+                        <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs opacity-75">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <span class="font-bold text-slate-700 truncate max-w-[140px]">{{ $access->tenant?->name ?? 'Boutique' }}</span>
+                                <span class="text-[9px] font-bold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 uppercase font-mono">
+                                    {{ $access->statusLabel() }}
+                                </span>
+                            </div>
+                            <p class="text-slate-500 text-[10px] truncate mb-1">Motif: {{ $access->reason }}</p>
+                            <p class="text-[9px] text-slate-400 font-mono">
+                                Modifié le {{ $access->updated_at->format('d/m H:i') }}
+                            </p>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center h-full">
+                            <span class="text-slate-300">Aucun historique d'expiration</span>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 </div>
 @endsection

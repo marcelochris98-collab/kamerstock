@@ -327,7 +327,20 @@ Route::prefix('landlord')->name('landlord.')->group(function () {
         // Consultations
         Route::get('subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');
         Route::get('payments', [\App\Http\Controllers\Landlord\PaymentController::class, 'index'])->name('payments.index');
+        // Support Accesses
         Route::get('support-accesses', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'index'])->name('support.index');
+        Route::get('support-accesses/create', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'create'])->name('support.create');
+        Route::post('support-accesses', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'store'])->name('support.store');
+        Route::get('support-accesses/{supportAccess}', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'show'])->name('support.show');
+        Route::post('support-accesses/{supportAccess}/activate', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'activate'])->name('support.activate');
+        Route::post('support-accesses/{supportAccess}/revoke', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'revoke'])->name('support.revoke');
+        Route::post('support-accesses/expire-old', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'expireOld'])->name('support.expire_old');
+        Route::get('support-accesses/{supportAccess}/enter', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'enter'])->name('support.enter');
+        
+        // Tenant specific support creation
+        Route::get('tenants/{tenant}/support', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'tenantSupport'])->name('tenants.support');
+        Route::post('tenants/{tenant}/support', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'tenantSupportStore'])->name('tenants.support.store');
+
         Route::get('backups', [\App\Http\Controllers\Landlord\BackupController::class, 'index'])->name('backups.index');
         Route::get('audit-logs', [\App\Http\Controllers\Landlord\AuditLogController::class, 'index'])->name('audit_logs.index');
     });
@@ -347,6 +360,33 @@ Route::get('/tenant/pending', function (\Illuminate\Http\Request $request) {
         'tenant_name' => $tenant ? $tenant->name : 'Boutique'
     ]);
 })->name('tenant.pending');
+
+Route::get('/support/exit', function () {
+    $tenantId = session('support_tenant_id');
+    $tenant = null;
+    if ($tenantId) {
+        $tenant = \App\Models\Platform\Tenant::on('landlord')->find($tenantId);
+    }
+    
+    // Clear session variables
+    session()->forget(['support_access_id', 'support_tenant_id']);
+    app(\App\Services\Platform\SupportContext::class)->clear();
+
+    if ($tenant) {
+        \App\Services\Platform\LandlordAuditService::record(
+            'support_access_exited',
+            $tenant,
+            "L'administrateur Landlord a quitté la session de support sur la boutique : {$tenant->name}"
+        );
+    }
+
+    if (auth('landlord')->check()) {
+        return redirect()->route('landlord.support.index')
+            ->with('success', "Session de support fermée avec succès.");
+    }
+
+    return redirect()->route('dashboard');
+})->name('support.exit');
 
 Route::get('/tenant-debug', function () {
     abort_unless(app()->environment('local', 'testing'), 404);

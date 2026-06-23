@@ -28,6 +28,25 @@
         @include('layouts.sidebar')
 
         <div class="flex flex-col flex-1 overflow-hidden">
+            @php
+                $supportContext = app(\App\Services\Platform\SupportContext::class);
+            @endphp
+
+            @if($supportContext->isSupportMode())
+                <div class="bg-indigo-600 text-white px-4 py-2.5 text-xs flex justify-between items-center z-50 select-none shadow-md">
+                    <div class="flex items-center gap-2">
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-300 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                        </span>
+                        <span>Mode support actif — accès temporaire jusqu'au <strong>{{ $supportContext->access()->ends_at->format('d/m/Y \à H:i') }}</strong>.</span>
+                    </div>
+                    <a href="{{ route('support.exit') }}" class="px-2.5 py-1 bg-white/20 hover:bg-white/30 text-white font-bold rounded-lg transition text-[10px]">
+                        Quitter le mode support
+                    </a>
+                </div>
+            @endif
+
             @include('layouts.header')
 
             <main class="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-100">
