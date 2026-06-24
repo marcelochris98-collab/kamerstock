@@ -62,6 +62,13 @@ class SubscriptionSecurityTest extends TestCase
             'read_only_at' => now(),
             'provisioning_status' => 'legacy_current_db',
         ]);
+
+        // Créer un rôle par défaut pour éviter les échecs de validation
+        \App\Models\Role::create([
+            'name' => 'Administrateur',
+            'slug' => 'admin',
+            'is_active' => true,
+        ]);
     }
 
     protected function tearDown(): void
@@ -109,6 +116,8 @@ class SubscriptionSecurityTest extends TestCase
                 'name' => 'Test User',
                 'email' => 'test@user.com',
                 'password' => 'password123',
+                'password_confirmation' => 'password123',
+                'role_id' => 1,
             ]);
 
         // Doit être redirigé vers la page précédente (back) avec une erreur flash de lecture seule
@@ -128,6 +137,8 @@ class SubscriptionSecurityTest extends TestCase
                 'name' => 'Test User',
                 'email' => 'test@user.com',
                 'password' => 'password123',
+                'password_confirmation' => 'password123',
+                'role_id' => 1,
             ]);
 
         $response->assertStatus(403);
@@ -157,6 +168,8 @@ class SubscriptionSecurityTest extends TestCase
                 'name' => 'Test User Support',
                 'email' => 'support@user.com',
                 'password' => 'password123',
+                'password_confirmation' => 'password123',
+                'role_id' => 1,
             ]);
 
         // Ne doit pas être bloqué avec une erreur de lecture seule (donc redirection standard suite à la tentative d'écriture, sans erreur flash de lecture seule)

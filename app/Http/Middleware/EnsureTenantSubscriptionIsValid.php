@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Services\Tenancy\TenantContext;
 use App\Models\Platform\Tenant;
+use App\Services\Platform\SupportContext;
+use App\Models\Platform\SupportAccess;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureTenantSubscriptionIsValid
@@ -69,6 +71,9 @@ class EnsureTenantSubscriptionIsValid
 
         // 6. Si tenant suspendu, on redirige vers tenant.pending
         if ($tenant->status === 'suspended') {
+            if ($this->isSupportModeAllowed($request, $tenant)) {
+                return $next($request);
+            }
             if (!$request->routeIs('tenant.pending')) {
                 return redirect()->route('tenant.pending', ['tenant' => $tenant->slug])
                     ->with('error', "Cette boutique est suspendue car l'abonnement a expiré.");
@@ -77,6 +82,10 @@ class EnsureTenantSubscriptionIsValid
 
         // 7. Si tenant read_only
         if ($tenant->status === 'read_only') {
+            if ($this->isSupportModeAllowed($request, $tenant)) {
+                return $next($request);
+            }
+
             // si la requête est GET, HEAD ou OPTIONS : laisser passer
             if ($request->isMethodSafe()) {
                 return $next($request);
@@ -101,4 +110,32 @@ class EnsureTenantSubscriptionIsValid
 
         return $next($request);
     }
+
+    /**
+     * Détermine si le mode support est actif et valide pour le tenant courant.
+     */
+    private function isSupportModeAllowed(Request $request, Tenant $tenant): bool
+    {
+        // 1. Vérifier via le SupportContext
+        $supportContext = app(SupportContext::class);
+        if ($supportContext->isSupportMode()) {
+            $access = $supportContext->access();
+            if ($access && $access->tenant_id === $tenant->id && $access->canBeUsed()) {
+                return true;
+            }
+        }
+
+        // 2. Vérifier via la session ou la query
+        $supportAccessId = $request->query('support_access') ?: session('support_access_id');
+        if ($supportAccessId) {
+            $access = SupportAccess::on('landlord')->find($supportAccessId);
+            if ($access && $access->tenant_id === $tenant->id && $access->canBeUsed()) {
+                $supportContext->setAccess($access);
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
+
