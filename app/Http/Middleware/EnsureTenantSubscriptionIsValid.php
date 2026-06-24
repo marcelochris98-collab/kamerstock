@@ -82,6 +82,14 @@ class EnsureTenantSubscriptionIsValid
                 return $next($request);
             }
 
+            // Retourner une réponse JSON 403 si la requête attend du JSON
+            if ($request->expectsJson() || $request->isJson()) {
+                return response()->json([
+                    'message' => 'Boutique en lecture seule. Les modifications de données sont impossibles.',
+                    'error' => 'Boutique en lecture seule. Les modifications de données sont impossibles.',
+                ], 403);
+            }
+
             // sinon bloquer les méthodes d'écriture : POST, PUT, PATCH, DELETE
             return redirect()
                 ->back()
