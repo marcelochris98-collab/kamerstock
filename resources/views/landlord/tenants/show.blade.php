@@ -167,7 +167,7 @@
                     <li class="flex justify-between items-center">
                         <span class="text-slate-400">Mode de déploiement</span>
                         <span class="font-semibold text-slate-850">
-                            @if(config('platform.enable_database_provisioning'))
+                            @if(config('platform.database_provisioning.enabled'))
                                 <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-bold">Réel</span>
                             @else
                                 <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 font-bold">Préparation seule</span>
@@ -198,6 +198,27 @@
                         </li>
                     @endif
                 </ul>
+
+                <div class="mt-4">
+                    @if(in_array($tenant->provisioning_status, ['prepared','failed']) && !empty($tenant->database_name) && $tenant->provisioning_status !== 'legacy_current_db')
+                        @if(!config('platform.database_provisioning.enabled'))
+                            <div class="mb-3 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-xs">
+                                Le provisionnement réel est désactivé. Activez PLATFORM_ENABLE_DB_PROVISIONING=true pour créer réellement la base.
+                            </div>
+                        @else
+                            <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                Cette action va créer la base de données réelle de la boutique si elle n’existe pas.
+                            </div>
+                        @endif
+
+                        <form action="{{ route('landlord.tenants.provision_database', $tenant) }}" method="POST" onsubmit="return confirm('Créer la base de données réelle pour cette boutique ?')">
+                            @csrf
+                            <button type="submit" class="w-full py-2 bg-indigo-650 hover:bg-indigo-750 text-white font-bold rounded-xl transition text-[11px]">
+                                Créer la base boutique
+                            </button>
+                        </form>
+                    @endif
+                </div>
             </div>
 
             {{-- Routage / Connexion Card --}}
@@ -464,7 +485,10 @@
                                             {{ $pay->status }}
                                         </span>
                                     </td>
-                                <                                    <td colspan="4" class="py-4 text-center text-slate-400">Aucun paiement enregistré.</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-4 text-center text-slate-400">Aucun paiement enregistré.</td>
                                 </tr>
                             @endforelse
                         </tbody>
