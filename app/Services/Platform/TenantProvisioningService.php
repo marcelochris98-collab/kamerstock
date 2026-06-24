@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use App\Services\Platform\LandlordAuditService;
 use Carbon\Carbon;
 use Exception;
 
@@ -135,42 +136,128 @@ class TenantProvisioningService
     }
 
     /**
+     * Check if a database can be provisioned for this tenant.
+     */
+    public function canProvisionDatabase(Tenant $tenant): bool
+    {
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            return false;
+        }
+
+        if (empty($tenant->database_name)) {
+            return false;
+        }
+
+        if (!config('platform.database_provisioning.enabled', false)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Create the physical database (MySQL or SQLite).
+     */
+    public function createDatabase(Tenant $tenant): bool
+    {
+        $dbName = $tenant->database_name;
+        $cleanDbName = preg_replace('/[^a-zA-Z0-9_]/', '', $dbName);
+        
+        if (empty($cleanDbName)) {
+            throw new Exception("Nom de base de données invalide après nettoyage.");
+        }
+
+        $driver = DB::connection('landlord')->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $path = database_path("tenants/{$cleanDbName}.sqlite");
+            if (!file_exists(dirname($path))) {
+                mkdir(dirname($path), 0755, true);
+            }
+            touch($path);
+            return true;
+        }
+
+        // MySQL database creation
+        DB::statement("CREATE DATABASE IF NOT EXISTS `{$cleanDbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        return true;
+    }
+
+    /**
+     * Mark the tenant database as successfully created.
+     */
+    public function markDatabaseCreated(Tenant $tenant): Tenant
+    {
+        $tenant->update([
+            'provisioning_status' => 'database_created',
+            'provisioning_error' => null,
+        ]);
+
+        LandlordAuditService::record(
+            'tenant_database_created',
+            $tenant,
+            "Base de données créée avec succès pour la boutique : {$tenant->name}"
+        );
+
+        return $tenant;
+    }
+
+    /**
+     * Mark the tenant database creation as failed.
+     */
+    public function markProvisioningFailed(Tenant $tenant, string $message): Tenant
+    {
+        // Sécurité : masquer les mots de passe potentiels
+        $cleanMessage = str_ireplace(
+            [
+                config('database.connections.landlord.password', 'DB_PASSWORD_NOT_FOUND_LANDLORD'),
+                config('database.connections.mysql.password', 'DB_PASSWORD_NOT_FOUND_MYSQL'),
+                config('platform.database_provisioning.default_password', 'DB_PASSWORD_NOT_FOUND_DEFAULT'),
+                $tenant->database_password,
+                $tenant->owner_password_plain
+            ],
+            '[MASQUE]',
+            $message
+        );
+
+        $tenant->update([
+            'provisioning_status' => 'failed',
+            'provisioning_error' => $cleanMessage,
+        ]);
+
+        LandlordAuditService::record(
+            'tenant_database_creation_failed',
+            $tenant,
+            "Échec de création de base de données pour la boutique : {$tenant->name}. Erreur : {$cleanMessage}"
+        );
+
+        return $tenant;
+    }
+
+    /**
      * Provision the actual database for the tenant (Mode B).
      */
-    public function provisionDatabase(Tenant $tenant): void
+    public function provisionDatabase(Tenant $tenant): Tenant
     {
-        if (!config('platform.enable_database_provisioning', false)) {
+        if (!config('platform.database_provisioning.enabled', false)) {
             $tenant->update([
                 'provisioning_status' => 'prepared'
             ]);
-            return;
+            return $tenant;
         }
 
-        $dbName = $tenant->database_name;
-        $driver = DB::connection('landlord')->getDriverName();
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            return $tenant;
+        }
 
         try {
-            if ($driver === 'sqlite') {
-                $path = database_path("tenants/{$dbName}.sqlite");
-                if (!file_exists(dirname($path))) {
-                    mkdir(dirname($path), 0755, true);
-                }
-                touch($path);
-            } else {
-                DB::statement("CREATE DATABASE `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-            }
-
-            $tenant->update([
-                'provisioning_status' => 'database_created',
-                'provisioning_error' => null,
-            ]);
+            $this->createDatabase($tenant);
+            $this->markDatabaseCreated($tenant);
         } catch (Exception $e) {
-            $tenant->update([
-                'provisioning_status' => 'failed',
-                'provisioning_error' => 'Database creation failed: ' . $e->getMessage(),
-            ]);
-            throw $e;
+            $this->markProvisioningFailed($tenant, $e->getMessage());
         }
+
+        return $tenant;
     }
 
     /**
