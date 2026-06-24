@@ -267,6 +267,43 @@ class TenantController extends Controller
     }
 
     /**
+     * Provisionner la base de données réelle pour une boutique (action Landlord).
+     */
+    public function provisionDatabase(Tenant $tenant)
+    {
+        // Protection boutique legacy
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            return back()->with('error', 'La boutique actuelle legacy ne doit pas être provisionnée depuis cette action.');
+        }
+
+        if (empty($tenant->database_name)) {
+            return back()->with('error', 'Aucun nom de base de données n\'est défini pour cette boutique.');
+        }
+
+        // Appel du service de provisionnement (Mode réel)
+        $result = $this->provisioningService->provisionDatabase($tenant);
+
+        // Recharger le tenant
+        $tenant->refresh();
+
+        if ($tenant->provisioning_status === 'database_created') {
+            LandlordAuditService::record('tenant_provision_database', $tenant, "Base boutique créée pour : {$tenant->name}");
+            return back()->with('success', 'Base boutique créée avec succès.');
+        }
+
+        if ($tenant->provisioning_status === 'prepared' && !config('platform.database_provisioning.enabled', false)) {
+            return back()->with('warning', 'Le provisionnement réel est désactivé dans la configuration.');
+        }
+
+        if ($tenant->provisioning_status === 'failed') {
+            return back()->with('error', 'Le provisionnement a échoué. Consultez le détail technique dans la section Provisionnement.');
+        }
+
+        // Statut inattendu
+        return back()->with('info', "Statut : {$tenant->provisioning_status}");
+    }
+
+    /**
      * Register the current active database as a legacy tenant.
      */
     public function registerLegacy()
