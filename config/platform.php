@@ -14,6 +14,16 @@ return [
     'tenant_default_password_length' => 10,
     'tenant_owner_default_role' => 'Administrateur',
 
+    'database_provisioning' => [
+        'enabled' => env('PLATFORM_ENABLE_DB_PROVISIONING', false),
+        'allow_local' => env('PLATFORM_ALLOW_LOCAL_DB_PROVISIONING', true),
+        'tenant_database_prefix' => env('PLATFORM_TENANT_DB_PREFIX', 'kamerstock_tenant_'),
+        'default_host' => env('TENANT_DB_HOST', env('DB_HOST', '127.0.0.1')),
+        'default_port' => env('TENANT_DB_PORT', env('DB_PORT', '3306')),
+        'default_username' => env('TENANT_DB_USERNAME', env('DB_USERNAME')),
+        'default_password' => env('TENANT_DB_PASSWORD', env('DB_PASSWORD')),
+    ],
+
     // Multi-tenant configuration settings
     'tenancy_enabled' => env('PLATFORM_TENANCY_ENABLED', false),
     'tenant_resolution_enabled' => env('PLATFORM_TENANT_RESOLUTION_ENABLED', true),
