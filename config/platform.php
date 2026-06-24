@@ -17,6 +17,7 @@ return [
     // Multi-tenant configuration settings
     'tenancy_enabled' => env('PLATFORM_TENANCY_ENABLED', false),
     'tenant_resolution_enabled' => env('PLATFORM_TENANT_RESOLUTION_ENABLED', true),
+    'enforce_subscription_middleware' => env('PLATFORM_ENFORCE_SUBSCRIPTION_MIDDLEWARE', false),
     'central_domains' => [
         env('APP_DOMAIN', 'localhost'),
         '127.0.0.1',

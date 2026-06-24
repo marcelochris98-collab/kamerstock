@@ -9,75 +9,87 @@ use App\Models\Platform\Subscription;
 use App\Models\Platform\SubscriptionPayment;
 use App\Models\Platform\SupportAccess;
 use App\Models\Platform\TenantBackup;
+use App\Services\Platform\PlatformStatsService;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
+use Exception;
 
 class DashboardController extends Controller
 {
+    protected PlatformStatsService $statsService;
+
+    public function __construct(PlatformStatsService $statsService)
+    {
+        $this->statsService = $statsService;
+    }
+
     /**
      * Display the landlord super admin dashboard.
      */
     public function index()
     {
-        $tenantsCount = Tenant::count();
-        $activeTenantsCount = Tenant::where('status', 'active')->count();
-        $suspendedTenantsCount = Tenant::where('status', 'suspended')
-            ->orWhereNotNull('suspended_at')
-            ->count();
+        // Utilisation de try-catch et de requêtes sécurisées pour éviter les plantages
+        $overview = $this->statsService->overview();
+        $backupStats = $this->statsService->backupStats();
 
-        $plansCount = Plan::where('is_active', true)->count();
-
-        // Subscriptions expiring within 7 days
-        $expiringSubscriptionsCount = Subscription::where('status', 'active')
-            ->where('ends_at', '<=', Carbon::now()->addDays(7))
-            ->where('ends_at', '>', Carbon::now())
-            ->count();
-
-        $pendingPaymentsCount = SubscriptionPayment::where('status', 'pending')->count();
-
-        $activeSupportCount = SupportAccess::where('status', 'active')
-            ->where('starts_at', '<=', Carbon::now())
-            ->where('ends_at', '>', Carbon::now())
-            ->whereNull('revoked_at')
-            ->count();
+        $tenantsCount = $overview['tenants_count'];
+        $activeTenantsCount = $overview['active_tenants_count'];
+        $suspendedTenantsCount = $overview['suspended_tenants_count'];
+        $plansCount = $overview['plans_count'];
+        $expiringSubscriptionsCount = $overview['expiring_subscriptions_count'];
+        $pendingPaymentsCount = $overview['pending_payments_count'];
+        $activeSupportCount = $overview['active_support_count'];
 
         // Accès support actifs
-        $activeSupportAccesses = SupportAccess::with('tenant')
-            ->where('status', 'active')
-            ->where('starts_at', '<=', Carbon::now())
-            ->where('ends_at', '>', Carbon::now())
-            ->whereNull('revoked_at')
-            ->orderBy('ends_at')
-            ->get();
+        $activeSupportAccesses = $this->safeGet(function () {
+            return SupportAccess::with('tenant')
+                ->where('status', 'active')
+                ->where('starts_at', '<=', Carbon::now())
+                ->where('ends_at', '>', Carbon::now())
+                ->whereNull('revoked_at')
+                ->orderBy('ends_at')
+                ->get();
+        }, collect());
 
         // Accès en attente
-        $pendingSupportAccesses = SupportAccess::with('tenant')
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $pendingSupportAccesses = $this->safeGet(function () {
+            return SupportAccess::with('tenant')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }, collect());
 
         // Accès expirés ou révoqués récemment
-        $recentlyExpiredSupportAccesses = SupportAccess::with('tenant')
-            ->where(function ($query) {
-                $query->where('status', 'expired')
-                    ->orWhere('status', 'revoked')
-                    ->orWhere(function ($q) {
-                        $q->where('status', 'active')
-                          ->where('ends_at', '<=', Carbon::now());
-                    });
-            })
-            ->orderBy('updated_at', 'desc')
-            ->limit(5)
-            ->get();
+        $recentlyExpiredSupportAccesses = $this->safeGet(function () {
+            return SupportAccess::with('tenant')
+                ->where(function ($query) {
+                    $query->where('status', 'expired')
+                        ->orWhere('status', 'revoked')
+                        ->orWhere(function ($q) {
+                            $q->where('status', 'active')
+                              ->where('ends_at', '<=', Carbon::now());
+                        });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->limit(5)
+                ->get();
+        }, collect());
 
-        $recentBackups = TenantBackup::with('tenant')->latest()->limit(5)->get();
-        $recentTenants = Tenant::latest()->limit(5)->get();
-        $recentPayments = SubscriptionPayment::with('tenant')->latest()->limit(5)->get();
+        $recentBackups = $overview['recent_backups'];
+        
+        $recentTenants = $this->safeGet(function () {
+            return Tenant::latest()->limit(5)->get();
+        }, collect());
 
-        $completedBackupsCount = TenantBackup::where('status', 'completed')->count();
-        $failedBackupsCount = TenantBackup::where('status', 'failed')->count();
-        $pendingBackupsCount = TenantBackup::whereIn('status', ['pending', 'running'])->count();
-        $lastBackup = TenantBackup::with('tenant')->whereNotNull('finished_at')->latest('finished_at')->first();
-        $tenantsWithoutBackupCount = Tenant::whereDoesntHave('backups')->count();
+        $recentPayments = $this->safeGet(function () {
+            return SubscriptionPayment::with('tenant')->latest()->limit(5)->get();
+        }, collect());
+
+        $completedBackupsCount = $backupStats['completed'];
+        $failedBackupsCount = $backupStats['failed'];
+        $pendingBackupsCount = $backupStats['pending'] + $backupStats['running'];
+        $lastBackup = $backupStats['last_backup'];
+        $tenantsWithoutBackupCount = $backupStats['tenants_without_backup'];
 
         return view('landlord.dashboard', compact(
             'tenantsCount',
@@ -100,4 +112,17 @@ class DashboardController extends Controller
             'tenantsWithoutBackupCount'
         ));
     }
+
+    /**
+     * Exécute une requête de façon sécurisée et retourne une valeur par défaut en cas d'erreur.
+     */
+    private function safeGet(callable $callback, $default)
+    {
+        try {
+            return $callback();
+        } catch (Exception $e) {
+            return $default;
+        }
+    }
 }
+

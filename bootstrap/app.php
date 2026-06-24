@@ -17,11 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'audit'      => \App\Http\Middleware\AuditRequests::class,
             'identify.tenant' => \App\Http\Middleware\IdentifyTenant::class,
             'identify.support' => \App\Http\Middleware\IdentifySupportAccess::class,
+            'tenant.subscription' => \App\Http\Middleware\EnsureTenantSubscriptionIsValid::class,
         ]);
 
         $middleware->web(append: [
             \App\Http\Middleware\IdentifyTenant::class,
             \App\Http\Middleware\IdentifySupportAccess::class,
+            \App\Http\Middleware\EnsureTenantSubscriptionIsValid::class,
         ]);
 
         $middleware->redirectGuestsTo(function ($request) {

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Services\Tenancy\TenantContext;
 use App\Services\Tenancy\TenantResolver;
 use App\Services\Tenancy\TenantDatabaseManager;
+use App\Services\Platform\TenantStatusService;
+use App\Services\Platform\SupportContext;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -15,12 +17,18 @@ class IdentifyTenant
     protected TenantResolver $resolver;
     protected TenantContext $context;
     protected TenantDatabaseManager $dbManager;
+    protected TenantStatusService $statusService;
 
-    public function __construct(TenantResolver $resolver, TenantContext $context, TenantDatabaseManager $dbManager)
-    {
+    public function __construct(
+        TenantResolver $resolver,
+        TenantContext $context,
+        TenantDatabaseManager $dbManager,
+        TenantStatusService $statusService
+    ) {
         $this->resolver = $resolver;
         $this->context = $context;
         $this->dbManager = $dbManager;
+        $this->statusService = $statusService;
     }
 
     /**
@@ -57,7 +65,17 @@ class IdentifyTenant
                 ]);
             }
 
-            // 5. Redirect pending/prepared tenants to pending page if tenancy is enabled
+            // 5. Appliquer la suspension s'il y a lieu
+            if (config('platform.tenancy_enabled', false)) {
+                if ($this->statusService->isSuspended($tenant)) {
+                    if (!$request->routeIs('tenant.pending') && !$request->routeIs('tenant.debug')) {
+                        return redirect()->route('tenant.pending', ['tenant' => $tenant->slug])
+                            ->with('error', "Cette boutique est suspendue car l'abonnement a expiré.");
+                    }
+                }
+            }
+
+            // 6. Redirect pending/prepared tenants to pending page if tenancy is enabled
             if (config('platform.tenancy_enabled', false)) {
                 $pendingStatuses = config('platform.tenant_pending_statuses', ['prepared', 'pending']);
                 if (in_array($tenant->provisioning_status, $pendingStatuses, true)) {
@@ -67,7 +85,27 @@ class IdentifyTenant
                 }
             }
 
-            // 6. Configure database connection if tenancy is enabled
+            // 7. Appliquer la restriction Lecture Seule s'il y a lieu
+            if (config('platform.tenancy_enabled', false)) {
+                if ($this->statusService->isReadOnly($tenant)) {
+                    // Si c'est une requête de modification
+                    if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
+                        // Et si on n'est pas en mode support
+                        if (!app(SupportContext::class)->isSupportMode()) {
+                            // Si la requête attend du JSON
+                            if ($request->expectsJson() || $request->wantsJson()) {
+                                return response()->json([
+                                    'error' => "Boutique en lecture seule. Modifications impossibles car l'abonnement a expiré."
+                                ], 403);
+                            }
+
+                            return back()->with('error', "Boutique en lecture seule. Les modifications de données sont impossibles.");
+                        }
+                    }
+                }
+            }
+
+            // 8. Configure database connection if tenancy is enabled
             if (config('platform.tenancy_enabled', false)) {
                 $this->dbManager->configureForTenant($tenant);
             }
@@ -81,3 +119,4 @@ class IdentifyTenant
         return $next($request);
     }
 }
+

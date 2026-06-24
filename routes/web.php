@@ -341,6 +341,7 @@ Route::prefix('landlord')->name('landlord.')->group(function () {
         Route::get('tenants/{tenant}/support', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'tenantSupport'])->name('tenants.support');
         Route::post('tenants/{tenant}/support', [\App\Http\Controllers\Landlord\SupportAccessController::class, 'tenantSupportStore'])->name('tenants.support.store');
 
+        Route::get('statistics', [\App\Http\Controllers\Landlord\StatisticsController::class, 'index'])->name('statistics.index');
         Route::get('backups', [\App\Http\Controllers\Landlord\BackupController::class, 'index'])->name('backups.index');
         Route::get('backups/{backup}', [\App\Http\Controllers\Landlord\BackupController::class, 'show'])->name('backups.show');
         Route::post('tenants/{tenant}/backups', [\App\Http\Controllers\Landlord\BackupController::class, 'store'])->name('tenants.backups.store');
