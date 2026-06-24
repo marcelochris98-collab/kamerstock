@@ -44,6 +44,8 @@ class PlatformHealthCheckCommand extends Command
         $this->line("Mode Multi-Tenant : " . ($tenancyEnabled ? "<info>ACTIVE</info>" : "<comment>DESACTIVE (Mode Mono-Boutique Legacy)</comment>"));
         $this->line("Resolution Tenant : " . ($resolutionEnabled ? "<info>ACTIVEE</info>" : "<comment>DESACTIVEE</comment>"));
         $this->line("Strategie de Tenancy : <info>{$strategy}</info>");
+        $dbProvEnabled = config('platform.database_provisioning.enabled', false);
+        $this->line("Provisionnement DB réel : " . ($dbProvEnabled ? "<info>ACTIVE</info>" : "<comment>DESACTIVE</comment>"));
         
         $tests[] = [
             'Composant' => 'Configuration Platform',
@@ -137,6 +139,17 @@ class PlatformHealthCheckCommand extends Command
                     'Statut' => 'ATTENTION',
                     'Details' => 'Absence de boutique legacy de secours'
                 ];
+            }
+
+            // Afficher le nombre de tenants par statut de provisioning
+            try {
+                $prepared = Tenant::where('provisioning_status', 'prepared')->count();
+                $created = Tenant::where('provisioning_status', 'database_created')->count();
+                $failed = Tenant::where('provisioning_status', 'failed')->count();
+
+                $this->line("Tenants (prepared): <info>{$prepared}</info> | (database_created): <info>{$created}</info> | (failed): <error>{$failed}</error>");
+            } catch (Exception $e) {
+                // ignore
             }
         }
 
