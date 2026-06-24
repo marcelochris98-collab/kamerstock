@@ -52,6 +52,20 @@ class TenantProvisioningService
     }
 
     /**
+     * Retourne si le provisionnement de base de données réel est activé.
+     * Supporte l'ancienne clé `platform.enable_database_provisioning`
+     * et la nouvelle `platform.database_provisioning.enabled`.
+     */
+    private function isDbProvisioningEnabled(): bool
+    {
+        // Retourne true si l'une des deux clés de configuration est activée.
+        return (bool) (
+            config('platform.database_provisioning.enabled', false) ||
+            config('platform.enable_database_provisioning', false)
+        );
+    }
+
+    /**
      * Prepare initial data for the tenant model.
      */
     public function prepareTenantData(array $data): array
@@ -148,7 +162,7 @@ class TenantProvisioningService
             return false;
         }
 
-        if (!config('platform.database_provisioning.enabled', false)) {
+        if (!$this->isDbProvisioningEnabled()) {
             return false;
         }
 
@@ -160,11 +174,16 @@ class TenantProvisioningService
      */
     public function createDatabase(Tenant $tenant): bool
     {
+        // Sécurité : refuser explicitement la boutique legacy
+        if ($tenant->provisioning_status === 'legacy_current_db' || $tenant->slug === 'legacy_current_db') {
+            throw new Exception('Provisionnement refusé pour la boutique legacy_current_db.');
+        }
+
         $dbName = $tenant->database_name;
-        $cleanDbName = preg_replace('/[^a-zA-Z0-9_]/', '', $dbName);
-        
+        $cleanDbName = preg_replace('/[^A-Za-z0-9_]/', '', (string) $dbName);
+
         if (empty($cleanDbName)) {
-            throw new Exception("Nom de base de données invalide après nettoyage.");
+            throw new Exception('Nom de base de données invalide après nettoyage. Autorisé : lettres, chiffres et underscores.');
         }
 
         $driver = DB::connection('landlord')->getDriverName();
@@ -174,11 +193,13 @@ class TenantProvisioningService
             if (!file_exists(dirname($path))) {
                 mkdir(dirname($path), 0755, true);
             }
-            touch($path);
+            if (!file_exists($path)) {
+                touch($path);
+            }
             return true;
         }
 
-        // MySQL database creation
+        // MySQL database creation — utilisation de l'identifiant nettoyé
         DB::statement("CREATE DATABASE IF NOT EXISTS `{$cleanDbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
         return true;
     }
@@ -208,28 +229,39 @@ class TenantProvisioningService
     public function markProvisioningFailed(Tenant $tenant, string $message): Tenant
     {
         // Sécurité : masquer les mots de passe potentiels
-        $cleanMessage = str_ireplace(
-            [
-                config('database.connections.landlord.password', 'DB_PASSWORD_NOT_FOUND_LANDLORD'),
-                config('database.connections.mysql.password', 'DB_PASSWORD_NOT_FOUND_MYSQL'),
-                config('platform.database_provisioning.default_password', 'DB_PASSWORD_NOT_FOUND_DEFAULT'),
-                $tenant->database_password,
-                $tenant->owner_password_plain
-            ],
-            '[MASQUE]',
-            $message
-        );
+        $sensitive = [];
+        $sensitive[] = config('database.connections.landlord.password', '');
+        $sensitive[] = config('database.connections.mysql.password', '');
+        if (!empty(config('platform.database_provisioning.default_password', ''))) {
+            $sensitive[] = config('platform.database_provisioning.default_password');
+        }
+        if (!empty($tenant->database_password)) {
+            $sensitive[] = $tenant->database_password;
+        }
+        if (!empty($tenant->owner_password_plain)) {
+            $sensitive[] = $tenant->owner_password_plain;
+        }
+
+        $cleanMessage = $message;
+        foreach (array_unique(array_filter($sensitive)) as $secret) {
+            $cleanMessage = str_ireplace($secret, '[MASQUE]', $cleanMessage);
+        }
 
         $tenant->update([
             'provisioning_status' => 'failed',
             'provisioning_error' => $cleanMessage,
         ]);
 
-        LandlordAuditService::record(
-            'tenant_database_creation_failed',
-            $tenant,
-            "Échec de création de base de données pour la boutique : {$tenant->name}. Erreur : {$cleanMessage}"
-        );
+        // Journaliser de façon contrôlée via LandlordAuditService si disponible
+        try {
+            LandlordAuditService::record(
+                'tenant_database_creation_failed',
+                $tenant,
+                "Échec de création de base de données pour la boutique : {$tenant->name}. Erreur technique enregistrée."
+            );
+        } catch (Exception $e) {
+            // ne pas propager l'erreur d'audit
+        }
 
         return $tenant;
     }
@@ -239,22 +271,39 @@ class TenantProvisioningService
      */
     public function provisionDatabase(Tenant $tenant): Tenant
     {
-        if (!config('platform.database_provisioning.enabled', false)) {
-            $tenant->update([
-                'provisioning_status' => 'prepared'
-            ]);
+        // Si le provisionnement réel est désactivé, on ne fait rien et on conserve le statut 'prepared'
+        if (!$this->isDbProvisioningEnabled()) {
+            // ne pas modifier le statut si déjà 'prepared'
+            if ($tenant->provisioning_status !== 'prepared') {
+                $tenant->update(['provisioning_status' => 'prepared']);
+            }
             return $tenant;
         }
 
-        if ($tenant->provisioning_status === 'legacy_current_db') {
+        // Protéger la boutique legacy
+        if ($tenant->provisioning_status === 'legacy_current_db' || $tenant->slug === 'legacy_current_db') {
             return $tenant;
+        }
+
+        // Vérifications préalables
+        if (empty($tenant->database_name)) {
+            return $this->markProvisioningFailed($tenant, 'Aucun nom de base de données défini pour cette boutique.');
         }
 
         try {
             $this->createDatabase($tenant);
             $this->markDatabaseCreated($tenant);
         } catch (Exception $e) {
-            $this->markProvisioningFailed($tenant, $e->getMessage());
+            // Ne jamais logger des messages bruts contenant potentiellement des secrets
+            try {
+                $this->markProvisioningFailed($tenant, $e->getMessage());
+            } catch (Exception $inner) {
+                // dernier recours : mettre en failed sans message sensible
+                $tenant->update([
+                    'provisioning_status' => 'failed',
+                    'provisioning_error' => 'Erreur inconnue lors du provisionnement.'
+                ]);
+            }
         }
 
         return $tenant;
@@ -265,7 +314,7 @@ class TenantProvisioningService
      */
     public function runTenantMigrations(Tenant $tenant): void
     {
-        if (!config('platform.enable_database_provisioning', false)) {
+        if (!$this->isDbProvisioningEnabled()) {
             return;
         }
 
@@ -334,7 +383,7 @@ class TenantProvisioningService
      */
     public function createTenantOwner(Tenant $tenant, string $password): void
     {
-        if (!config('platform.enable_database_provisioning', false)) {
+        if (!$this->isDbProvisioningEnabled()) {
             return;
         }
 
@@ -398,7 +447,7 @@ class TenantProvisioningService
      */
     public function provision(Tenant $tenant): void
     {
-        if (!config('platform.enable_database_provisioning', false)) {
+        if (!$this->isDbProvisioningEnabled()) {
             $tenant->update([
                 'provisioning_status' => 'prepared'
             ]);
