@@ -32,9 +32,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
-        <!-- Ensure provisioning and tenant migrations are disabled during tests -->
+        <!-- Ensure real DB provisioning is disabled during tests (can be overridden in tests) -->
         <env name="PLATFORM_ENABLE_DB_PROVISIONING" value="false"/>
-        <env name="PLATFORM_ENABLE_TENANT_MIGRATIONS" value="false"/>
-        <env name="PLATFORM_RUN_TENANT_SEEDERS" value="false"/>
     </php>
 </phpunit>
