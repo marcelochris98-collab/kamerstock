@@ -28,6 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // If tenant parameter is present in the request, preserve it in the intended redirect
+        $tenant = $request->input('tenant');
+        if ($tenant) {
+            return redirect()->intended(route('dashboard', ['tenant' => $tenant], false));
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

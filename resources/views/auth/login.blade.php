@@ -37,6 +37,10 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
+                @if(request('tenant'))
+                    <input type="hidden" name="tenant" value="{{ request('tenant') }}" />
+                @endif
+
                 <div class="mb-4">
                     <label class="block text-xs font-medium text-slate-400 mb-1.5">Adresse email</label>
                     <input type="email" name="email" value="{{ old('email') }}" required autofocus
