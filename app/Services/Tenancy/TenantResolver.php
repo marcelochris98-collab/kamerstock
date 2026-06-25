@@ -81,7 +81,12 @@ class TenantResolver
     public function resolveFromQuery(Request $request): ?Tenant
     {
         $param = config('platform.tenant_query_parameter', 'tenant');
+        // Accept tenant from query string OR from request payload (POST)
         $slug = $request->query($param);
+        if (!$slug) {
+            $slug = $request->input($param);
+        }
+
         if ($slug && is_string($slug)) {
             return $this->resolveBySlug($slug);
         }
