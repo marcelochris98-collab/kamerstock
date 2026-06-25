@@ -199,7 +199,7 @@
                     @endif
                 </ul>
 
-                <div class="mt-4">
+                <div class="mt-4 space-y-4">
                     @if(in_array($tenant->provisioning_status, ['prepared','failed']) && !empty($tenant->database_name) && $tenant->provisioning_status !== 'legacy_current_db')
                         @if(!config('platform.database_provisioning.enabled'))
                             <div class="mb-3 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-xs">
@@ -215,6 +215,25 @@
                             @csrf
                             <button type="submit" class="w-full py-2 bg-indigo-650 hover:bg-indigo-750 text-white font-bold rounded-xl transition text-[11px]">
                                 Créer la base boutique
+                            </button>
+                        </form>
+                    @endif
+
+                    @if($tenant->provisioning_status === 'database_created' && !empty($tenant->database_name) && $tenant->provisioning_status !== 'legacy_current_db')
+                        @if(!config('platform.tenant_migrations.enabled'))
+                            <div class="mb-3 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-xs">
+                                Les migrations tenant sont désactivées. Activez PLATFORM_ENABLE_TENANT_MIGRATIONS=true pour finaliser la boutique.
+                            </div>
+                        @else
+                            <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                Cette action va créer les tables métier et le compte propriétaire dans la base boutique.
+                            </div>
+                        @endif
+
+                        <form action="{{ route('landlord.tenants.migrate', $tenant) }}" method="POST" onsubmit="return confirm('Lancer les migrations boutique pour cette boutique ?')">
+                            @csrf
+                            <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-[11px]">
+                                Lancer les migrations boutique
                             </button>
                         </form>
                     @endif

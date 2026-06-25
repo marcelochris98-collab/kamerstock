@@ -310,70 +310,152 @@ class TenantProvisioningService
     }
 
     /**
-     * Run migrations in the tenant database.
+     * Retourne si les migrations tenant réelles sont activées.
+     * Supporte l'ancienne clé `platform.enable_database_provisioning` pour compatibilité.
      */
-    public function runTenantMigrations(Tenant $tenant): void
+    private function isTenantMigrationEnabled(): bool
     {
-        if (!$this->isDbProvisioningEnabled()) {
-            return;
+        $enabled = (bool) (
+            config('platform.tenant_migrations.enabled', false) ||
+            config('platform.enable_database_provisioning', false) ||
+            config('platform.database_provisioning.enabled', false)
+        );
+
+        if (!$enabled) {
+            return false;
         }
 
-        if ($tenant->provisioning_status === 'failed') {
-            return;
+        if (app()->environment('local') && !config('platform.tenant_migrations.allow_local', true)) {
+            return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Configure la connexion tenant à partir du tenant.
+     */
+    private function configureTenantConnection(Tenant $tenant): void
+    {
         $dbName = $tenant->database_name;
         $driver = DB::connection('landlord')->getDriverName();
 
-        try {
-            config([
-                'database.connections.tenant' => [
-                    'driver' => $driver,
-                    'database' => $driver === 'sqlite'
-                        ? database_path("tenants/{$dbName}.sqlite")
-                        : $dbName,
-                    'host' => config('database.connections.mysql.host', '127.0.0.1'),
-                    'port' => config('database.connections.mysql.port', '3306'),
-                    'username' => config('database.connections.mysql.username', 'root'),
-                    'password' => config('database.connections.mysql.password', ''),
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'foreign_key_constraints' => true,
-                ]
-            ]);
+        $tenantConfig = [
+            'driver' => $driver,
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ];
 
+        if ($driver === 'sqlite') {
+            $tenantConfig['database'] = database_path("tenants/{$dbName}.sqlite");
+        } else {
+            $tenantConfig['database'] = $dbName;
+            $tenantConfig['host'] = $tenant->database_host ?? config('platform.database_provisioning.default_host', '127.0.0.1');
+            $tenantConfig['port'] = $tenant->database_port ?? config('platform.database_provisioning.default_port', '3306');
+            $tenantConfig['username'] = $tenant->database_username ?? config('platform.database_provisioning.default_username', 'root');
+            $tenantConfig['password'] = $tenant->database_password ?? config('platform.database_provisioning.default_password', '');
+        }
+
+        config(['database.connections.tenant' => $tenantConfig]);
+    }
+
+    /**
+     * Restaure la connexion par défaut.
+     */
+    private function restoreDefaultConnection(?string $previousDefault): void
+    {
+        if ($previousDefault) {
+            config(['database.default' => $previousDefault]);
+        }
+        DB::purge('tenant');
+    }
+
+    /**
+     * Masque les informations sensibles du message d'erreur.
+     */
+    private function sanitizeProvisioningError(string $message, Tenant $tenant): string
+    {
+        $sensitive = [];
+
+        // Ajouter les mots de passe potentiels
+        $sensitive[] = $tenant->database_password ?? '';
+        $sensitive[] = $tenant->owner_password_plain ?? '';
+        $sensitive[] = config('database.connections.landlord.password', '');
+        $sensitive[] = config('database.connections.mysql.password', '');
+        $sensitive[] = config('platform.database_provisioning.default_password', '');
+        $sensitive[] = env('DB_PASSWORD', '');
+        $sensitive[] = env('TENANT_DB_PASSWORD', '');
+
+        $cleanMessage = $message;
+        foreach (array_unique(array_filter($sensitive)) as $secret) {
+            if (!empty($secret)) {
+                $cleanMessage = str_ireplace($secret, '[MASQUE]', $cleanMessage);
+            }
+        }
+
+        return $cleanMessage;
+    }
+
+    /**
+     * Run migrations in the tenant database.
+     */
+    public function runTenantMigrations(Tenant $tenant): Tenant
+    {
+        if (!$this->isTenantMigrationEnabled()) {
+            return $tenant;
+        }
+
+        // Refuser les boutiques spéciales
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            throw new Exception('Les migrations ne peuvent pas être lancées sur la boutique legacy.');
+        }
+
+        // Refuser les tenants en échec
+        if ($tenant->provisioning_status === 'failed') {
+            throw new Exception('Le tenant est en état d\'échec. Corrigez le problème avant les migrations.');
+        }
+
+        // Vérifier que la base existe
+        if ($tenant->provisioning_status === 'prepared') {
+            throw new Exception('La base de données doit être créée avant les migrations.');
+        }
+
+        // Vérifier le nom de base de données
+        if (empty($tenant->database_name)) {
+            throw new Exception('Aucun nom de base de données n\'est défini.');
+        }
+
+        $previousDefault = config('database.default');
+
+        try {
+            $this->configureTenantConnection($tenant);
             DB::purge('tenant');
 
+            // Lancer les migrations
             Artisan::call('migrate', [
                 '--database' => 'tenant',
                 '--path' => 'database/migrations',
                 '--force' => true,
             ]);
 
-            // Run role seeder dynamically via Artisan to prevent command console errors
-            $previousDefault = config('database.default');
-            config(['database.default' => 'tenant']);
-            DB::purge('tenant');
+            // Lancer les seeders si activés
+            if (config('platform.tenant_migrations.run_seeders', true)) {
+                config(['database.default' => 'tenant']);
+                DB::purge('tenant');
 
-            Artisan::call('db:seed', [
-                '--class' => 'RoleAndPermissionSeeder',
-                '--database' => 'tenant',
-            ]);
-
-            config(['database.default' => $previousDefault]);
-
-            $tenant->update([
-                'provisioning_status' => 'migrated',
-            ]);
-        } catch (Exception $e) {
-            if (isset($previousDefault)) {
-                config(['database.default' => $previousDefault]);
+                Artisan::call('db:seed', [
+                    '--class' => 'RoleAndPermissionSeeder',
+                    '--database' => 'tenant',
+                ]);
             }
-            $tenant->update([
-                'provisioning_status' => 'failed',
-                'provisioning_error' => 'Migrations run failed: ' . $e->getMessage(),
-            ]);
+
+            $this->restoreDefaultConnection($previousDefault);
+            return $tenant;
+
+        } catch (Exception $e) {
+            $this->restoreDefaultConnection($previousDefault);
             throw $e;
         }
     }
@@ -381,63 +463,133 @@ class TenantProvisioningService
     /**
      * Create default tenant owner user in tenant DB.
      */
-    public function createTenantOwner(Tenant $tenant, string $password): void
-    {
-        if (!$this->isDbProvisioningEnabled()) {
-            return;
+    public function createTenantOwner(Tenant $tenant, ?string $password = null): Tenant
+    {        if (!$this->isTenantMigrationEnabled()) {
+            return $tenant;
+        }
+        // Refuser les boutiques spéciales
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            throw new Exception('Le propriétaire ne peut pas être créé pour la boutique legacy.');
         }
 
+        // Refuser les tenants en echec
         if ($tenant->provisioning_status === 'failed') {
-            return;
+            throw new Exception('Le tenant est en état d\'échec. Corrigez le problème avant de créer le propriétaire.');
         }
 
-        $dbName = $tenant->database_name;
-        $driver = DB::connection('landlord')->getDriverName();
+        // Vérifier l'email propriétaire
+        if (empty($tenant->owner_login_email)) {
+            throw new Exception('Aucun email propriétaire n\'est défini.');
+        }
+
+        // Utiliser le mot de passe fourni ou celui du tenant
+        $ownerPassword = $password ?? $tenant->owner_password_plain;
+        if (empty($ownerPassword)) {
+            throw new Exception('Aucun mot de passe propriétaire n\'est défini.');
+        }
+
+        $previousDefault = config('database.default');
 
         try {
-            config([
-                'database.connections.tenant' => [
-                    'driver' => $driver,
-                    'database' => $driver === 'sqlite'
-                        ? database_path("tenants/{$dbName}.sqlite")
-                        : $dbName,
-                    'host' => config('database.connections.mysql.host', '127.0.0.1'),
-                    'port' => config('database.connections.mysql.port', '3306'),
-                    'username' => config('database.connections.mysql.username', 'root'),
-                    'password' => config('database.connections.mysql.password', ''),
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'foreign_key_constraints' => true,
-                ]
-            ]);
-
+            $this->configureTenantConnection($tenant);
             DB::purge('tenant');
 
-            $previousDefault = config('database.default');
             config(['database.default' => 'tenant']);
+            DB::purge('tenant');
 
-            $adminRole = Role::where('slug', 'admin')->first();
+            // Chercher le rôle propriétaire
+            $ownerRoleSlug = config('platform.tenant_migrations.default_owner_role_slug', 'admin');
+            $adminRole = Role::where('slug', $ownerRoleSlug)->first();
+            if (!$adminRole) {
+                throw new Exception("Le rôle '{$ownerRoleSlug}' n\'existe pas dans la base tenant.");
+            }
 
-            User::create([
-                'name' => $tenant->owner_name ?? 'Administrateur',
-                'email' => $tenant->owner_login_email,
-                'password' => $password,
-                'role_id' => $adminRole?->id,
-                'is_active' => true,
-                'notifications_enabled' => true,
-                'sounds_enabled' => true,
+            // Créer ou mettre à jour l'utilisateur propriétaire
+            $user = User::updateOrCreate(
+                ['email' => $tenant->owner_login_email],
+                [
+                    'name' => $tenant->owner_name ?? 'Administrateur',
+                    'password' => Hash::make($ownerPassword),
+                    'role_id' => $adminRole->id,
+                    'is_active' => true,
+                    'notifications_enabled' => true,
+                    'sounds_enabled' => true,
+                ]
+            );
+
+            $this->restoreDefaultConnection($previousDefault);
+            return $tenant;
+
+        } catch (Exception $e) {
+            $this->restoreDefaultConnection($previousDefault);
+            throw $e;
+        }
+    }
+
+    /**
+     * Migrate a tenant database and create owner account.
+     * Orchestrates the full migration process.
+     */
+    public function migrateTenant(Tenant $tenant): Tenant
+    {
+        if (!$this->isTenantMigrationEnabled()) {
+            throw new Exception('Les migrations tenant sont désactivées.');
+        }
+
+        // Refuser les boutiques spéciales
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            throw new Exception('La boutique legacy ne doit pas être migrée.');
+        }
+
+        // Vérifier le nom de base de données
+        if (empty($tenant->database_name)) {
+            throw new Exception('Aucun nom de base de données n\'est défini.');
+        }
+
+        // Refuser si encore en prepared
+        if ($tenant->provisioning_status === 'prepared') {
+            throw new Exception('La base de données doit être créée avant les migrations. Lancez d\'abord le provisionnement.');
+        }
+
+        // Si déjà migré, ne rien faire
+        if ($tenant->provisioning_status === 'migrated') {
+            return $tenant;
+        }
+
+        try {
+            // Lancer les migrations
+            $this->runTenantMigrations($tenant);
+
+            // Créer le compte propriétaire
+            $this->createTenantOwner($tenant);
+
+            // Marquer comme migré
+            $tenant->update([
+                'provisioning_status' => 'migrated',
+                'provisioning_error' => null,
             ]);
 
-            config(['database.default' => $previousDefault]);
+            LandlordAuditService::record(
+                'tenant_migrated',
+                $tenant,
+                "Boutique migrée avec succès : {$tenant->name}"
+            );
+
+            return $tenant;
+
         } catch (Exception $e) {
-            if (isset($previousDefault)) {
-                config(['database.default' => $previousDefault]);
-            }
+            $cleanError = $this->sanitizeProvisioningError($e->getMessage(), $tenant);
             $tenant->update([
                 'provisioning_status' => 'failed',
-                'provisioning_error' => 'Owner creation failed: ' . $e->getMessage(),
+                'provisioning_error' => $cleanError,
             ]);
+
+            LandlordAuditService::record(
+                'tenant_migration_failed',
+                $tenant,
+                "Échec de la migration : {$tenant->name}. Erreur technique enregistrée."
+            );
+
             throw $e;
         }
     }
@@ -456,9 +608,29 @@ class TenantProvisioningService
 
         try {
             $this->provisionDatabase($tenant);
-            $this->runTenantMigrations($tenant);
-            $this->createTenantOwner($tenant, $tenant->owner_password_plain);
+            $tenant->refresh();
+
+            if ($this->isTenantMigrationEnabled()) {
+                // Lancer les migrations
+                $this->runTenantMigrations($tenant);
+
+                // Créer le propriétaire
+                $this->createTenantOwner($tenant, $tenant->owner_password_plain);
+
+                // Mettre à jour le statut final
+                $tenant->update([
+                    'provisioning_status' => 'migrated',
+                    'provisioning_error' => null,
+                ]);
+            }
+
         } catch (Exception $e) {
+            $cleanError = $this->sanitizeProvisioningError($e->getMessage(), $tenant);
+            $tenant->update([
+                'provisioning_status' => 'failed',
+                'provisioning_error' => $cleanError,
+            ]);
+
             logger()->error('Tenant provisioning failed: ' . $e->getMessage(), [
                 'tenant_id' => $tenant->id,
                 'exception' => $e

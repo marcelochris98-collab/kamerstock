@@ -304,6 +304,55 @@ class TenantController extends Controller
     }
 
     /**
+     * Migrate the tenant database and create owner account.
+     */
+    public function migrateTenant(Tenant $tenant)
+    {
+        // Protection boutique legacy
+        if ($tenant->provisioning_status === 'legacy_current_db') {
+            return back()->with('error', 'La boutique actuelle legacy ne doit pas être migrée depuis cette action.');
+        }
+
+        // Vérifier que la base existe
+        if ($tenant->provisioning_status === 'prepared') {
+            return back()->with('error', 'La base boutique doit être créée avant de lancer les migrations.');
+        }
+
+        // Vérifier la base de données
+        if (empty($tenant->database_name)) {
+            return back()->with('error', 'Aucun nom de base de données n\'est défini pour cette boutique.');
+        }
+
+        // Vérifier que les migrations sont activées
+        if (!config('platform.tenant_migrations.enabled', false) && !config('platform.enable_database_provisioning', false)) {
+            return back()->with('warning', 'Les migrations tenant sont désactivées dans la configuration.');
+        }
+
+        try {
+            $this->provisioningService->migrateTenant($tenant);
+            $tenant->refresh();
+
+            if ($tenant->provisioning_status === 'migrated') {
+                LandlordAuditService::record('tenant_migrated', $tenant, "Boutique migrée avec succès : {$tenant->name}");
+                return back()->with('success', 'Boutique migrée avec succès. Le compte propriétaire est prêt.');
+            }
+
+            return back()->with('info', "Statut : {$tenant->provisioning_status}");
+
+        } catch (\Exception $e) {
+            $tenant->refresh();
+
+            if ($tenant->provisioning_status === 'failed') {
+                LandlordAuditService::record('tenant_migration_failed', $tenant, "Échec de migration : {$tenant->name}");
+                return back()->with('error', 'La migration tenant a échoué. Consultez le détail dans la section Provisionnement.');
+            }
+
+            logger()->error('Tenant migration failed: ' . $e->getMessage(), ['tenant_id' => $tenant->id]);
+            return back()->with('error', 'La migration tenant a échoué. Veuillez contacter le support.');
+        }
+    }
+
+    /**
      * Register the current active database as a legacy tenant.
      */
     public function registerLegacy()

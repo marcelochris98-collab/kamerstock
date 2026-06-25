@@ -46,6 +46,8 @@ class PlatformHealthCheckCommand extends Command
         $this->line("Strategie de Tenancy : <info>{$strategy}</info>");
         $dbProvEnabled = config('platform.database_provisioning.enabled', false);
         $this->line("Provisionnement DB réel : " . ($dbProvEnabled ? "<info>ACTIVE</info>" : "<comment>DESACTIVE</comment>"));
+        $tenantMigrationsEnabled = config('platform.tenant_migrations.enabled', false);
+        $this->line("Migrations tenant : " . ($tenantMigrationsEnabled ? "<info>ACTIVE</info>" : "<comment>DESACTIVE</comment>"));
         
         $tests[] = [
             'Composant' => 'Configuration Platform',
@@ -145,9 +147,18 @@ class PlatformHealthCheckCommand extends Command
             try {
                 $prepared = Tenant::where('provisioning_status', 'prepared')->count();
                 $created = Tenant::where('provisioning_status', 'database_created')->count();
+                $migrated = Tenant::where('provisioning_status', 'migrated')->count();
                 $failed = Tenant::where('provisioning_status', 'failed')->count();
 
-                $this->line("Tenants (prepared): <info>{$prepared}</info> | (database_created): <info>{$created}</info> | (failed): <error>{$failed}</error>");
+                $this->line("Tenants (prepared): <info>{$prepared}</info> | (database_created): <info>{$created}</info> | (migrated): <info>{$migrated}</info> | (failed): <error>{$failed}</error>");
+
+                if ($created > 0) {
+                    if (config('platform.tenant_migrations.enabled', false)) {
+                        $this->warn("[ATTENTION] {$created} boutiques ont une base créée mais ne sont pas encore migrées.");
+                    } else {
+                        $this->warn("[ATTENTION] {$created} boutiques ont une base créée. Les migrations tenant sont désactivées (PLATFORM_ENABLE_TENANT_MIGRATIONS=false). ");
+                    }
+                }
             } catch (Exception $e) {
                 // ignore
             }

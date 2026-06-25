@@ -24,6 +24,14 @@ return [
         'default_password' => env('TENANT_DB_PASSWORD', env('DB_PASSWORD')),
     ],
 
+    // Tenant migrations configuration
+    'tenant_migrations' => [
+        'enabled' => env('PLATFORM_ENABLE_TENANT_MIGRATIONS', false),
+        'allow_local' => env('PLATFORM_ALLOW_LOCAL_TENANT_MIGRATIONS', true),
+        'run_seeders' => env('PLATFORM_RUN_TENANT_SEEDERS', true),
+        'default_owner_role_slug' => env('PLATFORM_TENANT_OWNER_ROLE_SLUG', 'admin'),
+    ],
+
     // Multi-tenant configuration settings
     'tenancy_enabled' => env('PLATFORM_TENANCY_ENABLED', false),
     'tenant_resolution_enabled' => env('PLATFORM_TENANT_RESOLUTION_ENABLED', true),

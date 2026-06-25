@@ -121,4 +121,149 @@ class TenantProvisioningTest extends TestCase
         $dupResponse->assertRedirect(route('landlord.tenants.index'));
         $dupResponse->assertSessionHas('error');
     }
+
+    public function test_migrate_tenant_command_refuses_legacy_current_db()
+    {
+        $tenant = Tenant::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'name' => 'Legacy Boutique',
+            'slug' => 'legacy-boutique',
+            'owner_name' => 'Legacy Owner',
+            'owner_email' => 'legacy@tenant.test',
+            'status' => 'active',
+            'database_name' => 'legacy_db',
+            'provisioning_status' => 'legacy_current_db',
+        ]);
+
+        $exitCode = Artisan::call('platform:migrate-tenant', [
+            'slug' => $tenant->slug,
+            '--force' => true,
+        ]);
+
+        $output = Artisan::output();
+        $this->assertEquals(1, $exitCode);
+        $this->assertStringContainsString('La boutique actuelle legacy ne doit pas être migrée', $output);
+    }
+
+    public function test_migrate_tenant_command_refuses_prepared_tenant()
+    {
+        $tenant = Tenant::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'name' => 'Prepared Boutique',
+            'slug' => 'prepared-boutique',
+            'owner_name' => 'Prepared Owner',
+            'owner_email' => 'prepared@tenant.test',
+            'status' => 'trial',
+            'database_name' => 'prepared_tenant_db',
+            'provisioning_status' => 'prepared',
+        ]);
+
+        $exitCode = Artisan::call('platform:migrate-tenant', [
+            'slug' => $tenant->slug,
+            '--force' => true,
+        ]);
+
+        $output = Artisan::output();
+        $this->assertEquals(1, $exitCode);
+        $this->assertStringContainsString('La base n\'est pas encore créée', $output);
+    }
+
+    public function test_migrate_tenant_command_migrates_database_created_tenant_with_sqlite()
+    {
+        config(['platform.enable_database_provisioning' => true]);
+
+        $plan = Plan::first();
+        $tenantData = [
+            'name' => 'Tenant SQLite Command',
+            'owner_email' => 'owner@sqlitetenant.test',
+            'owner_name' => 'Tenant Owner',
+            'status' => 'trial',
+            'database_name' => 'kamerstock_tenant_sqlite_command',
+            'database_username' => 'root',
+            'database_password' => '',
+            'database_host' => '127.0.0.1',
+            'database_port' => '3306',
+            'provisioning_status' => 'database_created',
+            'owner_login_email' => 'owner@sqlitetenant.test',
+            'owner_password_plain' => 'Secret1234',
+        ];
+
+        $tenantData['slug'] = 'tenant-sqlite-command';
+        $tenant = Tenant::create($tenantData);
+
+        $dbPath = database_path("tenants/{$tenant->database_name}.sqlite");
+        if (!is_dir(dirname($dbPath))) {
+            mkdir(dirname($dbPath), 0755, true);
+        }
+        if (file_exists($dbPath)) {
+            @unlink($dbPath);
+        }
+
+        $exitCode = Artisan::call('platform:migrate-tenant', [
+            'slug' => $tenant->slug,
+            '--force' => true,
+        ]);
+
+        $tenant->refresh();
+        $this->assertEquals(0, $exitCode);
+        $this->assertEquals('migrated', $tenant->provisioning_status);
+        $this->assertTrue(file_exists($dbPath));
+
+        if (file_exists($dbPath)) {
+            @unlink($dbPath);
+        }
+    }
+
+    public function test_owner_user_is_created_in_tenant_database()
+    {
+        config(['platform.enable_database_provisioning' => true]);
+
+        $tenant = Tenant::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'name' => 'Tenant Owner DB',
+            'slug' => 'tenant-owner-db',
+            'owner_name' => 'Tenant Owner',
+            'owner_email' => 'owner@ownertenant.test',
+            'owner_login_email' => 'owner@ownertenant.test',
+            'owner_password_plain' => 'Secret1234',
+            'database_name' => 'kamerstock_tenant_owner_db',
+            'database_username' => 'root',
+            'database_password' => '',
+            'database_host' => '127.0.0.1',
+            'database_port' => '3306',
+            'status' => 'trial',
+            'provisioning_status' => 'database_created',
+        ]);
+
+        $dbPath = database_path("tenants/{$tenant->database_name}.sqlite");
+        if (!is_dir(dirname($dbPath))) {
+            mkdir(dirname($dbPath), 0755, true);
+        }
+        if (file_exists($dbPath)) {
+            @unlink($dbPath);
+        }
+
+        $service = new TenantProvisioningService();
+        $service->migrateTenant($tenant);
+        $tenant->refresh();
+
+        $this->assertEquals('migrated', $tenant->provisioning_status);
+        $this->assertTrue(file_exists($dbPath));
+
+        config(['database.default' => 'tenant']);
+        config(['database.connections.tenant' => [
+            'driver' => 'sqlite',
+            'database' => $dbPath,
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ]]);
+
+        DB::purge('tenant');
+        $user = DB::connection('tenant')->table('users')->where('email', $tenant->owner_login_email)->first();
+        $this->assertNotNull($user);
+
+        if (file_exists($dbPath)) {
+            @unlink($dbPath);
+        }
+    }
 }

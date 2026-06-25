@@ -317,6 +317,7 @@ Route::prefix('landlord')->name('landlord.')->group(function () {
         Route::post('tenants/{tenant}/read-only', [\App\Http\Controllers\Landlord\TenantController::class, 'readOnly'])->name('tenants.read_only');
         Route::post('tenants/{tenant}/regenerate-owner-password', [\App\Http\Controllers\Landlord\TenantController::class, 'regenerateOwnerPassword'])->name('tenants.regenerate_owner_password');
         Route::post('tenants/{tenant}/provision-database', [\App\Http\Controllers\Landlord\TenantController::class, 'provisionDatabase'])->name('tenants.provision_database');
+        Route::post('tenants/{tenant}/migrate', [\App\Http\Controllers\Landlord\TenantController::class, 'migrateTenant'])->name('tenants.migrate');
 
         // Plans CRUD
         Route::get('plans', [\App\Http\Controllers\Landlord\PlanController::class, 'index'])->name('plans.index');
