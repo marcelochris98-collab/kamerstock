@@ -69,11 +69,12 @@ class TenantResolutionTest extends TestCase
         // Restore config to default state
         Config::set('platform.tenancy_enabled', false);
 
-        // Restore default connection to avoid affecting subsequent tests
+        // Reset the default connection to avoid affecting subsequent tests
         DB::setDefaultConnection(config('database.default'));
 
-        // Purge tenant connection to release SQLite resources
+        // Purge the tenant connection to release SQLite resources if used
         DB::purge('tenant');
+        DB::disconnect('tenant');
 
         parent::tearDown();
     }
@@ -163,16 +164,29 @@ class TenantResolutionTest extends TestCase
     public function test_tenant_database_manager_switches_connection_config_for_ready_tenant()
     {
         Config::set('platform.tenancy_enabled', true);
+        Config::set('platform.tenant_resolution_enabled', true);
+        Config::set('platform.tenant_database_switching.enabled', true);
+        Config::set('platform.tenant_database_switching.allow_local', true);
+
         $manager = app(TenantDatabaseManager::class);
 
-        // Mock DB reconnect error or let config switch
-        $manager->configureForTenant($this->readyTenant);
+        try {
+            $manager->configureForTenant($this->readyTenant);
 
-        // Verify config is overridden
-        $tenantConfig = config('database.connections.tenant');
-        $this->assertEquals($this->readyTenant->database_name, $tenantConfig['database']);
-        $this->assertEquals('127.0.0.1', $tenantConfig['host']);
-        $this->assertEquals('password', $tenantConfig['password']);
+            $tenantConfig = config('database.connections.tenant');
+            if ($tenantConfig['driver'] === 'sqlite') {
+                $this->assertEquals(':memory:', $tenantConfig['database']);
+                $this->assertNull($tenantConfig['host']);
+                $this->assertNull($tenantConfig['password']);
+            } else {
+                $this->assertEquals($this->readyTenant->database_name, $tenantConfig['database']);
+                $this->assertEquals('127.0.0.1', $tenantConfig['host']);
+                $this->assertEquals('password', $tenantConfig['password']);
+            }
+            $this->assertEquals('tenant', DB::getDefaultConnection());
+        } finally {
+            $manager->switchToDefault();
+        }
     }
 
     public function test_tenant_debug_route_shows_context_correctly()

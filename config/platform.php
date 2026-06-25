@@ -32,6 +32,12 @@ return [
         'default_owner_role_slug' => env('PLATFORM_TENANT_OWNER_ROLE_SLUG', 'admin'),
     ],
 
+    'tenant_database_switching' => [
+        'enabled' => env('PLATFORM_TENANT_DATABASE_SWITCHING', false),
+        'allow_local' => env('PLATFORM_ALLOW_LOCAL_TENANT_SWITCHING', true),
+        'switch_only_migrated' => true,
+    ],
+
     // Multi-tenant configuration settings
     'tenancy_enabled' => env('PLATFORM_TENANCY_ENABLED', false),
     'tenant_resolution_enabled' => env('PLATFORM_TENANT_RESOLUTION_ENABLED', true),

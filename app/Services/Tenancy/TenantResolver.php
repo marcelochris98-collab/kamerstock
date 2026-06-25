@@ -61,7 +61,8 @@ class TenantResolver
         }
 
         // static files
-        if ($request->is('assets/*') || $request->is('build/*') || $request->is('storage/*') || 
+        if ($request->is('assets/*') || $request->is('build/*') || $request->is('storage/*') ||
+            $request->is('css/*') || $request->is('js/*') || $request->is('images/*') ||
             $path === 'favicon.ico' || $path === 'robots.txt') {
             return true;
         }
