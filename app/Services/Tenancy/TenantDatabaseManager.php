@@ -58,6 +58,8 @@ class TenantDatabaseManager
 
         DB::purge('tenant');
         DB::reconnect('tenant');
+        
+        Config::set('database.default', 'tenant');
         DB::setDefaultConnection('tenant');
     }
 
@@ -67,10 +69,15 @@ class TenantDatabaseManager
     public function switchToDefault(): void
     {
         $defaultConnection = $this->previousConnection ?? config('database.default', 'mysql');
+        if ($defaultConnection === 'tenant') {
+            $defaultConnection = 'mysql';
+        }
         $defaultConfig = config("database.connections.{$defaultConnection}");
 
         Config::set('database.connections.tenant', $defaultConfig);
         DB::purge('tenant');
+        
+        Config::set('database.default', $defaultConnection);
         DB::setDefaultConnection($defaultConnection);
         $this->previousConnection = null;
     }

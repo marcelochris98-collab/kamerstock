@@ -105,11 +105,23 @@ class IdentifyTenant
                 if ($hasTenantParam && config('platform.tenancy_enabled', false)) {
                     abort(404, 'Boutique introuvable');
                 }
+
+                if (config('platform.tenancy_enabled', false)) {
+                    $this->dbManager->switchToDefault();
+                }
             }
 
-            return $next($request);
+            $response = $next($request);
+
+            if (method_exists($response, 'render')) {
+                $response->render();
+            }
+
+            return $response;
         } finally {
-            $this->dbManager->switchToDefault();
+            if (config('platform.tenancy_enabled', false)) {
+                $this->dbManager->switchToDefault();
+            }
         }
     }
 }

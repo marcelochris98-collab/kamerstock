@@ -138,4 +138,24 @@ class TenantIsolationTest extends TestCase
         $this->assertArrayNotHasKey('database_password', $sanitized);
         $this->assertArrayNotHasKey('owner_password_plain', $sanitized);
     }
+
+    /**
+     * Test that tenant resolver resolves tenant from session when no other strategy matches.
+     */
+    public function test_resolver_can_resolve_by_session()
+    {
+        Config::set('platform.tenancy_enabled', true);
+        
+        $resolver = app(\App\Services\Tenancy\TenantResolver::class);
+        
+        // Simuler une requete avec session contenant current_tenant_slug
+        $request = \Illuminate\Http\Request::create('/dashboard', 'GET');
+        $request->setLaravelSession($this->app['session']->driver());
+        $request->session()->put('current_tenant_slug', 'boutique-actuelle');
+        
+        $tenant = $resolver->resolveFromRequest($request);
+        
+        $this->assertNotNull($tenant);
+        $this->assertEquals('boutique-actuelle', $tenant->slug);
+    }
 }

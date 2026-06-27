@@ -38,6 +38,12 @@ class TenantResolver
             if ($tenant) {
                 return $tenant;
             }
+
+            // 5. Resolve using Strategy 5: Session (current_tenant_slug)
+            $tenant = $this->resolveFromSession($request);
+            if ($tenant) {
+                return $tenant;
+            }
         } catch (\Throwable $e) {
             // Silence resolution errors (e.g. table platform_tenants not migrated yet in some tests)
             if (config('platform.security.log_tenant_resolution', true)) {
@@ -163,5 +169,19 @@ class TenantResolver
         return Tenant::on('landlord')
             ->where('domain', $domain)
             ->first();
+    }
+
+    /**
+     * Resolve tenant using session ('current_tenant_slug').
+     */
+    public function resolveFromSession(Request $request): ?Tenant
+    {
+        if ($request->hasSession()) {
+            $slug = $request->session()->get('current_tenant_slug');
+            if ($slug && is_string($slug)) {
+                return $this->resolveBySlug($slug);
+            }
+        }
+        return null;
     }
 }
