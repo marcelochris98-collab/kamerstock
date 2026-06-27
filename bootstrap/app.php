@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\IdentifyTenant::class,
             \App\Http\Middleware\IdentifySupportAccess::class,
             \App\Http\Middleware\EnsureTenantSubscriptionIsValid::class,
