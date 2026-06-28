@@ -1,3 +1,82 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /* AJOUT: base sombre coherente slate/amber pour les surfaces communes. */
+    .dark body {
+        @apply bg-slate-900 text-slate-100;
+    }
+
+    .dark input,
+    .dark select,
+    .dark textarea {
+        @apply border-slate-700 bg-slate-800 text-slate-100 placeholder-slate-500;
+    }
+
+    .dark input:focus,
+    .dark select:focus,
+    .dark textarea:focus {
+        @apply border-amber-500 ring-amber-500;
+    }
+
+    .dark table {
+        @apply text-slate-200;
+    }
+
+    .dark thead,
+    .dark tfoot {
+        @apply bg-slate-800 text-slate-300;
+    }
+
+    .dark tbody {
+        @apply divide-slate-700;
+    }
+}
+
+@layer components {
+    /* AJOUT: adaptation dark generique des classes slate/white frequentes dans les vues existantes. */
+    .dark .bg-white {
+        @apply bg-slate-800;
+    }
+
+    .dark .bg-slate-50,
+    .dark .bg-gray-50,
+    .dark .bg-gray-100 {
+        @apply bg-slate-900;
+    }
+
+    .dark .text-slate-900,
+    .dark .text-slate-800,
+    .dark .text-gray-900,
+    .dark .text-gray-800 {
+        @apply text-slate-100;
+    }
+
+    .dark .text-slate-700,
+    .dark .text-gray-700 {
+        @apply text-slate-200;
+    }
+
+    .dark .text-slate-600,
+    .dark .text-gray-600,
+    .dark .text-gray-500 {
+        @apply text-slate-400;
+    }
+
+    .dark .border-slate-50,
+    .dark .border-slate-100,
+    .dark .border-slate-200,
+    .dark .border-gray-100,
+    .dark .border-gray-200,
+    .dark .border-gray-300 {
+        @apply border-slate-700;
+    }
+
+    .dark .divide-slate-50,
+    .dark .divide-slate-100,
+    .dark .divide-gray-100,
+    .dark .divide-gray-200 {
+        @apply divide-slate-700;
+    }
+}
