@@ -76,7 +76,7 @@ class BusinessTypeService
         if ($this->current() === 'autre' && $this->customName()) {
             return $this->customName();
         }
-        return $this->getConfig()['subtitle'] ?? 'Gestion de stock, vente et caisse';
+        return $this->getConfig()['label'] ?? 'kamerstock';
     }
 
     /**

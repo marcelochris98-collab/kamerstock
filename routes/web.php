@@ -259,6 +259,8 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
     // Rapports & Statistiques (Reports & Stats)
     Route::middleware(['permission:reports.view'])->group(function () {
         Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+         Route::get('/reports/pdf/ventes', [App\Http\Controllers\ReportController::class, 'exportVentesPdf'])->name('reports.pdf.ventes');
+         Route::get('/reports/pdf/financier', [App\Http\Controllers\ReportController::class, 'exportFinancierPdf'])->name('reports.pdf.financier');
     });
 
     // Exports de Données (Exports)
