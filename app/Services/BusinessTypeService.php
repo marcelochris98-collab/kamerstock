@@ -42,7 +42,7 @@ class BusinessTypeService
         
         if (!$config) {
             $config = config("business_types.quincaillerie") ?? [
-                'label' => 'Quincaillerie',
+                'label' => 'quincailleriee',
                 'subtitle' => 'Matériaux, outillage et articles de construction',
                 'product_label' => 'Article',
                 'product_plural_label' => 'Articles',
