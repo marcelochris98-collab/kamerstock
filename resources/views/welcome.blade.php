@@ -131,7 +131,7 @@
                 </h1>
                 
                 <p class="text-slate-400 text-sm sm:text-base leading-relaxed font-light">
-                    KamerStock est une plateforme professionnelle conçue pour structurer l'activité des quincailleries et commerces. Automatisez vos inventaires, tracez chaque vente, gérez les crédits clients et facilitez les approvisionnements fournisseurs.
+                    KamerStock est une plateforme professionnelle conçue pour structurer l'activité des commerces. Automatisez vos inventaires, tracez chaque vente, gérez les crédits clients et facilitez les approvisionnements fournisseurs.
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">

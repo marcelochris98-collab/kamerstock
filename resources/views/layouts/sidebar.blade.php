@@ -40,6 +40,8 @@
             <span class="flex-1">Tableau de bord</span>
         </a>
 
+       
+
         {{-- Ventes & Devis --}}
         @if(auth()->user()->hasPermission('sales.view') || auth()->user()->hasPermission('sales.create'))
         <div class="mb-1">
@@ -353,9 +355,24 @@
                 </a>
                 @endif
             </div>
+{{-- Profil --}}
+        @if(Route::has('profile.edit'))
+        <a href="{{ route('profile.edit') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition mb-1
+            {{ request()->routeIs('profile.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+            <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                        d="M5.121 17.804A9 9 0 1118.879 17.8M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </span>
+            <span class="flex-1">Profil</span>
+        </a>
+        @endif
+   
         </div>
         @endif
-
+          
     </nav>
 
     {{-- User Footer --}}
