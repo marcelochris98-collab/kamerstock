@@ -11,11 +11,82 @@ use App\Models\Platform\TenantBackup;
 use App\Models\Platform\LandlordAuditLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Exception;
 
 class PlatformStatsService
 {
+    /**
+     * Obtenir toutes les données agrégées pour le Dashboard Landlord Super Admin.
+     */
+    public function getDashboardData(): array
+    {
+        $overview = $this->overview();
+        $backupStats = $this->backupStats();
+
+        $activeSupportAccesses = $this->safeQueryGet(function () {
+            return SupportAccess::with('tenant')
+                ->where('status', 'active')
+                ->where('starts_at', '<=', Carbon::now())
+                ->where('ends_at', '>', Carbon::now())
+                ->whereNull('revoked_at')
+                ->orderBy('ends_at')
+                ->get();
+        }, collect());
+
+        $pendingSupportAccesses = $this->safeQueryGet(function () {
+            return SupportAccess::with('tenant')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }, collect());
+
+        $recentlyExpiredSupportAccesses = $this->safeQueryGet(function () {
+            return SupportAccess::with('tenant')
+                ->where(function ($query) {
+                    $query->where('status', 'expired')
+                        ->orWhere('status', 'revoked')
+                        ->orWhere(function ($q) {
+                            $q->where('status', 'active')
+                              ->where('ends_at', '<=', Carbon::now());
+                        });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->limit(5)
+                ->get();
+        }, collect());
+
+        $recentTenants = $this->safeQueryGet(function () {
+            return Tenant::latest()->limit(5)->get();
+        }, collect());
+
+        $recentPayments = $this->safeQueryGet(function () {
+            return SubscriptionPayment::with('tenant')->latest()->limit(5)->get();
+        }, collect());
+
+        return [
+            'tenantsCount' => $overview['tenants_count'],
+            'activeTenantsCount' => $overview['active_tenants_count'],
+            'suspendedTenantsCount' => $overview['suspended_tenants_count'],
+            'plansCount' => $overview['plans_count'],
+            'expiringSubscriptionsCount' => $overview['expiring_subscriptions_count'],
+            'pendingPaymentsCount' => $overview['pending_payments_count'],
+            'activeSupportCount' => $overview['active_support_count'],
+            'activeSupportAccesses' => $activeSupportAccesses,
+            'pendingSupportAccesses' => $pendingSupportAccesses,
+            'recentlyExpiredSupportAccesses' => $recentlyExpiredSupportAccesses,
+            'recentBackups' => $overview['recent_backups'],
+            'recentTenants' => $recentTenants,
+            'recentPayments' => $recentPayments,
+            'completedBackupsCount' => $backupStats['completed'],
+            'failedBackupsCount' => $backupStats['failed'],
+            'pendingBackupsCount' => $backupStats['pending'] + $backupStats['running'],
+            'lastBackup' => $backupStats['last_backup'],
+            'tenantsWithoutBackupCount' => $backupStats['tenants_without_backup'],
+        ];
+    }
+
     /**
      * Obtenir une vue d'ensemble rapide pour le Dashboard.
      */
