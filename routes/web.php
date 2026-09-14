@@ -27,6 +27,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// AJOUT: changement de langue persistant en session
+Route::get('/lang/{locale}', function (string $locale) {
+    if (in_array($locale, ['fr', 'en'], true)) {
+        session(['locale' => $locale]);
+        app()->setLocale($locale);
+    }
+
+    return back();
+})->name('lang.switch');
+
 // Route test temporaire
 Route::get('/test-purchases', function () {
     return 'ROUTE PURCHASE OK';
@@ -430,4 +440,3 @@ Route::get('/tenant-debug', function () {
         ]
     ]);
 })->name('tenant.debug');
-

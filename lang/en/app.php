@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // AJOUT: shared application labels.
     'app_name' => 'KamerStock',
     'dashboard' => 'Dashboard',
     'menu_main' => 'Main menu',
