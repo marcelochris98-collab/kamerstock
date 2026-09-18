@@ -1,456 +1,369 @@
 @extends('layouts.landlord')
 
 @section('content')
-<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
-    
-    {{-- Header --}}
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800 space-y-6">
+
+    {{-- Top Header Section --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-xl font-bold text-slate-900 leading-none">Console Super Admin</h1>
-            <p class="text-xs text-slate-400 font-medium mt-1">Vue d'ensemble de la plateforme KamerStock</p>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Console Super Admin</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Vue d'ensemble et contrôle de la plateforme KamerStock</p>
         </div>
-        <div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-full text-xs font-bold text-indigo-600 shadow-sm">
-                <span class="w-2 h-2 bg-indigo-600 rounded-full animate-ping"></span>
+        <div class="flex items-center gap-3 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full text-xs font-bold text-emerald-700 shadow-sm">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                 Mode Plateforme Actif
+            </span>
+            <a href="{{ route('landlord.tenants.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition">
+                + Nouvelle Boutique
+            </a>
+            <a href="{{ route('landlord.support.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-sm transition">
+                Console Support
+            </a>
+        </div>
+    </div>
+
+    {{-- Security Notice Banner (Solid Dark Slate background for max readability) --}}
+    <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-400/30 flex items-center justify-center text-indigo-300 flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-sm font-bold text-white">Confidentialité des Boutiques & Isolation Multi-Tenant</h2>
+                <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                    Les données métier des boutiques restent strictly confidentielles et isolées. Seule l'infrastructure globale et la facturation sont gérées ici.
+                </p>
+            </div>
+        </div>
+        <div class="flex-shrink-0">
+            <span class="inline-block px-3 py-1 bg-indigo-950 border border-indigo-700/50 text-indigo-300 text-[10px] font-mono font-bold rounded-lg uppercase tracking-wider">
+                Tenant Guard Active
             </span>
         </div>
     </div>
 
-    {{-- System Status Banner --}}
-    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 shadow-md mb-6 relative overflow-hidden">
-        <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-1/4 translate-x-1/10">
-            <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/>
-            </svg>
-        </div>
-        <div class="relative z-10">
-            <h2 class="text-lg font-bold">Sécurité & Confidentialité des Boutiques</h2>
-            <p class="text-xs text-indigo-200/80 max-w-xl mt-1.5 leading-relaxed">
-                Les données métier des boutiques ne sont pas affichées ici. L’accès support aux espaces boutiques sera contrôlé et journalisé. En tant que propriétaire de la plateforme, vous gérez uniquement l'infrastructure, la facturation et les accès.
-            </p>
-        </div>
-    </div>
-
-    {{-- Stats Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    {{-- Hero 4 KPI Cards Grid --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        {{-- Total Tenants --}}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 group">
+        {{-- Card 1: Boutiques --}}
+        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Boutiques totales</p>
-                <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Boutiques Total</span>
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
                 </div>
             </div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-slate-900">{{ $tenantsCount }}</span>
-                <span class="text-[10px] text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">Enregistrées</span>
-            </div>
-        </div>
-
-        {{-- Active Tenants --}}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 group">
-            <div class="flex items-center justify-between mb-3">
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Boutiques actives</p>
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ $tenantsCount }}</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                        {{ $activeTenantsCount }} Actives
+                    </span>
+                    @if($suspendedTenantsCount > 0)
+                        <span class="inline-flex items-center text-xs font-bold bg-rose-50 text-rose-700 px-2 py-0.5 rounded border border-rose-200">
+                            {{ $suspendedTenantsCount }} HS
+                        </span>
+                    @endif
                 </div>
             </div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-slate-900">{{ $activeTenantsCount }}</span>
-                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">En ligne</span>
-            </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-medium">Boutiques enregistrées en plateforme</p>
         </div>
 
-        {{-- Suspended Tenants --}}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 group">
+        {{-- Card 2: Offres & Paiements --}}
+        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Boutiques suspendues</p>
-                <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-650 group-hover:scale-110 transition duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-slate-900">{{ $suspendedTenantsCount }}</span>
-                <span class="text-[10px] text-red-650 font-bold bg-red-50 px-1.5 py-0.5 rounded">Hors ligne</span>
-            </div>
-        </div>
-
-        {{-- Plans Count --}}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 group">
-            <div class="flex items-center justify-between mb-3">
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Plans Actifs</p>
-                <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 group-hover:scale-110 transition duration-150">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-slate-900">{{ $plansCount }}</span>
-                <span class="text-[10px] text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded">SaaS</span>
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Stats Cards 2 --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-        
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-650 flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Abonnements expirant bientôt</p>
-                <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $expiringSubscriptionsCount }} <span class="text-[10px] text-slate-400 font-semibold">(Sous 7j)</span></p>
-            </div>
-        </div>
-
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-650 flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Paiements en attente</p>
-                <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $pendingPaymentsCount }}</p>
-            </div>
-        </div>
-
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-650 flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                </svg>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Accès support actifs</p>
-                <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $activeSupportCount }}</p>
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Backup Stats Section --}}
-    <div class="mb-6">
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Statistiques de Sauvegarde</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            
-            {{-- Completed --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Plans & Abonnements</span>
+                <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <div>
-                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Complétées</p>
-                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $completedBackupsCount }}</p>
-                </div>
             </div>
-
-            {{-- Failed --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                </div>
+            <div class="flex items-baseline justify-between">
                 <div>
-                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Échouées</p>
-                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $failedBackupsCount }}</p>
+                    <span class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ $plansCount }}</span>
+                    <span class="text-xs font-bold text-slate-400 ml-1">Offres</span>
                 </div>
+                @if($pendingPaymentsCount > 0)
+                    <span class="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200">
+                        {{ $pendingPaymentsCount }} en attente
+                    </span>
+                @else
+                    <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                        0 en attente
+                    </span>
+                @endif
             </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-medium">Plans SaaS actifs sur la plateforme</p>
+        </div>
 
-            {{-- Pending --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+        {{-- Card 3: Alertes Abonnements --}}
+        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Abonnements (-7j)</span>
+                <div class="w-9 h-9 rounded-xl {{ $expiringSubscriptionsCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500' }} flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <div>
-                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">En attente</p>
-                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $pendingBackupsCount }}</p>
-                </div>
             </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ $expiringSubscriptionsCount }}</span>
+                @if($expiringSubscriptionsCount > 0)
+                    <span class="inline-flex items-center text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        Attention requise
+                    </span>
+                @else
+                    <span class="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        À jour
+                    </span>
+                @endif
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-medium">Renouvellement requis cette semaine</p>
+        </div>
 
-            {{-- Last Backup --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-655 flex items-center justify-center flex-shrink-0">
+        {{-- Card 4: Sauvegardes DB --}}
+        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Sauvegardes DB</span>
+                <div class="w-9 h-9 rounded-xl {{ $failedBackupsCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600' }} flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
                 </div>
-                <div class="min-w-0 flex-1">
-                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Dernière</p>
-                    @if($lastBackup)
-                        <p class="text-xs font-bold text-slate-900 mt-0.5 truncate" title="{{ $lastBackup->filename }}">{{ $lastBackup->finished_at->format('d/m H:i') }}</p>
-                        <p class="text-[9px] text-slate-450 truncate">{{ $lastBackup->tenant?->name }}</p>
-                    @else
-                        <p class="text-xs font-bold text-slate-400 mt-0.5">Aucune</p>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <div>
+                    <span class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ $completedBackupsCount }}</span>
+                    <span class="text-xs font-bold text-emerald-600 ml-1">OK</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    @if($failedBackupsCount > 0)
+                        <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                            {{ $failedBackupsCount }} Échecs
+                        </span>
+                    @endif
+                    @if($tenantsWithoutBackupCount > 0)
+                        <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                            {{ $tenantsWithoutBackupCount }} sans backup
+                        </span>
                     @endif
                 </div>
             </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-medium">Bases de données protégées</p>
+        </div>
 
-            {{-- Without backup --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
+    </div>
+
+    {{-- Main Grid: 3 Columns (Left 2 Cols, Right 1 Col) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {{-- Left Section (2 Cols) --}}
+        <div class="lg:col-span-2 space-y-6">
+
+            {{-- Recent Tenants Table Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Dernières Boutiques Inscrites</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Nouveaux espaces marchands sur la plateforme</p>
+                    </div>
+                    <a href="{{ route('landlord.tenants.index') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                        Voir tout →
+                    </a>
                 </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-150 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <th class="py-2">Boutique</th>
+                                <th class="py-2">Propriétaire</th>
+                                <th class="py-2 text-right">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-xs">
+                            @forelse($recentTenants as $tenant)
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="py-3 font-semibold text-slate-900">
+                                        {{ $tenant->name }}
+                                        <span class="block text-[10px] text-slate-400 font-mono font-normal">{{ $tenant->slug }}</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <p class="font-medium text-slate-700">{{ $tenant->owner_name }}</p>
+                                        <p class="text-[10px] text-slate-400">{{ $tenant->owner_email }}</p>
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold
+                                            @if($tenant->status === 'active') bg-emerald-50 text-emerald-700 border border-emerald-100
+                                            @elseif($tenant->status === 'trial') bg-indigo-50 text-indigo-700 border border-indigo-100
+                                            @else bg-red-50 text-red-700 border border-red-100 @endif">
+                                            {{ ucfirst($tenant->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="py-8 text-center text-slate-400 text-xs">Aucune boutique enregistrée.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- Recent DB Backups Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Sauvegardes de Bases de Données Récentes</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Dernières sauvegardes automatiques exécutées</p>
+                    </div>
+                    <a href="{{ route('landlord.backups.index') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                        Voir tout →
+                    </a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-150 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <th class="py-2">Boutique</th>
+                                <th class="py-2">Fichier / Taille</th>
+                                <th class="py-2 text-right">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-xs">
+                            @forelse($recentBackups as $backup)
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="py-3 font-semibold text-slate-900">{{ $backup->tenant?->name ?? 'Boutique' }}</td>
+                                    <td class="py-3">
+                                        <p class="font-mono text-[10px] text-slate-600 truncate max-w-[200px]">{{ $backup->filename }}</p>
+                                        <p class="text-[10px] text-slate-400 font-semibold">{{ number_format($backup->size_bytes / 1024 / 1024, 2) }} Mo</p>
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                            {{ ucfirst($backup->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="py-8 text-center text-slate-400 text-xs">Aucune sauvegarde enregistrée.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- Right Section (1 Col) --}}
+        <div class="lg:col-span-1 space-y-6">
+
+            {{-- Support & Maintenance Card --}}
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 space-y-5">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Console Support</h3>
+                        <p class="text-xs text-slate-400">Interventions temporaires</p>
+                    </div>
+                    <a href="{{ route('landlord.support.index') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                        Tout voir →
+                    </a>
+                </div>
+
+                {{-- Sessions Actives --}}
                 <div>
-                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Sans backup</p>
-                    <p class="text-xl font-bold text-slate-900 mt-0.5">{{ $tenantsWithoutBackupCount }}</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    {{-- Details Sections --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {{-- Recent Tenants --}}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-                <h3 class="text-sm font-bold text-slate-800">Dernières boutiques créées</h3>
-                <a href="{{ route('landlord.tenants.index') }}" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800">Voir tout</a>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-150 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            <th class="py-2">Boutique</th>
-                            <th class="py-2">Propriétaire</th>
-                            <th class="py-2 text-right">Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-xs">
-                        @forelse($recentTenants as $tenant)
-                            <tr>
-                                <td class="py-3 font-semibold text-slate-800">
-                                    {{ $tenant->name }}
-                                    <span class="block text-[10px] text-slate-400 font-mono font-normal">{{ $tenant->slug }}</span>
-                                </td>
-                                <td class="py-3">
-                                    <p class="font-medium text-slate-650">{{ $tenant->owner_name }}</p>
-                                    <p class="text-[10px] text-slate-400">{{ $tenant->owner_email }}</p>
-                                </td>
-                                <td class="py-3 text-right">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold
-                                        @if($tenant->status === 'active') bg-emerald-50 text-emerald-700
-                                        @elseif($tenant->status === 'trial') bg-indigo-50 text-indigo-750
-                                        @else bg-red-50 text-red-700 @endif">
-                                        {{ $tenant->status }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="py-8 text-center text-slate-400 text-xs">Aucune boutique enregistrée.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        {{-- Recent Backups --}}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-                <h3 class="text-sm font-bold text-slate-800">Sauvegardes de bases de données récentes</h3>
-                <a href="{{ route('landlord.backups.index') }}" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800">Voir tout</a>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-150 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            <th class="py-2">Boutique</th>
-                            <th class="py-2">Fichier / Taille</th>
-                            <th class="py-2 text-right">Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-xs">
-                        @forelse($recentBackups as $backup)
-                            <tr>
-                                <td class="py-3 font-semibold text-slate-800">{{ $backup->tenant?->name }}</td>
-                                <td class="py-3">
-                                    <p class="font-mono text-[10px] text-slate-650">{{ $backup->filename }}</p>
-                                    <p class="text-[10px] text-slate-400 font-semibold">{{ number_format($backup->size_bytes / 1024 / 1024, 2) }} Mo</p>
-                                </td>
-                                <td class="py-3 text-right">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">
-                                        {{ $backup->status }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="py-8 text-center text-slate-400 text-xs">Aucune sauvegarde trouvée.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Section Accès Support Sécurisé --}}
-    <div class="mt-8 border-t border-slate-200 pt-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <svg class="w-4.5 h-4.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                    Maintenance & Support Sécurisé
-                </h2>
-                <p class="text-xs text-slate-400 font-medium mt-0.5">Suivi des sessions d'intervention et des demandes d'accès temporaires</p>
-            </div>
-            <a href="{{ route('landlord.support.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-xs font-bold text-slate-700 rounded-xl transition">
-                Gérer tous les accès
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {{-- Accès Actifs --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 flex-shrink-0">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="flex h-2 w-2 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Sessions Actives</span>
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            {{ $activeSupportAccesses->count() }}
                         </span>
-                        Sessions Actives ({{ $activeSupportAccesses->count() }})
-                    </h3>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        @forelse($activeSupportAccesses as $access)
+                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2">
+                                <div class="flex justify-between items-start gap-2">
+                                    <span class="font-bold text-slate-900 truncate">{{ $access->tenant?->name ?? 'Boutique' }}</span>
+                                    <span class="text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-200">
+                                        ACTIF
+                                    </span>
+                                </div>
+                                <p class="text-slate-500 text-[11px] truncate">Motif: {{ $access->reason }}</p>
+                                <div class="flex items-center justify-between text-[10px] text-slate-500">
+                                    <span>Temps restant :</span>
+                                    <span class="font-mono font-bold text-indigo-700">{{ $access->remainingDurationLabel() }}</span>
+                                </div>
+                                <div class="flex gap-2 pt-1">
+                                    <a href="{{ route('landlord.support.enter', $access) }}" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-center transition text-[11px]">
+                                        Entrer
+                                    </a>
+                                    <form action="{{ route('landlord.support.revoke', $access) }}" method="POST" onsubmit="return confirm('Révoquer cet accès support ?')">
+                                        @csrf
+                                        <button type="submit" class="px-2.5 py-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 rounded-lg transition text-[11px] font-bold">
+                                            Révoquer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="py-4 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-100">
+                                Aucune session active
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto max-h-[280px] space-y-3 pr-1">
-                    @forelse($activeSupportAccesses as $access)
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs relative group/item">
-                            <div class="flex justify-between items-start gap-2 mb-1">
-                                <span class="font-bold text-slate-900 truncate max-w-[140px]">{{ $access->tenant?->name ?? 'Boutique' }}</span>
-                                <span class="inline-flex items-center gap-1 text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 uppercase font-mono">
-                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
-                                    Actif
-                                </span>
-                            </div>
-                            <p class="text-slate-500 text-[10px] truncate mb-2">Motif: {{ $access->reason }}</p>
-                            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-2">
-                                <span>Temps restant :</span>
-                                <span class="font-bold text-indigo-650 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 font-mono">{{ $access->remainingDurationLabel() }}</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <a href="{{ route('landlord.support.enter', $access) }}" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-center transition text-[10px]">
-                                    Entrer
-                                </a>
-                                <form action="{{ route('landlord.support.revoke', $access) }}" method="POST" class="inline-block" onsubmit="return confirm('Révoquer immédiatement cet accès ?')">
-                                    @csrf
-                                    <button type="submit" class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg transition text-[10px]" title="Révoquer">
-                                        Révoquer
-                                    </button>
-                                </form>
-                            </div>
+                {{-- Demandes en Attente --}}
+                @if($pendingSupportAccesses->count() > 0)
+                    <div class="pt-3 border-t border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">En Attente</span>
+                            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                                {{ $pendingSupportAccesses->count() }}
+                            </span>
                         </div>
-                    @empty
-                        <div class="py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center h-full">
-                            <span class="text-slate-300 mb-1">Aucune session active</span>
-                            <a href="{{ route('landlord.support.create') }}" class="text-[10px] text-indigo-650 font-bold hover:underline">Créer une demande d'accès →</a>
+
+                        <div class="space-y-2.5">
+                            @foreach($pendingSupportAccesses as $access)
+                                <div class="p-3 bg-amber-50/60 border border-amber-200 rounded-xl text-xs space-y-2">
+                                    <div class="flex justify-between items-start gap-2">
+                                        <span class="font-bold text-slate-900 truncate">{{ $access->tenant?->name ?? 'Boutique' }}</span>
+                                        <span class="text-[9px] font-mono font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">ATTENTE</span>
+                                    </div>
+                                    <p class="text-slate-600 text-[11px] truncate">Motif: {{ $access->reason }}</p>
+                                    <form action="{{ route('landlord.support.activate', $access) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-center transition text-[11px]">
+                                            Activer l'accès
+                                        </button>
+                                    </form>
+                                </div>
+                            @endforeach
                         </div>
-                    @endforelse
+                    </div>
+                @endif
+
+                <div class="pt-3 border-t border-slate-100">
+                    <a href="{{ route('landlord.support.create') }}" class="block w-full text-center py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">
+                        + Créer une demande support
+                    </a>
                 </div>
+
             </div>
 
-            {{-- Accès en Attente --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 flex-shrink-0">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        En Attente ({{ $pendingSupportAccesses->count() }})
-                    </h3>
-                </div>
-
-                <div class="flex-1 overflow-y-auto max-h-[280px] space-y-3 pr-1">
-                    @forelse($pendingSupportAccesses as $access)
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-                            <div class="flex justify-between items-start gap-2 mb-1">
-                                <span class="font-bold text-slate-900 truncate max-w-[140px]">{{ $access->tenant?->name ?? 'Boutique' }}</span>
-                                <span class="text-[9px] font-bold bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200 uppercase font-mono">Attente</span>
-                            </div>
-                            <p class="text-slate-500 text-[10px] truncate mb-2">Motif: {{ $access->reason }}</p>
-                            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-2">
-                                <span>Durée demandée :</span>
-                                <span class="font-bold text-slate-650">{{ $access->metadata['duration'] ?? '30 mins' }}</span>
-                            </div>
-                            <form action="{{ route('landlord.support.activate', $access) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-center transition text-[10px]">
-                                    Activer l'accès
-                                </button>
-                            </form>
-                        </div>
-                    @empty
-                        <div class="py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center h-full">
-                            <span class="text-slate-300">Aucune demande en attente</span>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-
-            {{-- Expirés Récemment --}}
-            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 flex-shrink-0">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-slate-450" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                        Expirés récemment
-                    </h3>
-                </div>
-
-                <div class="flex-1 overflow-y-auto max-h-[280px] space-y-3 pr-1">
-                    @forelse($recentlyExpiredSupportAccesses as $access)
-                        <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs opacity-75">
-                            <div class="flex justify-between items-start gap-2 mb-1">
-                                <span class="font-bold text-slate-700 truncate max-w-[140px]">{{ $access->tenant?->name ?? 'Boutique' }}</span>
-                                <span class="text-[9px] font-bold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 uppercase font-mono">
-                                    {{ $access->statusLabel() }}
-                                </span>
-                            </div>
-                            <p class="text-slate-500 text-[10px] truncate mb-1">Motif: {{ $access->reason }}</p>
-                            <p class="text-[9px] text-slate-400 font-mono">
-                                Modifié le {{ $access->updated_at->format('d/m H:i') }}
-                            </p>
-                        </div>
-                    @empty
-                        <div class="py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center h-full">
-                            <span class="text-slate-300">Aucun historique d'expiration</span>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
         </div>
-    </div>
 
-</div>
+    </div>
 
 </div>
 @endsection

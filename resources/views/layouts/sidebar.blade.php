@@ -1,13 +1,10 @@
 <aside class="fixed md:static inset-y-0 left-0 z-40 w-56 bg-slate-900 flex flex-col flex-shrink-0 transform md:transform-none transition-transform duration-200"
-    :class="mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+    :class="mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+    @keydown.window.escape="mobileSidebarOpen = false">
 
     {{-- Logo --}}
     <div class="flex items-center gap-2.5 px-5 h-14 border-b border-slate-800">
-        @php
-            $siteSettings = \App\Models\Setting::first();
-        @endphp
-
-        @if($siteSettings && $siteSettings->logo)
+        @if(isset($siteSettings) && $siteSettings->logo)
             <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="Logo" class="w-7 h-7 rounded-lg object-cover flex-shrink-0">
         @else
             <div class="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center font-black text-sm text-slate-950 flex-shrink-0">
@@ -156,7 +153,7 @@
                     {{ request()->routeIs('advanced_purchases.orders.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Bons de Commande
                 </a>
-                <a href="{{ route('advanced_purchases.orders.index') }}"
+                <a href="{{ route('advanced_purchases.receptions.index') }}"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
                     {{ request()->routeIs('advanced_purchases.receptions.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Réceptions livraisons
