@@ -317,6 +317,29 @@ class AdvancedPurchaseController extends Controller
         }
     }
 
+    // === RECEPTIONS DE MARCHANDISES (RECEPTIONS) ===
+    public function receptionsIndex(Request $request)
+    {
+        $query = SupplierReception::with(['supplierOrder.supplier', 'user', 'items.product']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('reference', 'like', "%{$search}%")
+                  ->orWhereHas('supplierOrder.supplier', function($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('supplierOrder', function($sq) use ($search) {
+                      $sq->where('reference', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $receptions = $query->latest()->paginate(20);
+
+        return view('advanced_purchases.receptions.index', compact('receptions'));
+    }
+
     // === RETOURS FOURNISSEURS (RETURNS) ===
     public function returnsIndex(Request $request)
     {

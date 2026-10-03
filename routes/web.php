@@ -236,6 +236,7 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
     // Achats Avancés (Advanced Purchases)
     Route::middleware(['permission:purchases.view'])->group(function () {
         Route::get('/advanced-purchases/orders', [App\Http\Controllers\AdvancedPurchaseController::class, 'ordersIndex'])->name('advanced_purchases.orders.index');
+        Route::get('/advanced-purchases/receptions', [App\Http\Controllers\AdvancedPurchaseController::class, 'receptionsIndex'])->name('advanced_purchases.receptions.index');
         Route::get('/advanced-purchases/returns', [App\Http\Controllers\AdvancedPurchaseController::class, 'returnsIndex'])->name('advanced_purchases.returns.index');
     });
 
