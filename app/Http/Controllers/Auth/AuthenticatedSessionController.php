@@ -30,11 +30,6 @@ class AuthenticatedSessionController extends Controller
     {
         $tenantSlug = $request->input('tenant');
 
-        // ✅ CORRECTION PRINCIPALE :
-        // Si un slug tenant est présent, on switche la connexion DB vers la DB
-        // de ce tenant AVANT que LoginRequest::authenticate() soit appelé.
-        // Sans ça, Laravel cherche l'utilisateur dans la DB principale (kamerstock)
-        // au lieu de la DB tenant (ex: kamerstock_boutique_test) → "identifiants incorrects".
         if ($tenantSlug) {
             $tenant = Tenant::on('landlord')
                 ->where('slug', $tenantSlug)
@@ -42,11 +37,7 @@ class AuthenticatedSessionController extends Controller
                 ->first();
 
             if ($tenant) {
-                // Reconfigurer la connexion tenant dynamiquement
-                config(['database.connections.tenant.database' => $tenant->database_name]);
-                DB::purge('tenant');
-                config(['database.default' => 'tenant']);
-                DB::reconnect('tenant');
+                app(\App\Services\Tenancy\TenantDatabaseManager::class)->switchToTenant($tenant);
             }
         }
 
@@ -54,12 +45,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // ✅ CORRECTION : On force la redirection vers dashboard avec ?tenant=slug.
-        // redirect()->intended() est ignoré ici car il utiliserait l'URL sauvegardée
-        // en session (sans le paramètre tenant) et ferait perdre le contexte tenant.
+        // Récupérer le slug résolu pendant l'authentification s'il n'était pas fourni au départ
+        $tenantSlug = $request->input('tenant') ?? session('current_tenant_slug');
+
         if ($tenantSlug) {
             $request->session()->put('current_tenant_slug', $tenantSlug);
-            // Vider l'URL "intended" pour éviter qu'elle soit utilisée sans le tenant
             $request->session()->forget('url.intended');
             return redirect(route('dashboard', ['tenant' => $tenantSlug], false));
         } else {

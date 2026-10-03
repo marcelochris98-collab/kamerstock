@@ -35,8 +35,12 @@ class TenantDatabaseManager
      */
     public function useDefaultDatabase(): void
     {
-        $defaultConnection = config('database.default', 'mysql');
-        $defaultConfig = config("database.connections.{$defaultConnection}");
+        $defaultConnection = app()->environment('testing') ? 'sqlite' : config('database.default', 'mysql');
+        if ($defaultConnection === 'tenant') {
+            $defaultConnection = app()->environment('testing') ? 'sqlite' : 'mysql';
+        }
+        $defaultConfig = config("database.connections.{$defaultConnection}", []);
+        unset($defaultConfig['read'], $defaultConfig['write'], $defaultConfig['hosts'], $defaultConfig['sticky']);
 
         Config::set('database.connections.tenant', $defaultConfig);
         DB::purge('tenant');
@@ -51,13 +55,22 @@ class TenantDatabaseManager
      */
     public function switchToTenant(Tenant $tenant): void
     {
-        $this->previousConnection = DB::getDefaultConnection();
+        $current = DB::getDefaultConnection();
+        if ($current !== 'tenant') {
+            $this->previousConnection = $current;
+        }
+
+        try {
+            DB::disconnect('tenant');
+            DB::purge('tenant');
+        } catch (\Throwable $e) {}
 
         $config = $this->getTenantConnectionConfig($tenant);
+        unset($config['read'], $config['write'], $config['hosts'], $config['sticky']);
+
         Config::set('database.connections.tenant', $config);
 
         DB::purge('tenant');
-        DB::reconnect('tenant');
         
         Config::set('database.default', 'tenant');
         DB::setDefaultConnection('tenant');
@@ -68,15 +81,17 @@ class TenantDatabaseManager
      */
     public function switchToDefault(): void
     {
-        $defaultConnection = $this->previousConnection ?? config('database.default', 'mysql');
+        $fallback = app()->environment('testing') ? 'sqlite' : (config('database.default') !== 'tenant' ? config('database.default') : 'mysql');
+        $defaultConnection = $this->previousConnection ?? $fallback;
         if ($defaultConnection === 'tenant') {
-            $defaultConnection = 'mysql';
+            $defaultConnection = $fallback;
         }
-        $defaultConfig = config("database.connections.{$defaultConnection}");
 
-        Config::set('database.connections.tenant', $defaultConfig);
-        DB::purge('tenant');
-        
+        try {
+            DB::disconnect('tenant');
+            DB::purge('tenant');
+        } catch (\Throwable $e) {}
+
         Config::set('database.default', $defaultConnection);
         DB::setDefaultConnection($defaultConnection);
         $this->previousConnection = null;
@@ -163,19 +178,27 @@ class TenantDatabaseManager
     public function getTenantConnectionConfig(Tenant $tenant): array
     {
         $defaultConnection = config('database.default', 'mysql');
+        if ($defaultConnection === 'tenant') {
+            $defaultConnection = $this->previousConnection ?? (app()->environment('testing') ? 'sqlite' : env('DB_CONNECTION', 'mysql'));
+        }
         $defaultConfig = config("database.connections.{$defaultConnection}", []);
 
         $config = array_merge($defaultConfig, [
-            'driver' => $defaultConfig['driver'] ?? 'mysql',
+            'driver' => $defaultConfig['driver'] ?? (app()->environment('testing') ? 'sqlite' : 'mysql'),
             'charset' => $defaultConfig['charset'] ?? 'utf8mb4',
             'collation' => $defaultConfig['collation'] ?? 'utf8mb4_unicode_ci',
             'prefix' => $defaultConfig['prefix'] ?? '',
             'foreign_key_constraints' => $defaultConfig['foreign_key_constraints'] ?? true,
         ]);
 
+        unset($config['read'], $config['write'], $config['hosts'], $config['sticky']);
+
         if ($config['driver'] === 'sqlite') {
             if ($tenant->database_name === ':memory:') {
-                $config['database'] = ':memory:';
+                $config['database'] = database_path("tenants/test_memory_{$tenant->id}.sqlite");
+                if (!file_exists(dirname($config['database']))) {
+                    mkdir(dirname($config['database']), 0755, true);
+                }
             } else {
                 $config['database'] = database_path("tenants/{$tenant->database_name}.sqlite");
             }

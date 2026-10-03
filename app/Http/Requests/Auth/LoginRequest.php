@@ -37,27 +37,36 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $tenantSlug = $this->input('tenant');
+        $email = $this->string('email');
+
+        // ✅ AUTO-DÉTECTION TENANT : Si pas de slug dans la requête, chercher si l'email correspond à un tenant
+        if (!$tenantSlug && !empty($email)) {
+            $tenantCandidate = Tenant::on('landlord')
+                ->where(function ($q) use ($email) {
+                    $q->where('owner_login_email', $email)
+                      ->orWhere('owner_email', $email);
+                })
+                ->where('provisioning_status', 'migrated')
+                ->first();
+
+            if ($tenantCandidate) {
+                $tenantSlug = $tenantCandidate->slug;
+            }
+        }
 
         // ✅ CAS TENANT : authentification manuelle sur la DB tenant
-        // Auth::attempt() utilise le provider résolu au boot — il ignore le switch
-        // de DB fait dans le contrôleur. On contourne en faisant le check manuellement.
         if ($tenantSlug) {
-
             $tenant = Tenant::on('landlord')
                 ->where('slug', $tenantSlug)
                 ->where('provisioning_status', 'migrated')
                 ->first();
 
             if ($tenant) {
-                // Configurer et activer la connexion tenant
-                config(['database.connections.tenant.database' => $tenant->database_name]);
-                DB::purge('tenant');
-                config(['database.default' => 'tenant']);
-                DB::reconnect('tenant');
+                app(\App\Services\Tenancy\TenantDatabaseManager::class)->switchToTenant($tenant);
 
                 // Chercher l'utilisateur dans la DB tenant
                 $user = User::on('tenant')
-                    ->where('email', $this->string('email'))
+                    ->where('email', $email)
                     ->first();
 
                 if ($user && $user->is_active && Hash::check($this->string('password'), $user->password)) {
@@ -79,8 +88,31 @@ class LoginRequest extends FormRequest
             }
         }
 
-        // CAS NORMAL (boutique legacy / sans tenant) : Auth::attempt() standard
+        // CAS NORMAL (boutique legacy / sans tenant) : Auth::attempt() standard sur DB par défaut
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            // Si Auth::attempt échoue sur la DB centrale, faire une recherche de secours sur tous les tenants migrés
+            $allMigratedTenants = Tenant::on('landlord')
+                ->where('provisioning_status', 'migrated')
+                ->get();
+
+            $dbManager = app(\App\Services\Tenancy\TenantDatabaseManager::class);
+
+            foreach ($allMigratedTenants as $t) {
+                try {
+                    $dbManager->switchToTenant($t);
+
+                    $tenantUser = User::on('tenant')->where('email', $email)->first();
+                    if ($tenantUser && $tenantUser->is_active && Hash::check($this->string('password'), $tenantUser->password)) {
+                        Auth::login($tenantUser, $this->boolean('remember'));
+                        session(['current_tenant_slug' => $t->slug]);
+                        RateLimiter::clear($this->throttleKey());
+                        return;
+                    }
+                } catch (\Throwable $ex) {
+                    // Ignorer les erreurs de connexion temporaires
+                }
+            }
+
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

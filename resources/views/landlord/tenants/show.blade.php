@@ -59,9 +59,9 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                     </span>
-                    Boutique créée et prête à être partagée !
+                    Boutique créée et prête à être utilisée !
                 </h4>
-                <p class="text-xs text-indigo-300">Les accès d'administration ont été configurés en mode préparé. Copiez le message ci-dessous pour l'envoyer au propriétaire.</p>
+                <p class="text-xs text-indigo-300">Les accès d'administration ont été créés et migrés avec succès. Vous pouvez copier le message récapitulatif pour l'envoyer au propriétaire.</p>
             </div>
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <button type="button" onclick="copyAccessMessage()" class="px-4 py-2 bg-indigo-650 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition select-none flex items-center gap-1.5">
@@ -73,6 +73,18 @@
             </div>
         </div>
     @endif
+
+    {{-- Hidden textarea for copy script --}}
+    <textarea id="accessMessageText" style="position: absolute; left: -9999px;" readonly>Bonjour {{ $tenant->owner_name ?? 'Cher Client' }},
+
+Votre boutique {{ $tenant->name }} a été créée avec succès sur la plateforme KamerStock.
+
+Voici vos accès d'administration :
+- URL de connexion : {{ url('/login?tenant=' . $tenant->slug) }}
+- Email : {{ $tenant->owner_login_email ?? $tenant->owner_email }}
+- Mot de passe : {{ $tenant->owner_password_plain }}
+
+Merci de conserver ces identifiants en lieu sûr.</textarea>
 
     {{-- Confidentiality Disclaimer --}}
     <div class="mb-6 p-4 bg-slate-900 border border-slate-800 text-slate-400 rounded-xl text-xs flex items-center justify-between shadow-sm select-none">
@@ -89,6 +101,45 @@
 
         {{-- Left: Metadata Card --}}
         <div class="space-y-6">
+
+            {{-- Identifiants d'Accès Card --}}
+            <div class="bg-slate-900 border border-slate-800 shadow-md rounded-2xl p-6 text-white">
+                <h3 class="text-sm font-bold mb-4 pb-2 border-b border-slate-800 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"/>
+                        </svg>
+                        Identifiants Propriétaire
+                    </span>
+                    <button type="button" onclick="copyAccessMessage()" class="text-[10px] px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-medium transition">
+                        Copier
+                    </button>
+                </h3>
+
+                <ul class="space-y-3.5 text-xs">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Adresse Email (Identifiant)</span>
+                        <span class="font-mono text-white text-xs font-semibold select-all bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700 block">
+                            {{ $tenant->owner_login_email ?? $tenant->owner_email ?? 'Non défini' }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Mot de Passe d'Administration</span>
+                        <span class="font-mono text-amber-400 text-xs font-bold bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700 block select-all">
+                            {{ $tenant->owner_password_plain ?? '••••••••' }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Lien de Connexion Directe</span>
+                        <a href="{{ url('/login?tenant=' . $tenant->slug) }}" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline font-mono break-all flex items-center gap-1">
+                            {{ url('/login?tenant=' . $tenant->slug) }}
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </ul>
+            </div>
             
             {{-- General Info Card --}}
             <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">

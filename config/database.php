@@ -55,7 +55,13 @@ return [
             'engine' => null,
         ],
 
-        'tenant' => [
+        'tenant' => env('TENANT_DB_CONNECTION', env('DB_CONNECTION', 'mysql')) === 'sqlite' ? [
+            'driver' => 'sqlite',
+            'url' => env('TENANT_DB_URL', env('DB_URL')),
+            'database' => env('TENANT_DB_DATABASE', env('DB_DATABASE', database_path('database.sqlite'))),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ] : [
             'driver' => env('TENANT_DB_CONNECTION', env('DB_CONNECTION', 'mysql')),
             'host' => env('TENANT_DB_HOST', env('DB_HOST', '127.0.0.1')),
             'port' => env('TENANT_DB_PORT', env('DB_PORT', '3306')),

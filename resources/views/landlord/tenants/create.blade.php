@@ -89,7 +89,7 @@
                         <h2 class="text-sm font-bold text-slate-800">Propriétaire & Contact</h2>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-655 mb-1.5">Nom complet</label>
                             <input type="text" name="owner_name"
@@ -97,14 +97,20 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Adresse e-mail</label>
-                            <input type="email" name="owner_email"
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Adresse e-mail <span class="text-red-500">*</span></label>
+                            <input type="email" name="owner_email" required
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-655 mb-1.5">Téléphone</label>
                             <input type="text" name="owner_phone"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-655 mb-1.5">Mot de passe initial (optionnel)</label>
+                            <input type="text" name="owner_password" placeholder="Laissez vide pour générer automatiquement"
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         </div>
                     </div>

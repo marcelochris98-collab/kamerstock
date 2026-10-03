@@ -90,8 +90,12 @@ class TenantProvisioningService
 
         $data['owner_login_email'] = $data['owner_email'] ?? null;
         
-        $passLen = config('platform.tenant_default_password_length', 10);
-        $data['owner_password_plain'] = $this->generateTemporaryPassword($passLen);
+        if (!empty($data['owner_password'])) {
+            $data['owner_password_plain'] = $data['owner_password'];
+        } else {
+            $passLen = config('platform.tenant_default_password_length', 10);
+            $data['owner_password_plain'] = $this->generateTemporaryPassword($passLen);
+        }
         $data['owner_login_password_generated_at'] = now();
 
         return $data;

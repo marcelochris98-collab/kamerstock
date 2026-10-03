@@ -215,14 +215,15 @@
         </div>
 
         {{-- Profil --}}
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
-            <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-white font-semibold text-xs">
+        <a href="{{ route('profile.edit') }}" title="Mon Profil & Sécurité"
+            class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-lg transition">
+            <div class="w-6 h-6 rounded bg-amber-500 flex items-center justify-center text-slate-950 font-bold text-xs">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </div>
             <div class="hidden md:block">
                 <p class="text-xs font-semibold text-slate-700 leading-none">{{ auth()->user()->name }}</p>
             </div>
-        </div>
+        </a>
 
         {{-- Déconnexion --}}
         <form method="POST" action="{{ route('logout') }}">

@@ -55,6 +55,7 @@ class TenantController extends Controller
             'owner_name' => 'nullable|string|max:255',
             'owner_email' => 'nullable|email|max:255',
             'owner_phone' => 'nullable|string|max:255',
+            'owner_password' => 'nullable|string|min:6',
             'business_type' => 'nullable|string|max:255',
             'business_type_custom' => 'nullable|string|max:255',
             'status' => 'required|string|in:trial,active,payment_due,grace_period,read_only,suspended,archived',
