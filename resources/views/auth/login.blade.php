@@ -27,6 +27,16 @@
             <h1 class="text-sm font-semibold text-white mb-1">Connexion</h1>
             <p class="text-xs text-slate-500 mb-6">Entrez vos identifiants pour accéder au système.</p>
 
+            {{-- Status / Success message --}}
+            @if(session('success'))
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-3 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <p class="text-xs text-emerald-400 font-medium">{{ session('success') }}</p>
+            </div>
+            @endif
+
             {{-- Erreurs --}}
             @if($errors->any())
             <div class="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4">

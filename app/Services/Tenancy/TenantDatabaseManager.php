@@ -203,11 +203,7 @@ class TenantDatabaseManager
                 $config['database'] = database_path("tenants/{$tenant->database_name}.sqlite");
             }
 
-            $config['url'] = null;
-            $config['host'] = null;
-            $config['port'] = null;
-            $config['username'] = null;
-            $config['password'] = null;
+            unset($config['url'], $config['host'], $config['port'], $config['username'], $config['password']);
         } else {
             $config['database'] = $tenant->database_name;
             $config['host'] = $tenant->database_host ?: config('platform.database_provisioning.default_host', env('DB_HOST', '127.0.0.1'));

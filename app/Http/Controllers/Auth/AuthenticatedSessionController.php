@@ -64,13 +64,20 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Si en mode support landlord, quitter la session de support
+        if (session()->has('support_access_id') || app(\App\Services\Platform\SupportContext::class)->isSupportMode()) {
+            return redirect()->route('support.exit');
+        }
+
+        Auth::logout();
         Auth::guard('web')->logout();
 
-        $request->session()->forget('current_tenant_slug');
-        $request->session()->invalidate();
+        app(\App\Services\Tenancy\TenantDatabaseManager::class)->switchToDefault();
 
+        $request->session()->forget(['current_tenant_slug', 'support_access_id', 'support_tenant_id']);
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')->with('success', 'Vous avez été déconnecté avec succès.');
     }
 }

@@ -41,17 +41,19 @@ class LoginRequest extends FormRequest
 
         // ✅ AUTO-DÉTECTION TENANT : Si pas de slug dans la requête, chercher si l'email correspond à un tenant
         if (!$tenantSlug && !empty($email)) {
-            $tenantCandidate = Tenant::on('landlord')
-                ->where(function ($q) use ($email) {
-                    $q->where('owner_login_email', $email)
-                      ->orWhere('owner_email', $email);
-                })
-                ->where('provisioning_status', 'migrated')
-                ->first();
+            try {
+                $tenantCandidate = Tenant::on('landlord')
+                    ->where(function ($q) use ($email) {
+                        $q->where('owner_login_email', $email)
+                          ->orWhere('owner_email', $email);
+                    })
+                    ->where('provisioning_status', 'migrated')
+                    ->first();
 
-            if ($tenantCandidate) {
-                $tenantSlug = $tenantCandidate->slug;
-            }
+                if ($tenantCandidate) {
+                    $tenantSlug = $tenantCandidate->slug;
+                }
+            } catch (\Throwable $e) {}
         }
 
         // ✅ CAS TENANT : authentification manuelle sur la DB tenant

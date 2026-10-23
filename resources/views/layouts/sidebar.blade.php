@@ -37,19 +37,6 @@
             <span class="flex-1">Tableau de bord</span>
         </a>
 
-        {{-- Mon Profil & Sécurité --}}
-        <a href="{{ route('profile.edit') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition mb-1
-            {{ request()->routeIs('profile.edit') ? 'bg-slate-800 text-amber-400 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
-            <span class="w-6 h-6 rounded-md flex items-center justify-center bg-slate-800 flex-shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-            </span>
-            <span class="flex-1">Mon Profil & Sécurité</span>
-        </a>
-
         {{-- Ventes & Devis --}}
         @if(auth()->user()->hasPermission('sales.view') || auth()->user()->hasPermission('sales.create'))
         <div class="mb-1">
@@ -389,8 +376,8 @@
             </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" title="Déconnexion"
-                    class="text-slate-600 hover:text-red-400 transition p-1 rounded-lg hover:bg-slate-800">
+                <button type="submit" title="Déconnexion" aria-label="Déconnexion"
+                    class="text-slate-400 hover:text-red-400 hover:bg-slate-800 transition p-1.5 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
