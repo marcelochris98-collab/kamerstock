@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\PlatformController;
 use App\Http\Controllers\ClientPortalController;
+use App\Http\Controllers\TenantBillingController;
 
 // Redirection racine ou landing page
 Route::get('/', function () {
@@ -50,6 +51,10 @@ Route::middleware(['checkauth', 'audit'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Espace Facturation & Choix du Plan en libre-service
+    Route::get('/billing', [TenantBillingController::class, 'index'])->name('tenant.billing');
+    Route::post('/billing/checkout', [TenantBillingController::class, 'checkout'])->name('tenant.billing.checkout');
 
     // Zone administration
     Route::prefix('admin')->name('admin.')->group(function () {

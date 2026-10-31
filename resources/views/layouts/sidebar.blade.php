@@ -329,6 +329,16 @@
                     {{ request()->routeIs('admin.settings.*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
                     Paramètres Shop
                 </a>
+                <a href="{{ route('tenant.billing') }}"
+                    class="flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition
+                    {{ request()->routeIs('tenant.billing*') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">
+                    <span class="flex items-center gap-2">
+                        <span>Mon Abonnement</span>
+                    </span>
+                    <span class="px-1.5 py-0.2 text-[8px] font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        SaaS
+                    </span>
+                </a>
                 <a href="{{ route('settings.credit.edit') }}"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition
                     {{ request()->routeIs('settings.credit.edit') ? 'text-amber-400 font-medium' : 'text-slate-500 hover:text-white' }}">

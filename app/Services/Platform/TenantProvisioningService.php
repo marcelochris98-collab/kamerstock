@@ -139,7 +139,7 @@ class TenantProvisioningService
                 : now()->addMonths($months);
         }
 
-        return Subscription::create([
+        $subscription = Subscription::create([
             'tenant_id' => $tenant->id,
             'plan_id' => $plan->id,
             'status' => $status,
@@ -151,6 +151,13 @@ class TenantProvisioningService
             'billing_cycle' => 'monthly',
             'auto_renew' => true,
         ]);
+
+        $tenant->update([
+            'trial_ends_at' => $trialEndsAt,
+            'subscription_ends_at' => $endsAt,
+        ]);
+
+        return $subscription;
     }
 
     /**

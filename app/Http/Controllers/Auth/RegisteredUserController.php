@@ -155,6 +155,7 @@ class RegisteredUserController extends Controller
             'business_type_custom' => $validated['business_type_custom'] ?? null,
             'status'               => 'trial',
             'trial_days'           => $trialDays,
+            'trial_ends_at'        => now()->addDays($trialDays),
             'plan_id'              => $plan?->id,
             'timezone'             => 'Africa/Douala',
             'currency'             => config('platform.default_currency', 'FCFA'),

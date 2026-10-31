@@ -47,6 +47,33 @@
                 </div>
             @endif
 
+            @php
+                $activeTenant = app(\App\Services\Tenancy\TenantContext::class)->tenant();
+                $tenantIsTrial = $activeTenant && $activeTenant->status === 'trial';
+                $trialEnd = $activeTenant?->trial_ends_at ?? $activeTenant?->subscriptions()->latest()->first()?->trial_ends_at ?? now()->addDays(14);
+                $trialDaysLeft = max(1, (int) ceil(now()->diffInSeconds($trialEnd, false) / 86400));
+            @endphp
+
+            @if($tenantIsTrial)
+                <div class="bg-slate-900 border-b border-amber-500/20 text-slate-200 px-4 py-2 text-xs flex flex-wrap justify-between items-center gap-2 z-40 select-none shadow-sm">
+                    <div class="flex items-center gap-2.5">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                            ESSAI GRATUIT
+                        </span>
+                        <span class="text-slate-300 text-[11px]">
+                            Il vous reste <strong class="text-amber-400">{{ $trialDaysLeft }} jour{{ $trialDaysLeft > 1 ? 's' : '' }}</strong> d'essai gratuit avec base MySQL dédiée.
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-slate-400 hidden sm:inline">Activez votre formule commerciale sans interruption</span>
+                        <a href="{{ route('tenant.billing') }}" class="px-2.5 py-1 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold rounded-lg transition text-[10px] shadow-sm shadow-amber-500/20">
+                            Choisir mon forfait &rarr;
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             @include('layouts.header')
 
             <main class="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-100">

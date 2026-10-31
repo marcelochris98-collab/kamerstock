@@ -25,23 +25,143 @@
     @endif
 </div>
 
-@if($siteSetting && !$siteSetting->setup_completed && auth()->user()->hasPermission('settings.manage'))
-    <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center flex-shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
+{{-- GUIDE DE DÉMARRAGE RAPIDE (ONBOARDING STEPPER) --}}
+@if($showOnboarding ?? false)
+<div class="mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/[0.08] rounded-2xl p-5 shadow-sm space-y-4"
+     x-data="{ openGuide: true }"
+     x-show="openGuide">
+    
+    <!-- En-tête de la checklist -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-slate-900 dark:text-white">Guide de démarrage rapide</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                    {{ $completedSteps ?? 1 }}/4 étapes terminées ({{ $progressPercent ?? 25 }}%)
+                </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Suivez ces 4 étapes pour mettre en route votre boutique et commencer à vendre.
+            </p>
+        </div>
+
+        <button type="button" @click="openGuide = false" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 self-start sm:self-auto transition">
+            Masquer le guide &times;
+        </button>
+    </div>
+
+    <!-- Barre de progression -->
+    <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
+             style="width: {{ $progressPercent ?? 25 }}%"></div>
+    </div>
+
+    <!-- 4 Étapes de la checklist -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+        
+        <!-- Étape 1 : Boutique & Base MySQL -->
+        <div class="p-3.5 rounded-xl border {{ ($onboarding['shop_created'] ?? true) ? 'bg-emerald-500/[0.03] border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.06]' }} space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase">Étape 01</span>
+                @if($onboarding['shop_created'] ?? true)
+                <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                @else
+                <span class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 flex items-center justify-center text-xs">○</span>
+                @endif
             </div>
             <div>
-                <p class="text-xs font-bold text-slate-900">Configuration de la boutique non terminée</p>
-                <p class="text-[10px] text-slate-500">Personnalisez votre logiciel de gestion en renseignant les détails de votre commerce.</p>
+                <p class="text-xs font-bold text-slate-800 dark:text-white">Création du compte</p>
+                <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Base MySQL isolée prête et configurée.</p>
+            </div>
+            <div class="pt-1">
+                <span class="text-[10px] font-semibold text-emerald-500">Terminé</span>
             </div>
         </div>
-        <a href="{{ route('admin.settings.index') }}" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg transition shadow-sm select-none flex-shrink-0 text-center">
-            Configurer maintenant
-        </a>
+
+        <!-- Étape 2 : Catalogue / Premier produit -->
+        <div class="p-3.5 rounded-xl border {{ ($onboarding['has_products'] ?? false) ? 'bg-emerald-500/[0.03] border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.06]' }} space-y-2 flex flex-col justify-between">
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase">Étape 02</span>
+                    @if($onboarding['has_products'] ?? false)
+                    <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                    @else
+                    <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center text-xs font-bold animate-pulse">2</span>
+                    @endif
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800 dark:text-white">Ajouter vos stocks</p>
+                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Ajoutez au moins 1 article en rayon.</p>
+                </div>
+            </div>
+            <div class="pt-1">
+                @if($onboarding['has_products'] ?? false)
+                <span class="text-[10px] font-semibold text-emerald-500">✓ {{ $totalProduits }} article{{ $totalProduits > 1 ? 's' : '' }} en stock</span>
+                @else
+                <a href="{{ route('products.create') }}" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:text-amber-400">
+                    + Ajouter un article &rarr;
+                </a>
+                @endif
+            </div>
+        </div>
+
+        <!-- Étape 3 : Première vente Caisse POS -->
+        <div class="p-3.5 rounded-xl border {{ ($onboarding['has_sales'] ?? false) ? 'bg-emerald-500/[0.03] border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.06]' }} space-y-2 flex flex-col justify-between">
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase">Étape 03</span>
+                    @if($onboarding['has_sales'] ?? false)
+                    <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                    @else
+                    <span class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 flex items-center justify-center text-xs font-bold">3</span>
+                    @endif
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800 dark:text-white">Tester la caisse POS</p>
+                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Encaissez une première vente test.</p>
+                </div>
+            </div>
+            <div class="pt-1">
+                @if($onboarding['has_sales'] ?? false)
+                <span class="text-[10px] font-semibold text-emerald-500">✓ Vente test réalisée</span>
+                @else
+                <a href="{{ route('sales.create') }}" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:text-amber-400">
+                    Ouvrir la caisse &rarr;
+                </a>
+                @endif
+            </div>
+        </div>
+
+        <!-- Étape 4 : Personnaliser tickets & paramètres -->
+        <div class="p-3.5 rounded-xl border {{ ($onboarding['setup_complete'] ?? false) ? 'bg-emerald-500/[0.03] border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-white/[0.06]' }} space-y-2 flex flex-col justify-between">
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase">Étape 04</span>
+                    @if($onboarding['setup_complete'] ?? false)
+                    <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                    @else
+                    <span class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 flex items-center justify-center text-xs font-bold">4</span>
+                    @endif
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800 dark:text-white">Ticket & Boutique</p>
+                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Logo, téléphone, mentions légales.</p>
+                </div>
+            </div>
+            <div class="pt-1">
+                @if($onboarding['setup_complete'] ?? false)
+                <span class="text-[10px] font-semibold text-emerald-500">✓ Configuration OK</span>
+                @else
+                <a href="{{ route('admin.settings.index') }}" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:text-amber-400">
+                    Configurer &rarr;
+                </a>
+                @endif
+            </div>
+        </div>
+
     </div>
+
+</div>
 @endif
 
 {{-- STATS --}}

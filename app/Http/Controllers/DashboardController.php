@@ -81,9 +81,25 @@ class DashboardController extends Controller
                                  ->limit(5)
                                  ->get();
 
+        // Calcul des étapes du guide de démarrage (Onboarding Checklist)
+        $totalVentesHistorique = Sale::where('status', '!=', 'annulee')->count();
+        $siteSetting = \App\Models\Setting::first();
+        
+        $onboarding = [
+            'shop_created'   => true,
+            'has_products'   => $totalProduits > 0,
+            'has_sales'      => $totalVentesHistorique > 0,
+            'setup_complete' => (bool) ($siteSetting?->setup_completed),
+        ];
+
+        $completedSteps = count(array_filter($onboarding));
+        $progressPercent = (int) (($completedSteps / 4) * 100);
+        $showOnboarding = $totalVentesHistorique < 5;
+
         return view('dashboard', compact(
             'caJour', 'ventesJour', 'totalProduits', 'alertesStock',
-            'labels', 'totals', 'dernieresVentes', 'topProduits', 'produitsAlerte'
+            'labels', 'totals', 'dernieresVentes', 'topProduits', 'produitsAlerte',
+            'onboarding', 'completedSteps', 'progressPercent', 'showOnboarding', 'siteSetting'
         ));
     }
 }
