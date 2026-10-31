@@ -28,8 +28,8 @@ class RegistrationTest extends TestCase
         $response = $this->get('/register');
 
         $response->assertStatus(200);
-        $response->assertSee('Lancez votre commerce en 2 minutes');
-        $response->assertSee('Nom de votre commerce ou boutique');
+        $response->assertSee('Lancez votre boutique en 2 minutes');
+        $response->assertSee('Nom du commerce ou boutique');
         $response->assertSee('kamerstock.cm/t/');
     }
 
