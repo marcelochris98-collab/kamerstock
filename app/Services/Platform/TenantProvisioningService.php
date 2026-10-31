@@ -521,6 +521,21 @@ class TenantProvisioningService
                 ]
             );
 
+            // Synchroniser le nom de la boutique et le type de commerce dans les paramètres
+            try {
+                \App\Models\Setting::updateOrCreate(
+                    ['id' => 1],
+                    [
+                        'shop_name' => $tenant->name,
+                        'email' => $tenant->owner_login_email,
+                        'business_type' => $tenant->business_type ?? 'quincaillerie',
+                        'business_type_custom' => $tenant->business_type_custom,
+                    ]
+                );
+            } catch (\Throwable $ignored) {
+                // Silencieux si indisponible
+            }
+
             $this->restoreDefaultConnection($previousDefault);
             return $tenant;
 

@@ -380,6 +380,12 @@ Route::get('/tenant/pending', function (\Illuminate\Http\Request $request) {
     ]);
 })->name('tenant.pending');
 
+Route::get('/t/{tenant}/{any?}', function (\Illuminate\Http\Request $request, $tenant, $any = null) {
+    $target = $any ? ltrim($any, '/') : 'login';
+    return redirect()->to(url('/' . $target . '?tenant=' . urlencode($tenant)));
+})->where('any', '.*')->name('tenant.path_redirect');
+
+
 Route::get('/support/exit', function () {
     $tenantId = session('support_tenant_id');
     $tenant = null;
