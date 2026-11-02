@@ -94,7 +94,7 @@ class DashboardController extends Controller
 
         $completedSteps = count(array_filter($onboarding));
         $progressPercent = (int) (($completedSteps / 4) * 100);
-        $showOnboarding = $totalVentesHistorique < 5;
+        $showOnboarding = false;
 
         return view('dashboard', compact(
             'caJour', 'ventesJour', 'totalProduits', 'alertesStock',

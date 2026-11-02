@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KamerStock Client | @yield('title', 'Portail')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.loading-assets')
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col">
 
@@ -61,14 +62,23 @@
     </div>
     @endif
 
-    <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full">
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full relative">
         @if(session('success'))
         <div class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-lg text-xs font-semibold text-emerald-700">
             {{ session('success') }}
         </div>
         @endif
 
-        @yield('content')
+        {{-- SQUELETTE UNIVERSEL PORTAIL CLIENT --}}
+        <div id="kamerstock-page-skeleton" class="space-y-6 max-w-5xl mx-auto transition-opacity duration-300">
+            <x-skeleton-cards :count="3" :cols="3" />
+            <x-skeleton-table :rows="5" :cols="5" :hasActions="false" />
+        </div>
+
+        {{-- CONTENU RÉEL DÉVOILÉ --}}
+        <div id="kamerstock-page-content" class="transition-opacity duration-300" style="display: none; opacity: 0;">
+            @yield('content')
+        </div>
     </main>
 
     {{-- Footer --}}

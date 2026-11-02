@@ -54,14 +54,7 @@
     </form>
 </div>
 
-<div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 350)">
-    {{-- SQUELETTE DE CHARGEMENT ANIMÉ --}}
-    <div x-show="!loaded">
-        <x-skeleton-table :rows="6" :cols="6" :hasActions="true" />
-    </div>
-
-    {{-- TABLEAU RÉEL REÇU --}}
-    <div x-show="loaded" x-cloak class="bg-white rounded-xl shadow-sm overflow-hidden">
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-slate-100 bg-slate-50">
@@ -131,7 +124,6 @@
         {{ $orders->links() }}
     </div>
     @endif
-</div>
 </div>
 
 @endsection

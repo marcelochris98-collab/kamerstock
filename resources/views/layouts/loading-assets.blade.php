@@ -187,5 +187,74 @@
     }
 
     window.KamerStockLoading = new LoadingEngine();
+
+    // =========================================================================
+    // CONTRÔLEUR UNIVERSEL DU SKELETON (TOUTES LES PAGES)
+    // =========================================================================
+    window.initKamerStockSkeleton = function(durationMs) {
+        durationMs = durationMs || 1000; // ~1 seconde visible et élégante
+        
+        if (window.KamerStockLoading) {
+            window.KamerStockLoading.start();
+        }
+
+        setTimeout(function() {
+            var skeleton = document.getElementById('kamerstock-page-skeleton');
+            var content = document.getElementById('kamerstock-page-content');
+
+            if (skeleton) {
+                skeleton.style.transition = 'opacity 0.25s ease-out';
+                skeleton.style.opacity = '0';
+
+                setTimeout(function() {
+                    skeleton.style.display = 'none';
+                    if (content) {
+                        content.style.display = 'block';
+                        void content.offsetWidth; // Force le reflow du navigateur
+                        content.style.opacity = '1';
+                    }
+                }, 250);
+            } else if (content) {
+                content.style.display = 'block';
+                content.style.opacity = '1';
+            }
+
+            if (window.KamerStockLoading) {
+                window.KamerStockLoading.done();
+            }
+        }, durationMs);
+
+        // Sécurité absolue : affichage garanti quoi qu'il arrive après 2.5s
+        setTimeout(function() {
+            var skeleton = document.getElementById('kamerstock-page-skeleton');
+            var content = document.getElementById('kamerstock-page-content');
+            if (skeleton && skeleton.style.display !== 'none') {
+                skeleton.style.display = 'none';
+            }
+            if (content && (content.style.display === 'none' || content.style.opacity === '0')) {
+                content.style.display = 'block';
+                content.style.opacity = '1';
+            }
+            if (window.KamerStockLoading) {
+                window.KamerStockLoading.done();
+            }
+        }, 2500);
+    };
+
+    // Déclenchement automatique au chargement
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            window.initKamerStockSkeleton(1000);
+        });
+    } else {
+        window.initKamerStockSkeleton(1000);
+    }
 })();
 </script>
+
+<noscript>
+    <style>
+        #kamerstock-page-skeleton { display: none !important; }
+        #kamerstock-page-content { display: block !important; opacity: 1 !important; }
+    </style>
+</noscript>

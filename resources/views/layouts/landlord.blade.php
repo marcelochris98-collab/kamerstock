@@ -186,8 +186,25 @@
             </header>
 
             {{-- Main Content --}}
-            <main class="flex-1 overflow-y-auto">
-                @yield('content')
+            <main class="flex-1 overflow-y-auto p-6 relative">
+
+                {{-- SQUELETTE UNIVERSEL LANDLORD --}}
+                <div id="kamerstock-page-skeleton" class="space-y-6 max-w-7xl mx-auto transition-opacity duration-300">
+                    <div class="flex items-center justify-between pb-2">
+                        <div class="space-y-2">
+                            <div class="h-6 bg-slate-200 rounded-lg skeleton-shimmer w-56"></div>
+                            <div class="h-3 bg-slate-200/70 rounded skeleton-shimmer w-80"></div>
+                        </div>
+                        <div class="h-9 bg-slate-200 rounded-xl skeleton-shimmer w-36"></div>
+                    </div>
+                    <x-skeleton-cards :count="4" :cols="4" />
+                    <x-skeleton-table :rows="6" :cols="6" :hasActions="true" />
+                </div>
+
+                {{-- CONTENU RÉEL DÉVOILÉ --}}
+                <div id="kamerstock-page-content" class="transition-opacity duration-300" style="display: none; opacity: 0;">
+                    @yield('content')
+                </div>
             </main>
         </div>
 

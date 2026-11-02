@@ -69,17 +69,14 @@ class TenantBillingTest extends TestCase
         app(TenantContext::class)->setTenant($this->tenant);
     }
 
-    public function test_dashboard_displays_quickstart_onboarding(): void
+    public function test_dashboard_does_not_display_quickstart_onboarding(): void
     {
         $response = $this->actingAs($this->user)
             ->withSession(['current_tenant_slug' => $this->tenant->slug])
             ->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Guide de démarrage rapide');
-        $response->assertSee('Création du compte');
-        $response->assertSee('Ajouter vos stocks');
-        $response->assertSee('Tester la caisse POS');
+        $response->assertDontSee('Guide de démarrage rapide');
     }
 
     public function test_billing_page_can_be_rendered(): void

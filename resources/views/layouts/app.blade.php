@@ -81,9 +81,31 @@
 
             @include('layouts.header')
 
-            <main class="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-100">
-                @yield('content')
-                {{ $slot ?? '' }}
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-100 relative">
+
+                {{-- SQUELETTE UNIVERSEL VISIBLE SUR TOUTES LES PAGES --}}
+                <div id="kamerstock-page-skeleton" class="space-y-6 max-w-7xl mx-auto transition-opacity duration-300">
+                    {{-- En-tête squelette --}}
+                    <div class="flex items-center justify-between pb-2">
+                        <div class="space-y-2">
+                            <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg skeleton-shimmer w-52"></div>
+                            <div class="h-3 bg-slate-200/70 dark:bg-slate-800 rounded skeleton-shimmer w-72"></div>
+                        </div>
+                        <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded-xl skeleton-shimmer w-32"></div>
+                    </div>
+
+                    {{-- Cartes de métriques squelettes --}}
+                    <x-skeleton-cards :count="4" :cols="4" />
+
+                    {{-- Tableau squelette animé avec shimmer --}}
+                    <x-skeleton-table :rows="7" :cols="6" :hasActions="true" />
+                </div>
+
+                {{-- CONTENU RÉEL DÉVOILÉ APRÈS LE CHARGEMENT --}}
+                <div id="kamerstock-page-content" class="transition-opacity duration-300" style="display: none; opacity: 0;">
+                    @yield('content')
+                    {{ $slot ?? '' }}
+                </div>
             </main>
         </div>
     </div>
