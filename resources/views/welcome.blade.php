@@ -300,101 +300,216 @@
         </p>
 
         <!-- ========================================================================= -->
-        <!-- 3. HERO SHOWCASE : Sleek Linear-style App Canvas -->
+        <!-- 3. HERO SHOWCASE : Live Cloud Canvas (Screenshot Replica) -->
         <!-- ========================================================================= -->
         <div class="mt-14 relative mx-auto max-w-5xl">
             <!-- Ambient Behind-frame Glow -->
-            <div class="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-indigo-500/10 to-amber-500/20 rounded-2xl blur-2xl opacity-50 -z-10"></div>
+            <div class="absolute -inset-1.5 bg-gradient-to-r from-amber-500/20 via-emerald-500/15 to-indigo-500/20 rounded-3xl blur-2xl opacity-60 -z-10"></div>
 
-            <div class="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-slate-900/80 shadow-2xl shadow-slate-200/50 dark:shadow-black/80 backdrop-blur-xl overflow-hidden text-left">
+            <!-- Outer Canvas Window -->
+            <div class="rounded-3xl border border-slate-200/90 dark:border-white/[0.08] bg-[#f8fafc]/95 dark:bg-slate-950/80 shadow-2xl shadow-slate-200/60 dark:shadow-black/80 backdrop-blur-xl p-4 sm:p-6 lg:p-7 text-left transition-colors duration-200">
                 
-                <!-- Window Chrome / Top Bar -->
-                <div class="h-10 border-b border-slate-200 dark:border-white/[0.06] bg-slate-100/70 dark:bg-slate-950/60 px-4 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
-                        <span class="ml-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5">
-                            <span class="text-slate-400 dark:text-slate-600">app.kamerstock.cm</span>
+                <!-- Top Bar (URL Breadcrumb + Active Status + Shortcut) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-5 mb-5 border-b border-slate-100 dark:border-white/[0.06]">
+                    <!-- Left: Brand Icon + Breadcrumb URL -->
+                    <div class="flex items-center gap-2.5">
+                        <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <div class="text-xs sm:text-sm font-mono flex items-center gap-1.5">
+                            <span class="text-slate-600 dark:text-slate-300 font-medium">app.kamerstock.cm</span>
                             <span class="text-slate-400 dark:text-slate-600">/</span>
-                            <span class="text-amber-600 dark:text-amber-400 font-medium">boutique-principale</span>
-                        </span>
+                            <span class="text-amber-500 dark:text-amber-400 font-semibold">boutique-principale</span>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                            <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <!-- Right: Pill Status Badge + Ctrl+K -->
+                    <div class="flex items-center gap-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/40 shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             BDD Dédiée Active
                         </span>
-                        <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono hidden sm:inline">Ctrl + K</span>
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-slate-800/60 shadow-sm hidden sm:inline-flex items-center">
+                            Ctrl + K
+                        </span>
                     </div>
                 </div>
 
-                <!-- Canvas Preview Content -->
-                <div class="p-5 sm:p-6 space-y-5 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900/50 dark:to-slate-950/70">
+                <!-- 4 KPI Summary Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                     
-                    <!-- KPI Row -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                        <div class="p-3.5 rounded-lg border border-slate-200 dark:border-white/[0.05] bg-white dark:bg-slate-900/60 shadow-sm">
-                            <span class="text-[10px] uppercase font-mono text-slate-500">Chiffre d'Affaires Jour</span>
-                            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-outfit mt-1">1 240 500 <span class="text-[10px] font-normal font-mono text-amber-500">FCFA</span></div>
-                            <span class="text-[10px] text-emerald-500 dark:text-emerald-400 font-medium">+18.4% vs hier</span>
+                    <!-- KPI 1 : Chiffre d'Affaires Jour -->
+                    <div class="p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900/70 shadow-sm flex flex-col justify-between transition-colors">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 rounded-md bg-emerald-100/80 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Chiffre d'affaires jour</span>
+                            </div>
+                            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight">
+                                1 240 500 <span class="text-amber-500 font-bold text-sm sm:text-base font-outfit">FCFA</span>
+                            </div>
                         </div>
-                        <div class="p-3.5 rounded-lg border border-slate-200 dark:border-white/[0.05] bg-white dark:bg-slate-900/60 shadow-sm">
-                            <span class="text-[10px] uppercase font-mono text-slate-500">Tickets de Caisse</span>
-                            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-outfit mt-1">142 <span class="text-[10px] font-normal text-slate-400">ventes</span></div>
-                            <span class="text-[10px] text-slate-500">Panier moy: 8 730 FCFA</span>
-                        </div>
-                        <div class="p-3.5 rounded-lg border border-slate-200 dark:border-white/[0.05] bg-white dark:bg-slate-900/60 shadow-sm">
-                            <span class="text-[10px] uppercase font-mono text-slate-500">Alertes Stock</span>
-                            <div class="text-base sm:text-lg font-bold text-rose-500 dark:text-rose-400 font-outfit mt-1">3 <span class="text-[10px] font-normal text-slate-400">ruptures</span></div>
-                            <span class="text-[10px] text-rose-500">Réapprovisionner</span>
-                        </div>
-                        <div class="p-3.5 rounded-lg border border-slate-200 dark:border-white/[0.05] bg-white dark:bg-slate-900/60 shadow-sm">
-                            <span class="text-[10px] uppercase font-mono text-slate-500">Encours Crédits</span>
-                            <div class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 font-outfit mt-1">480 000 <span class="text-[10px] font-normal font-mono text-slate-400">FCFA</span></div>
-                            <span class="text-[10px] text-slate-500">5 clients relançables</span>
+                        <div class="mt-3">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                                <span>▲</span> +18,4% vs hier
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Visual POS / Stock Mock Table -->
-                    <div class="rounded-lg border border-slate-200 dark:border-white/[0.05] bg-slate-50/50 dark:bg-slate-950/50 overflow-hidden">
-                        <div class="px-4 py-2 border-b border-slate-200 dark:border-white/[0.05] flex items-center justify-between text-[11px] font-mono text-slate-500">
-                            <span>DERNIÈRES OPÉRATIONS DE CAISSE EN TEMPS RÉEL</span>
-                            <span class="text-emerald-500 dark:text-emerald-400">● Caisse Ouverte · Fond: 50 000 FCFA</span>
-                        </div>
-                        <div class="divide-y divide-slate-200 dark:divide-white/[0.03] text-xs">
-                            <div class="px-4 py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-mono text-slate-400">#TK-1084</span>
-                                    <span class="font-medium text-slate-800 dark:text-slate-200">Sac Ciment Dangote 50kg (x10)</span>
+                    <!-- KPI 2 : Tickets de Caisse -->
+                    <div class="p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900/70 shadow-sm flex flex-col justify-between transition-colors">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 rounded-md bg-sky-100/80 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 7a2 2 0 012-2h12a2 2 0 012 2M4 7v11a2 2 0 002 2h12a2 2 0 002-2V7M8 11h.01M12 11h.01M16 11h.01M8 14h.01M12 14h.01M16 14h.01M8 17h8"/>
+                                    </svg>
                                 </div>
-                                <div class="flex items-center gap-4">
-                                    <span class="font-mono text-slate-800 dark:text-slate-200">52 000 FCFA</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Espèces</span>
-                                </div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Tickets de caisse</span>
                             </div>
-                            <div class="px-4 py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-mono text-slate-400">#TK-1083</span>
-                                    <span class="font-medium text-slate-800 dark:text-slate-200">Fer à Béton Ø12 (x25)</span>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <span class="font-mono text-slate-800 dark:text-slate-200">112 500 FCFA</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400">Orange Money</span>
-                                </div>
-                            </div>
-                            <div class="px-4 py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-mono text-slate-400">#TK-1082</span>
-                                    <span class="font-medium text-slate-800 dark:text-slate-200">Tuyau PVC Pression Ø50 (x6)</span>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <span class="font-mono text-slate-800 dark:text-slate-200">19 800 FCFA</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">Crédit Client</span>
-                                </div>
+                            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight">
+                                142 <span class="text-slate-600 dark:text-slate-400 font-medium text-sm sm:text-base">ventes</span>
                             </div>
                         </div>
+                        <div class="mt-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            Panier moy : 8 730 FCFA
+                        </div>
+                    </div>
+
+                    <!-- KPI 3 : Alertes Stock -->
+                    <div class="p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900/70 shadow-sm flex flex-col justify-between transition-colors">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 rounded-md bg-rose-100/80 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Alertes stock</span>
+                            </div>
+                            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-rose-600 dark:text-rose-500 font-outfit tracking-tight">
+                                3 <span class="text-slate-600 dark:text-slate-400 font-medium text-sm sm:text-base">ruptures</span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+                                Réapprovisionner
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4 : Encours Crédits -->
+                    <div class="p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900/70 shadow-sm flex flex-col justify-between transition-colors">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 rounded-md bg-orange-100/80 dark:bg-orange-950/70 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Encours crédits</span>
+                            </div>
+                            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-amber-500 font-outfit tracking-tight">
+                                480 000 <span class="text-slate-600 dark:text-slate-400 font-medium text-sm sm:text-base font-outfit">FCFA</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            5 clients relançables
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Live POS / Stock Table (Visual Replica) -->
+                <div class="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900/80 p-4 sm:p-5 shadow-sm transition-colors">
+                    
+                    <!-- Table Header -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span class="text-xs sm:text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                                Dernières opérations de caisse en temps réel
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Caisse Ouverte
+                            </span>
+                            <span class="text-slate-300 dark:text-slate-700">•</span>
+                            <span>Fonds : 50 000 FCFA</span>
+                        </div>
+                    </div>
+
+                    <!-- Table Rows -->
+                    <div class="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                        
+                        <!-- Row 1 : Dangote -->
+                        <div class="py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-xs sm:text-sm">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium flex-shrink-0">
+                                    #TK-1084
+                                </span>
+                                <span class="font-medium text-slate-800 dark:text-slate-200 truncate">
+                                    Sac Ciment Dangote 50kg (x10)
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-4 sm:gap-6 flex-shrink-0 ml-auto sm:ml-0">
+                                <span class="font-semibold text-slate-900 dark:text-white font-mono">
+                                    52 000 FCFA
+                                </span>
+                                <span class="w-28 text-center px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                                    Espèces
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 : Fer à Béton -->
+                        <div class="py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-xs sm:text-sm">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium flex-shrink-0">
+                                    #TK-1083
+                                </span>
+                                <span class="font-medium text-slate-800 dark:text-slate-200 truncate">
+                                    Fer à Béton Ø12 (x25)
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-4 sm:gap-6 flex-shrink-0 ml-auto sm:ml-0">
+                                <span class="font-semibold text-slate-900 dark:text-white font-mono">
+                                    112 500 FCFA
+                                </span>
+                                <span class="w-28 text-center px-3 py-1 rounded-lg text-xs font-semibold bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400">
+                                    Orange Money
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Row 3 : Tuyau PVC -->
+                        <div class="py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-xs sm:text-sm">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium flex-shrink-0">
+                                    #TK-1082
+                                </span>
+                                <span class="font-medium text-slate-800 dark:text-slate-200 truncate">
+                                    Tuyau PVC Pression Ø50 (x6)
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-4 sm:gap-6 flex-shrink-0 ml-auto sm:ml-0">
+                                <span class="font-semibold text-slate-900 dark:text-white font-mono">
+                                    19 800 FCFA
+                                </span>
+                                <span class="w-28 text-center px-3 py-1 rounded-lg text-xs font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
+                                    Crédit Client
+                                </span>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
