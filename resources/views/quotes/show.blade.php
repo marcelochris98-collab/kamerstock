@@ -105,18 +105,18 @@
             
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-600">
-                    {{ strtoupper(substr($quote->client->name ?? 'P', 0, 1)) }}
+                    {{ strtoupper(substr($quote->client?->name ?? 'P', 0, 1)) }}
                 </div>
                 <div class="min-w-0">
-                    <p class="text-xs font-bold text-slate-800 truncate">{{ $quote->client->name ?? 'Passager' }}</p>
-                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $quote->client->type_label ?? 'Particulier' }}</p>
+                    <p class="text-xs font-bold text-slate-800 truncate">{{ $quote->client?->name ?? 'Passager' }}</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $quote->client?->type_label ?? 'Particulier' }}</p>
                 </div>
             </div>
 
             <div class="text-[11px] text-slate-600 space-y-1 pt-2 border-t border-slate-50">
-                <p><strong>Téléphone :</strong> {{ $quote->client->phone ?? '—' }}</p>
-                <p><strong>Email :</strong> {{ $quote->client->email ?? '—' }}</p>
-                <p><strong>Adresse :</strong> {{ $quote->client->address ?? '—' }}</p>
+                <p><strong>Téléphone :</strong> {{ $quote->client?->phone ?? '—' }}</p>
+                <p><strong>Email :</strong> {{ $quote->client?->email ?? '—' }}</p>
+                <p><strong>Adresse :</strong> {{ $quote->client?->address ?? '—' }}</p>
             </div>
         </div>
 

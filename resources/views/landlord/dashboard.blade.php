@@ -45,8 +45,24 @@
         </div>
     </div>
 
-    {{-- Hero 4 KPI Cards Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 350)">
+        {{-- SQUELETTES ANIMÉS LANDLORD --}}
+        <div x-show="!loaded" class="space-y-6">
+            <x-skeleton-cards :count="4" :cols="4" />
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                    <x-skeleton-table :rows="4" :cols="4" :showHeader="true" />
+                </div>
+                <div class="lg:col-span-1">
+                    <x-skeleton-details :items="4" />
+                </div>
+            </div>
+        </div>
+
+        {{-- CONTENU RÉEL DÉVOILÉ --}}
+        <div x-show="loaded" x-cloak class="space-y-6">
+            {{-- Hero 4 KPI Cards Grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {{-- Card 1: Boutiques --}}
         <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-200">
@@ -364,6 +380,7 @@
         </div>
 
     </div>
-
+</div>
+</div>
 </div>
 @endsection

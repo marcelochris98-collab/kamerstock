@@ -164,8 +164,24 @@
 </div>
 @endif
 
-{{-- STATS --}}
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
+    {{-- SQUELETTES ANIMÉS PENDANT LE CHARGEMENT INITIAL --}}
+    <div x-show="!loaded" class="space-y-5 mb-6">
+        <x-skeleton-cards :count="4" :cols="4" />
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2">
+                <x-skeleton-table :rows="4" :cols="3" :showHeader="true" />
+            </div>
+            <div class="lg:col-span-1">
+                <x-skeleton-details :items="4" />
+            </div>
+        </div>
+    </div>
+
+    {{-- CONTENU DU TABLEAU DE BORD DÉVOILÉ APRÈS CHARGEMENT --}}
+    <div x-show="loaded" x-cloak class="transition-opacity duration-300">
+        {{-- STATS --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700 rounded-xl shadow-sm p-4 text-white hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs text-indigo-100 font-medium">CA du jour</span>
@@ -356,6 +372,8 @@
         </div>
     </div>
 
+    </div>
+</div>
 </div>
 
 @endsection

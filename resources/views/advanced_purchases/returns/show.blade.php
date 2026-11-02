@@ -19,7 +19,7 @@
         </a>
         <div>
             <h1 class="text-sm font-semibold text-slate-800">Retour {{ $return->reference }}</h1>
-            <p class="text-xs text-slate-400 mt-0.5">Enregistré le {{ $return->return_date->format('d/m/Y') }} par {{ $return->user->name }}</p>
+            <p class="text-xs text-slate-400 mt-0.5">Enregistré le {{ $return->return_date->format('d/m/Y') }} par {{ $return->user?->name ?? 'Système' }}</p>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
             <div class="space-y-2 text-xs">
                 <div class="flex justify-between">
                     <span class="text-slate-400">Fournisseur:</span>
-                    <span class="font-semibold text-slate-800">{{ $return->supplier->name }}</span>
+                    <span class="font-semibold text-slate-800">{{ $return->supplier?->name ?? 'Fournisseur inconnu / non défini' }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-slate-400">Facture d'achat:</span>

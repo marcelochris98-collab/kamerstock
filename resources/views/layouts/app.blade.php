@@ -17,9 +17,14 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
+
+    @include('layouts.loading-assets')
 </head>
 
 <body class="bg-slate-50 antialiased" x-data="{ mobileSidebarOpen: false }">
+
+    {{-- Barre de progression de chargement globale --}}
+    <div id="global-top-progress"></div>
 
     <div class="flex h-screen overflow-hidden">
         {{-- Backdrop mobile --}}

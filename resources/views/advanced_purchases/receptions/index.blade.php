@@ -58,7 +58,7 @@
             <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
                 <td class="px-5 py-3">
                     <p class="text-xs font-semibold text-slate-800">{{ $reception->reference }}</p>
-                    <p class="text-[10px] text-slate-400">Reçu par {{ $reception->user->name ?? 'Système' }}</p>
+                    <p class="text-[10px] text-slate-400">Reçu par {{ $reception->user?->name ?? 'Système' }}</p>
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">
@@ -72,7 +72,7 @@
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">
-                    {{ $reception->supplierOrder->supplier->name ?? 'N/A' }}
+                    {{ $reception->supplierOrder?->supplier?->name ?? 'N/A' }}
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">

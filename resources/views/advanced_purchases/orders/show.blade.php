@@ -41,11 +41,11 @@
                 </div>
                 <div class="flex justify-between">
                     <span class="text-slate-400">Créé par:</span>
-                    <span class="font-semibold text-slate-800">{{ $order->user->name }}</span>
+                    <span class="font-semibold text-slate-800">{{ $order->user?->name ?? 'Système' }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-slate-400">Fournisseur:</span>
-                    <span class="font-semibold text-slate-800">{{ $order->supplier->name }}</span>
+                    <span class="font-semibold text-slate-800">{{ $order->supplier?->name ?? 'Fournisseur inconnu / non défini' }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-slate-400">Statut:</span>

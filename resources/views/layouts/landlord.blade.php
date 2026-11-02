@@ -16,8 +16,12 @@
     </style>
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.loading-assets')
 </head>
 <body class="h-full font-sans antialiased text-slate-800" x-data="{ mobileSidebarOpen: false }">
+
+    {{-- Barre de progression de chargement globale Landlord (thème violet) --}}
+    <div id="global-top-progress" class="landlord"></div>
 
     <div class="flex h-screen overflow-hidden w-full">
         

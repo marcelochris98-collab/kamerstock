@@ -71,7 +71,7 @@
             @forelse($credits as $credit)
             <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
                 <td class="px-5 py-3">
-                    <p class="text-xs font-semibold text-slate-800">{{ $credit->client->name ?? 'Client supprimé' }}</p>
+                    <p class="text-xs font-semibold text-slate-800">{{ $credit->client?->name ?? 'Client supprimé' }}</p>
                     <p class="text-xs text-slate-400">{{ $credit->created_at->format('d/m/Y H:i') }}</p>
                 </td>
 

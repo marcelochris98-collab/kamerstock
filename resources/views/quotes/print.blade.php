@@ -70,10 +70,10 @@
 
             <div class="bg-slate-50 p-4 rounded-lg">
                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Destinataire</p>
-                <p class="font-bold text-slate-800">{{ $quote->client->name ?? 'Passager' }}</p>
+                <p class="font-bold text-slate-800">{{ $quote->client?->name ?? 'Passager' }}</p>
                 <p class="text-slate-500 mt-1">
-                    {{ $quote->client->phone ?? '—' }} <br>
-                    {{ $quote->client->address ?? '—' }}
+                    {{ $quote->client?->phone ?? '—' }} <br>
+                    {{ $quote->client?->address ?? '—' }}
                 </p>
             </div>
         </div>

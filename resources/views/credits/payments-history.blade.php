@@ -36,10 +36,10 @@
             <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
                 <td class="px-5 py-3">
                     <p class="text-xs font-semibold text-slate-800">
-                        {{ $payment->client->name ?? 'Client supprimé' }}
+                        {{ $payment->client?->name ?? 'Client supprimé' }}
                     </p>
                     <p class="text-xs text-slate-400">
-                        {{ $payment->client->phone ?? '—' }}
+                        {{ $payment->client?->phone ?? '—' }}
                     </p>
                 </td>
 

@@ -16,14 +16,61 @@
 }
 
 .skeleton-shimmer {
-    background: linear-gradient(90deg, rgba(226, 232, 240, 0.6) 25%, rgba(241, 245, 249, 0.9) 50%, rgba(226, 232, 240, 0.6) 75%);
+    background: linear-gradient(90deg, rgba(226, 232, 240, 0.7) 25%, rgba(241, 245, 249, 1) 50%, rgba(226, 232, 240, 0.7) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
 }
 
 .dark .skeleton-shimmer {
-    background: linear-gradient(90deg, rgba(30, 41, 59, 0.8) 25%, rgba(51, 65, 85, 0.8) 50%, rgba(30, 41, 59, 0.8) 75%);
+    background: linear-gradient(90deg, rgba(30, 41, 59, 0.8) 25%, rgba(51, 65, 85, 0.9) 50%, rgba(30, 41, 59, 0.8) 75%);
     background-size: 200% 100%;
+}
+
+/* ========================================================================= */
+/* BARRE DE PROGRESSION GLOBALE (TOP LOADING BAR)                            */
+/* ========================================================================= */
+#global-top-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    z-index: 999999;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #d97706);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.7), 0 0 4px rgba(251, 191, 36, 0.9);
+    transition: width 0.25s ease-out, opacity 0.3s ease;
+    pointer-events: none;
+    opacity: 0;
+}
+
+#global-top-progress.landlord {
+    background: linear-gradient(90deg, #6366f1, #818cf8, #4f46e5);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.7), 0 0 4px rgba(129, 140, 248, 0.9);
+}
+
+/* ========================================================================= */
+/* BOUTONS EN COURS DE CHARGEMENT (BTN-LOADING)                              */
+/* ========================================================================= */
+.btn-is-loading {
+    position: relative !important;
+    pointer-events: none !important;
+    opacity: 0.75 !important;
+    cursor: not-allowed !important;
+}
+
+.btn-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    vertical-align: -0.125em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
 }
 
 @layer base {

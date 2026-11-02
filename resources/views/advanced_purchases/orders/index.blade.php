@@ -54,10 +54,17 @@
     </form>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <table class="w-full">
-        <thead>
-            <tr class="border-b border-slate-100 bg-slate-50">
+<div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 350)">
+    {{-- SQUELETTE DE CHARGEMENT ANIMÉ --}}
+    <div x-show="!loaded">
+        <x-skeleton-table :rows="6" :cols="6" :hasActions="true" />
+    </div>
+
+    {{-- TABLEAU RÉEL REÇU --}}
+    <div x-show="loaded" x-cloak class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-slate-100 bg-slate-50">
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Référence</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Fournisseur</th>
                 <th class="px-5 py-3 text-left text-xs font-medium text-slate-400">Date de Commande</th>
@@ -72,11 +79,11 @@
             <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
                 <td class="px-5 py-3">
                     <p class="text-xs font-semibold text-slate-800">{{ $order->reference }}</p>
-                    <p class="text-[10px] text-slate-400">Créé par {{ $order->user->name }}</p>
+                    <p class="text-[10px] text-slate-400">Créé par {{ $order->user?->name ?? 'Système' }}</p>
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">
-                    {{ $order->supplier->name }}
+                    {{ $order->supplier?->name ?? 'Fournisseur inconnu / non défini' }}
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">
@@ -124,6 +131,7 @@
         {{ $orders->links() }}
     </div>
     @endif
+</div>
 </div>
 
 @endsection

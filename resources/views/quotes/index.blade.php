@@ -91,8 +91,8 @@
                         <p class="text-[10px] text-slate-400 font-normal mt-0.5">Créé le {{ $quote->created_at->format('d/m/Y') }}</p>
                     </td>
                     <td class="px-5 py-3 text-xs">
-                        <p class="font-semibold text-slate-800">{{ $quote->client->name ?? 'Passager' }}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">{{ $quote->client->phone ?? '—' }}</p>
+                        <p class="font-semibold text-slate-800">{{ $quote->client?->name ?? 'Passager' }}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">{{ $quote->client?->phone ?? '—' }}</p>
                     </td>
                     <td class="px-5 py-3 text-center">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase

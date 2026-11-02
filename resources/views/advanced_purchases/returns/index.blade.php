@@ -59,11 +59,11 @@
             <tr class="border-b border-slate-50 hover:bg-slate-50 transition last:border-0">
                 <td class="px-5 py-3">
                     <p class="text-xs font-semibold text-slate-800">{{ $ret->reference }}</p>
-                    <p class="text-[10px] text-slate-400">Par {{ $ret->user->name }}</p>
+                    <p class="text-[10px] text-slate-400">Par {{ $ret->user?->name ?? 'Utilisateur' }}</p>
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">
-                    {{ $ret->supplier->name }}
+                    {{ $ret->supplier?->name ?? 'Fournisseur inconnu / non défini' }}
                 </td>
 
                 <td class="px-5 py-3 text-xs text-slate-600">

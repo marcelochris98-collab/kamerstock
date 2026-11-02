@@ -29,10 +29,10 @@
     <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2">
         <p class="text-xs text-slate-400">Client</p>
         <h1 class="text-base font-semibold text-slate-800 mt-1">
-            {{ $credit->client->name ?? 'Client supprimé' }}
+            {{ $credit->client?->name ?? 'Client supprimé' }}
         </h1>
         <p class="text-xs text-slate-400 mt-1">
-            {{ $credit->client->phone ?? '—' }}
+            {{ $credit->client?->phone ?? '—' }}
         </p>
     </div>
 
