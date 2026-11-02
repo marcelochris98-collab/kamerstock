@@ -546,12 +546,12 @@
     <!-- ========================================================================= -->
     <section id="features" class="py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <div class="max-w-3xl mb-16">
+        <div class="max-w-3xl mx-auto text-center mb-16">
             <span class="text-xs font-semibold text-amber-500 dark:text-amber-400 tracking-wider uppercase font-mono block mb-2">Modules Métier</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight leading-tight">
                 Tout ce dont votre commerce a besoin.<br>Rien de superflu.
             </h2>
-            <p class="mt-3 text-sm text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
                 Une interface épurée pensée pour les gérants et les caissiers : rapidité de saisie, visibilité complète sur la trésorerie et élimination des pertes.
             </p>
         </div>
