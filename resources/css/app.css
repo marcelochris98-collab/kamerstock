@@ -27,6 +27,34 @@
 }
 
 /* ========================================================================= */
+/* BANDE DÉFILANTE HORIZONTALE (INFINITE MARQUEE TICKER)                     */
+/* ========================================================================= */
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee-scroll {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 45s linear infinite;
+    will-change: transform;
+}
+
+.animate-marquee-scroll:hover {
+    animation-play-state: paused;
+}
+
+.marquee-gradient-mask {
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+/* ========================================================================= */
 /* BARRE DE PROGRESSION GLOBALE (TOP LOADING BAR)                            */
 /* ========================================================================= */
 #global-top-progress {

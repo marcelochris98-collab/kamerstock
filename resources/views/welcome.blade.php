@@ -520,23 +520,155 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 4. TRUSTED SECTORS TICKER (Linear Minimalist Strip) -->
+    <!-- 4. ANIMATED SOFTWARE CAPABILITIES TICKER (Infinite Horizontal Marquee) -->
     <!-- ========================================================================= -->
-    <div class="border-y border-slate-200/80 bg-white/60 dark:border-white/[0.06] dark:bg-slate-950/40 py-6 transition-colors duration-200">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-[11px] font-medium uppercase tracking-wider text-slate-500 mb-3">
-                Solution éprouvée sur le terrain pour les commerces exigeants
+    <div class="relative w-full border-y border-slate-200/80 bg-slate-50/70 dark:border-white/[0.06] dark:bg-slate-950/60 py-5 overflow-hidden transition-colors duration-200">
+        <!-- Fading Side Gradients for Infinite Depth -->
+        <div class="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-36 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-36 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent z-10"></div>
+
+        <div class="max-w-7xl mx-auto px-4 text-center mb-3">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Modules & Fonctionnalités Intégrés au Système
             </p>
-            <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-slate-600 dark:text-slate-400">
-                <span class="hover:text-slate-900 dark:hover:text-white transition-colors">Quincailleries & BTP</span>
-                <span class="text-slate-300 dark:text-slate-700">·</span>
-                <span class="hover:text-slate-900 dark:hover:text-white transition-colors">Prêt-à-porter & Maroquinerie</span>
-                <span class="text-slate-300 dark:text-slate-700">·</span>
-                <span class="hover:text-slate-900 dark:hover:text-white transition-colors">Supérettes & Alimentation</span>
-                <span class="text-slate-300 dark:text-slate-700">·</span>
-                <span class="hover:text-slate-900 dark:hover:text-white transition-colors">High-Tech & Électronique</span>
-                <span class="text-slate-300 dark:text-slate-700">·</span>
-                <span class="hover:text-slate-900 dark:hover:text-white transition-colors">Réseaux Franchisés</span>
+        </div>
+
+        <!-- Marquee Track with CSS Mask and Infinite Animation -->
+        <div class="marquee-gradient-mask overflow-hidden py-1">
+            <div class="animate-marquee-scroll flex items-center gap-3 select-none">
+                
+                <!-- Set 1 of Badges -->
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-purple-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    <span>Comptabilité & Trésorerie</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-rose-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    <span>Dépenses & Décaissements</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-sky-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    <span>Fournisseurs & Réassort</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-amber-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <span>Clients & Crédits</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-rose-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span>Notifications & Alertes Stock</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-emerald-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    <span>Rapports & Statistiques</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-indigo-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <span>Produits & Gestion Stocks</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-violet-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>Commandes & Factures</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-purple-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <span>Multi-Magasins & Succursales</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-cyan-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                    <span>Scan Code-Barres</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-amber-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <span>Point de Vente (POS)</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-emerald-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <span>Bases de Données Dédiées</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-teal-400/60 transition whitespace-nowrap">
+                    <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    <span>Reçus Thermiques & PDF</span>
+                </div>
+
+                <!-- Set 2 (Identical duplicate for seamless continuous loop) -->
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-purple-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    <span>Comptabilité & Trésorerie</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-rose-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    <span>Dépenses & Décaissements</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-sky-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    <span>Fournisseurs & Réassort</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-amber-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <span>Clients & Crédits</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-rose-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span>Notifications & Alertes Stock</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-emerald-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    <span>Rapports & Statistiques</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-indigo-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <span>Produits & Gestion Stocks</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-violet-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>Commandes & Factures</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-purple-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <span>Multi-Magasins & Succursales</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-cyan-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                    <span>Scan Code-Barres</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-amber-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <span>Point de Vente (POS)</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-emerald-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <span>Bases de Données Dédiées</span>
+                </div>
+
+                <div class="rounded-full border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-slate-900/90 px-4 py-2 flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:border-teal-400/60 transition whitespace-nowrap" aria-hidden="true">
+                    <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    <span>Reçus Thermiques & PDF</span>
+                </div>
+
             </div>
         </div>
     </div>
