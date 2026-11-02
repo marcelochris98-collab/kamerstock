@@ -269,45 +269,67 @@
                             <x-input-error :messages="$errors->get('shop_name')" class="mt-1 text-[11px]" />
                         </div>
 
-                        <!-- Secteur d'activité -->
+                        <!-- Secteur d'activité (Saisie libre + Suggestions rapides) -->
                         <div>
-                            <label for="business_type" 
-                                   class="block text-xs font-semibold mb-1"
-                                   :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                Secteur d'activité <span class="text-amber-500">*</span>
-                            </label>
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="business_type" 
+                                       class="block text-xs font-semibold"
+                                       :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                                    Secteur d'activité <span class="text-[11px] font-normal text-slate-400">(libre ou suggéré)</span>
+                                </label>
+                            </div>
                             <div class="relative flex items-center">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
                                 </div>
-                                <select id="business_type" 
-                                        name="business_type" 
-                                        required
-                                        x-model="businessType"
-                                        class="w-full pl-9 pr-3 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                        :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-slate-50/80 border-slate-200 text-slate-900'">
-                                    <option value="" disabled selected>Choisir un secteur...</option>
+                                <input type="text" 
+                                       id="business_type" 
+                                       name="business_type" 
+                                       x-model="businessType"
+                                       list="business_type_suggestions"
+                                       placeholder="Ex: Quincaillerie, Menuiserie, Restaurant..."
+                                       value="{{ old('business_type') }}"
+                                       class="w-full pl-9 pr-3 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
+
+                                <datalist id="business_type_suggestions">
                                     @foreach($businessTypes as $key => $type)
-                                        <option value="{{ $key }}" {{ old('business_type') === $key ? 'selected' : '' }}>
-                                            {{ $type['label'] ?? ucfirst($key) }}
-                                        </option>
+                                        <option value="{{ $type['label'] ?? ucfirst($key) }}"></option>
                                     @endforeach
-                                </select>
+                                </datalist>
                             </div>
                             <x-input-error :messages="$errors->get('business_type')" class="mt-1 text-[11px]" />
                         </div>
                     </div>
 
-                    <!-- Champ dynamique si "autre" -->
-                    <div x-show="businessType === 'autre'" x-cloak>
-                        <input type="text" 
-                               name="business_type_custom" 
-                               value="{{ old('business_type_custom') }}"
-                               placeholder="Précisez votre activité (ex: Librairie, Fleuriste...)"
-                               class="w-full px-3.5 py-2 rounded-xl text-xs transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                               :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
+                    <!-- Suggestions rapides cliquables (Pills) -->
+                    <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                        <span class="text-[10px] font-medium text-slate-500 select-none mr-0.5">Suggestions rapides :</span>
+                        @php
+                            $quickSectors = [
+                                'Quincaillerie', 
+                                'Supérette', 
+                                'Cosmétique', 
+                                'Prêt-à-porter',
+                                'Pharmacie',
+                                'Informatique', 
+                                'Dépôt / Grossiste',
+                                'Électroménager',
+                                'Menuiserie'
+                            ];
+                        @endphp
+                        @foreach($quickSectors as $sector)
+                            <button type="button" 
+                                    @click="businessType = (businessType.toLowerCase() === '{{ strtolower($sector) }}' ? '' : '{{ $sector }}')"
+                                    class="px-2 py-0.5 rounded-lg text-[10px] font-medium transition select-none border cursor-pointer"
+                                    :class="businessType.toLowerCase() === '{{ strtolower($sector) }}'
+                                        ? (darkMode ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm' : 'bg-amber-100 border-amber-300 text-amber-800')
+                                        : (darkMode ? 'bg-white/[0.03] border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.06]' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200')">
+                                {{ $sector }}
+                            </button>
+                        @endforeach
                     </div>
 
                     <!-- LIGNE 2 : Identifiant Web / Slug en direct -->

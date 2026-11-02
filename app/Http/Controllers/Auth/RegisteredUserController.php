@@ -103,13 +103,10 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $businessTypes = array_keys(config('business_types', []));
-        $validTypesRule = !empty($businessTypes) ? 'in:' . implode(',', $businessTypes) : 'string';
-
         $validated = $request->validate([
             'shop_name'            => ['required', 'string', 'max:255'],
             'slug'                 => ['nullable', 'string', 'max:100', 'regex:/^[a-zA-Z0-9\-_]+$/'],
-            'business_type'        => ['required', 'string', $validTypesRule],
+            'business_type'        => ['nullable', 'string', 'max:255'],
             'business_type_custom' => ['nullable', 'string', 'max:255'],
             'name'                 => ['required', 'string', 'max:255'],
             'email'                => ['required', 'string', 'lowercase', 'email', 'max:255'],
@@ -118,13 +115,47 @@ class RegisteredUserController extends Controller
             'terms'                => ['accepted'],
         ], [
             'shop_name.required'     => 'Le nom de votre commerce ou boutique est obligatoire.',
-            'business_type.required' => 'Veuillez sélectionner votre secteur d’activité.',
             'name.required'          => 'Votre nom complet est obligatoire.',
             'email.required'         => 'Une adresse e-mail valide est obligatoire.',
             'password.required'      => 'Le mot de passe est obligatoire.',
             'password.confirmed'     => 'La confirmation du mot de passe ne correspond pas.',
             'terms.accepted'         => 'Veuillez accepter les conditions d’utilisation de la plateforme.',
         ]);
+
+        // Résolution souple et intelligente du secteur d'activité (saisie libre ou suggestion)
+        $rawType = trim((string)($validated['business_type'] ?? ''));
+        $configTypes = config('business_types', []);
+
+        $resolvedType = 'autre';
+        $customTypeName = null;
+
+        if (!empty($rawType)) {
+            if (array_key_exists($rawType, $configTypes)) {
+                $resolvedType = $rawType;
+            } else {
+                $matchedKey = null;
+                foreach ($configTypes as $k => $info) {
+                    if (strcasecmp($info['label'] ?? '', $rawType) === 0 || strcasecmp($k, $rawType) === 0) {
+                        $matchedKey = $k;
+                        break;
+                    }
+                }
+
+                if ($matchedKey) {
+                    $resolvedType = $matchedKey;
+                } else {
+                    $resolvedType = 'autre';
+                    $customTypeName = $rawType;
+                }
+            }
+        } else {
+            $resolvedType = 'autre';
+            $customTypeName = 'Commerce';
+        }
+
+        if (!empty($validated['business_type_custom'])) {
+            $customTypeName = $validated['business_type_custom'];
+        }
 
         // Déterminer ou dériver un slug propre et garanti unique
         $requestedSlug = !empty($validated['slug'])
@@ -151,8 +182,8 @@ class RegisteredUserController extends Controller
             'owner_name'           => $validated['name'],
             'owner_email'          => $validated['email'],
             'owner_password'       => $validated['password'],
-            'business_type'        => $validated['business_type'],
-            'business_type_custom' => $validated['business_type_custom'] ?? null,
+            'business_type'        => $resolvedType,
+            'business_type_custom' => $customTypeName,
             'status'               => 'trial',
             'trial_days'           => $trialDays,
             'trial_ends_at'        => now()->addDays($trialDays),

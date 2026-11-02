@@ -79,4 +79,27 @@ class RegistrationTest extends TestCase
         // La réponse doit soit rediriger vers le dashboard du tenant, soit vers pending
         $response->assertStatus(302);
     }
+
+    public function test_new_boutiques_can_self_register_with_custom_business_type(): void
+    {
+        $response = $this->post('/register', [
+            'shop_name'             => 'Atelier Menuiserie Moderne',
+            'slug'                  => 'atelier-menuiserie-moderne',
+            'business_type'         => 'Menuiserie & Ébénisterie',
+            'name'                  => 'Artisan Gérant',
+            'email'                 => 'artisan@example.com',
+            'password'              => 'Password@2026',
+            'password_confirmation' => 'Password@2026',
+            'terms'                 => '1',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $tenant = Tenant::on('landlord')->where('slug', 'atelier-menuiserie-moderne')->first();
+        $this->assertNotNull($tenant);
+        $this->assertEquals('autre', $tenant->business_type);
+        $this->assertEquals('Menuiserie & Ébénisterie', $tenant->business_type_custom);
+        $response->assertStatus(302);
+    }
 }
+
