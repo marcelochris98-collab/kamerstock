@@ -26,26 +26,29 @@
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
 
-        .field-pair {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
-        @media (min-width: 640px) {
-            .field-pair {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.25);
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.45);
         }
     </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-slate-950 flex flex-col justify-between">
+<body class="min-h-screen lg:h-screen lg:overflow-hidden bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-slate-950">
 
-    <div class="min-h-screen w-full flex flex-col lg:flex-row">
+    <div class="min-h-screen lg:h-screen w-full flex flex-col lg:flex-row lg:overflow-hidden">
 
         <!-- ========================================================================= -->
-        <!-- VOLET GAUCHE : BRANDING, FORCES CLÉS & FILIGRANE (OMNIVAULT STYLE)       -->
+        <!-- VOLET GAUCHE : BRANDING, FORCES CLÉS & FILIGRANE (FIXE / NON SCROLLABLE)  -->
         <!-- ========================================================================= -->
-        <aside class="relative lg:w-1/2 xl:w-[46%] bg-[#06090e] border-b lg:border-b-0 lg:border-r border-white/[0.06] p-8 sm:p-12 lg:p-16 flex flex-col justify-between overflow-hidden">
+        <aside class="relative lg:w-1/2 xl:w-[46%] lg:h-screen bg-[#06090e] border-b lg:border-b-0 lg:border-r border-white/[0.06] p-8 sm:p-12 lg:p-10 xl:p-14 flex flex-col justify-between shrink-0 overflow-hidden lg:sticky lg:top-0">
             
             <!-- Trame de fond subtile -->
             <div class="absolute inset-0 linear-grid pointer-events-none opacity-60"></div>
@@ -75,10 +78,10 @@
             </div>
 
             <!-- 2. Cœur gauche : Accroche & 3 Piliers réels de KamerStock (Sans IA) -->
-            <div class="relative z-10 my-10 lg:my-auto max-w-lg">
+            <div class="relative z-10 my-6 xl:my-auto max-w-lg">
                 
                 <!-- Badge capsule -->
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/[0.04] text-slate-300 border border-white/[0.08] backdrop-blur-md mb-6 shadow-inner">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/[0.04] text-slate-300 border border-white/[0.08] backdrop-blur-md mb-4 xl:mb-6 shadow-inner">
                     <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                     </svg>
@@ -86,59 +89,59 @@
                 </div>
 
                 <!-- Grand Titre -->
-                <h1 class="font-outfit font-black text-3xl sm:text-4xl lg:text-[44px] tracking-tight text-white leading-[1.15]">
+                <h1 class="font-outfit font-black text-2xl sm:text-3xl xl:text-4xl tracking-tight text-white leading-[1.15]">
                     Votre commerce,<br>
                     <span class="text-slate-400">enfin sous contrôle.</span>
                 </h1>
 
                 <!-- Sous-titre descriptif -->
-                <p class="text-slate-400 text-sm sm:text-base leading-relaxed mt-4 mb-8">
+                <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mt-2.5 mb-5 xl:mb-7">
                     Déployez votre espace de gestion commerciale en 2 minutes. Vos données sont 100% étanches et isolées.
                 </p>
 
                 <!-- Les 3 Cartes Fonctionnalités Réelles -->
-                <div class="space-y-4">
+                <div class="space-y-3 xl:space-y-3.5">
                     
                     <!-- Pilier 1 : Stock & Dépôts -->
-                    <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.04] transition duration-200">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-start gap-3.5 p-3 xl:p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.04] transition duration-200">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-sm font-bold text-white font-outfit">Stock en temps réel</h2>
-                            <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                            <h2 class="text-xs sm:text-sm font-bold text-white font-outfit">Stock en temps réel</h2>
+                            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 leading-relaxed">
                                 Entrées, sorties, inventaires et alertes de rupture sur tous vos dépôts.
                             </p>
                         </div>
                     </div>
 
                     <!-- Pilier 2 : Ventes & Facturation -->
-                    <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.04] transition duration-200">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-start gap-3.5 p-3 xl:p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.04] transition duration-200">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-sm font-bold text-white font-outfit">Ventes & factures</h2>
-                            <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                            <h2 class="text-xs sm:text-sm font-bold text-white font-outfit">Ventes & factures</h2>
+                            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 leading-relaxed">
                                 Caisse POS express, tickets thermiques et devis/factures PDF à votre logo en FCFA.
                             </p>
                         </div>
                     </div>
 
                     <!-- Pilier 3 : Crédits Clients & Marges (Remplacement de l'IA) -->
-                    <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.04] transition duration-200">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-start gap-3.5 p-3 xl:p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.04] transition duration-200">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-sm font-bold text-white font-outfit">Crédits clients & rentabilité</h2>
-                            <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                            <h2 class="text-xs sm:text-sm font-bold text-white font-outfit">Crédits clients & rentabilité</h2>
+                            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 leading-relaxed">
                                 Plafonds autorisés, blocage automatique des créances et suivi précis de vos marges.
                             </p>
                         </div>
@@ -149,7 +152,7 @@
             </div>
 
             <!-- 3. Pied gauche : Copyright & Ville -->
-            <div class="relative z-10 pt-6 border-t border-white/[0.04] flex items-center justify-between text-xs text-slate-500">
+            <div class="relative z-10 pt-4 xl:pt-6 border-t border-white/[0.04] flex items-center justify-between text-xs text-slate-500">
                 <span>&copy; {{ date('Y') }} KamerStock. Tous droits réservés.</span>
                 <span class="font-mono text-[11px] text-slate-600">Douala, Cameroun</span>
             </div>
@@ -157,9 +160,9 @@
         </aside>
 
         <!-- ========================================================================= -->
-        <!-- VOLET DROIT : FORMULAIRE D'INSCRIPTION ÉPURÉ                              -->
+        <!-- VOLET DROIT : FORMULAIRE D'INSCRIPTION SCROLLABLE (CUSTOM SCROLLBAR)      -->
         <!-- ========================================================================= -->
-        <main class="lg:w-1/2 xl:w-[54%] flex flex-col justify-between p-6 sm:p-10 lg:p-12 transition-colors duration-200 overflow-y-auto"
+        <main class="lg:w-1/2 xl:w-[54%] lg:h-screen overflow-y-auto flex flex-col justify-between p-6 sm:p-10 lg:p-12 transition-colors duration-200 custom-scrollbar"
               :class="darkMode ? 'bg-[#0a0e17] text-slate-100' : 'bg-white text-slate-900'">
             
             <!-- Barre supérieure : Retour & Thème toggle -->
@@ -193,7 +196,7 @@
             </div>
 
             <!-- Conteneur centré du formulaire -->
-            <div class="w-full max-w-xl mx-auto my-auto py-6">
+            <div class="w-full max-w-lg mx-auto my-auto py-6">
                 
                 <!-- Icône centrale de marque -->
                 <div class="flex justify-center mb-4">
@@ -235,106 +238,41 @@
                     </div>
                 @endif
 
-                <!-- Formulaire d'Inscription -->
-                <form method="POST" action="{{ route('register') }}" class="space-y-3.5" @submit="isSubmitting = true">
+                <!-- Formulaire d'Inscription (Disposition 100% Verticale style Google) -->
+                <form method="POST" action="{{ route('register') }}" class="space-y-4" @submit="isSubmitting = true">
                     @csrf
 
-                    <!-- LIGNE 1 : Nom de la boutique & Secteur d'activité -->
-                    <div class="field-pair">
-                        <!-- Nom Boutique -->
-                        <div>
-                            <label for="shop_name" 
-                                   class="block text-xs font-semibold mb-1"
-                                   :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                Nom du commerce ou boutique <span class="text-amber-500">*</span>
-                            </label>
-                            <div class="relative flex items-center">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                    </svg>
-                                </div>
-                                <input type="text" 
-                                       id="shop_name" 
-                                       name="shop_name" 
-                                       required
-                                       autofocus
-                                       placeholder="EX : supermarche des jeux" 
-                                       x-model="shopName"
-                                       @input="updateSlug()"
-                                       value="{{ old('shop_name') }}"
-                                       class="w-full pl-9 pr-3 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
-                            </div>
-                            <x-input-error :messages="$errors->get('shop_name')" class="mt-1 text-[11px]" />
-                        </div>
-
-                        <!-- Secteur d'activité (Saisie libre + Suggestions rapides) -->
-                        <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label for="business_type" 
-                                       class="block text-xs font-semibold"
-                                       :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                    Secteur d'activité <span class="text-[11px] font-normal text-slate-400">(libre ou suggéré)</span>
-                                </label>
-                            </div>
-                            <div class="relative flex items-center">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                    </svg>
-                                </div>
-                                <input type="text" 
-                                       id="business_type" 
-                                       name="business_type" 
-                                       x-model="businessType"
-                                       list="business_type_suggestions"
-                                       placeholder="Ex: Quincaillerie, Menuiserie, Restaurant..."
-                                       value="{{ old('business_type') }}"
-                                       class="w-full pl-9 pr-3 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
-
-                                <datalist id="business_type_suggestions">
-                                    @foreach($businessTypes as $key => $type)
-                                        <option value="{{ $type['label'] ?? ucfirst($key) }}"></option>
-                                    @endforeach
-                                </datalist>
-                            </div>
-                            <x-input-error :messages="$errors->get('business_type')" class="mt-1 text-[11px]" />
-                        </div>
-                    </div>
-
-                    <!-- Suggestions rapides cliquables (Pills) -->
-                    <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
-                        <span class="text-[10px] font-medium text-slate-500 select-none mr-0.5">Suggestions rapides :</span>
-                        @php
-                            $quickSectors = [
-                                'Quincaillerie', 
-                                'Supérette', 
-                                'Cosmétique', 
-                                'Prêt-à-porter',
-                                'Pharmacie',
-                                'Informatique', 
-                                'Dépôt / Grossiste',
-                                'Électroménager',
-                                'Menuiserie'
-                            ];
-                        @endphp
-                        @foreach($quickSectors as $sector)
-                            <button type="button" 
-                                    @click="businessType = (businessType.toLowerCase() === '{{ strtolower($sector) }}' ? '' : '{{ $sector }}')"
-                                    class="px-2 py-0.5 rounded-lg text-[10px] font-medium transition select-none border cursor-pointer"
-                                    :class="businessType.toLowerCase() === '{{ strtolower($sector) }}'
-                                        ? (darkMode ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm' : 'bg-amber-100 border-amber-300 text-amber-800')
-                                        : (darkMode ? 'bg-white/[0.03] border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.06]' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200')">
-                                {{ $sector }}
-                            </button>
-                        @endforeach
-                    </div>
-
-                    <!-- LIGNE 2 : Identifiant Web / Slug en direct -->
+                    <!-- 1. Nom de la boutique -->
                     <div>
-                        <div class="flex items-center justify-between mb-1">
+                        <label for="shop_name" 
+                               class="block text-xs font-semibold mb-1.5"
+                               :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            Nom du commerce ou boutique <span class="text-amber-500">*</span>
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                            <input type="text" 
+                                   id="shop_name" 
+                                   name="shop_name" 
+                                   required
+                                   autofocus
+                                   placeholder="Ex : Supermarché Le Rond-Point, Quincaillerie Moderne..." 
+                                   x-model="shopName"
+                                   @input="updateSlug()"
+                                   value="{{ old('shop_name') }}"
+                                   class="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400 hover:border-slate-300'">
+                        </div>
+                        <x-input-error :messages="$errors->get('shop_name')" class="mt-1 text-[11px]" />
+                    </div>
+
+                    <!-- 2. Adresse web dédiée / Slug en direct -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
                             <label for="slug" 
                                    class="text-xs font-semibold"
                                    :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
@@ -371,153 +309,213 @@
                                    @input="checkSlugAvailability()"
                                    value="{{ old('slug') }}"
                                    placeholder="identifiant-boutique"
-                                   class="w-full bg-transparent pl-32 pr-3 py-2 rounded-xl text-xs sm:text-sm font-mono text-amber-500 transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 placeholder-slate-600' : 'bg-slate-50/80 border-slate-200 placeholder-slate-400'">
+                                   class="w-full bg-transparent pl-32 pr-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-mono text-amber-500 transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 placeholder-slate-600 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 placeholder-slate-400 hover:border-slate-300'">
                         </div>
+                        <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                            Vos caissiers et gérants utiliseront cette adresse pour accéder directement au point de vente.
+                        </p>
                         <x-input-error :messages="$errors->get('slug')" class="mt-1 text-[11px]" />
                     </div>
 
-                    <!-- LIGNE 3 : Nom Gérant & Email Professionnel -->
-                    <div class="field-pair">
-                        <!-- Nom complet -->
-                        <div>
-                            <label for="name" 
-                                   class="block text-xs font-semibold mb-1"
-                                   :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                Votre nom complet <span class="text-amber-500">*</span>
-                            </label>
-                            <div class="relative flex items-center">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                </div>
-                                <input type="text" 
-                                       id="name" 
-                                       name="name" 
-                                       required
-                                       value="{{ old('name') }}"
-                                       placeholder="Ex: Marcel Tchamba"
-                                       class="w-full pl-9 pr-3 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
+                    <!-- 3. Secteur d'activité (Saisie libre + Suggestions rapides) -->
+                    <div>
+                        <label for="business_type" 
+                               class="block text-xs font-semibold mb-1.5"
+                               :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            Secteur d'activité <span class="text-[11px] font-normal text-slate-400">(libre ou suggéré)</span>
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
                             </div>
-                            <x-input-error :messages="$errors->get('name')" class="mt-1 text-[11px]" />
-                        </div>
+                            <input type="text" 
+                                   id="business_type" 
+                                   name="business_type" 
+                                   x-model="businessType"
+                                   list="business_type_suggestions"
+                                   placeholder="Ex : Quincaillerie, Supérette, Cosmétique, Prêt-à-porter..."
+                                   value="{{ old('business_type') }}"
+                                   class="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400 hover:border-slate-300'">
 
-                        <!-- Email pro -->
-                        <div>
-                            <label for="email" 
-                                   class="block text-xs font-semibold mb-1"
-                                   :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                Email professionnel <span class="text-amber-500">*</span>
-                            </label>
-                            <div class="relative flex items-center">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
-                                    </svg>
-                                </div>
-                                <input type="email" 
-                                       id="email" 
-                                       name="email" 
-                                       required
-                                       value="{{ old('email') }}"
-                                       placeholder="gerant@commerce.com"
-                                       class="w-full pl-9 pr-3 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
-                            </div>
-                            <x-input-error :messages="$errors->get('email')" class="mt-1 text-[11px]" />
+                            <datalist id="business_type_suggestions">
+                                @foreach($businessTypes as $key => $type)
+                                    <option value="{{ $type['label'] ?? ucfirst($key) }}"></option>
+                                @endforeach
+                            </datalist>
+                        </div>
+                        <x-input-error :messages="$errors->get('business_type')" class="mt-1 text-[11px]" />
+
+                        <!-- Suggestions rapides cliquables (Pills) -->
+                        <div class="flex items-center gap-1.5 flex-wrap pt-2">
+                            <span class="text-[10px] font-medium text-slate-500 select-none mr-0.5">Suggestions :</span>
+                            @php
+                                $quickSectors = [
+                                    'Quincaillerie', 
+                                    'Supérette', 
+                                    'Cosmétique', 
+                                    'Prêt-à-porter',
+                                    'Pharmacie',
+                                    'Informatique', 
+                                    'Dépôt / Grossiste',
+                                    'Électroménager',
+                                    'Menuiserie'
+                                ];
+                            @endphp
+                            @foreach($quickSectors as $sector)
+                                <button type="button" 
+                                        @click="businessType = (businessType.toLowerCase() === '{{ strtolower($sector) }}' ? '' : '{{ $sector }}')"
+                                        class="px-2 py-0.5 rounded-lg text-[10px] font-medium transition select-none border cursor-pointer"
+                                        :class="businessType.toLowerCase() === '{{ strtolower($sector) }}'
+                                            ? (darkMode ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm' : 'bg-amber-100 border-amber-300 text-amber-800')
+                                            : (darkMode ? 'bg-white/[0.03] border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.06]' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200')">
+                                    {{ $sector }}
+                                </button>
+                            @endforeach
                         </div>
                     </div>
 
-                    <!-- LIGNE 4 : Mot de passe & Confirmation avec toggles œil -->
-                    <div class="field-pair">
-                        <!-- Mot de passe -->
-                        <div>
-                            <label for="password" 
-                                   class="block text-xs font-semibold mb-1"
-                                   :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                Mot de passe <span class="text-amber-500">*</span>
-                            </label>
-                            <div class="relative flex items-center">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                </div>
-                                <input :type="showPassword ? 'text' : 'password'" 
-                                       id="password" 
-                                       name="password" 
-                                       required
-                                       x-model="password"
-                                       autocomplete="new-password"
-                                       placeholder="8 caractères min."
-                                       class="w-full pl-9 pr-9 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
-                                <button type="button" 
-                                        @click="showPassword = !showPassword"
-                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-amber-400 transition"
-                                        aria-label="Afficher ou masquer le mot de passe">
-                                    <template x-if="!showPassword">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                    </template>
-                                    <template x-if="showPassword">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
-                                        </svg>
-                                    </template>
-                                </button>
+                    <!-- 4. Nom complet du gérant -->
+                    <div>
+                        <label for="name" 
+                               class="block text-xs font-semibold mb-1.5"
+                               :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            Votre nom complet (Gérant ou Propriétaire) <span class="text-amber-500">*</span>
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
                             </div>
-                            <x-input-error :messages="$errors->get('password')" class="mt-1 text-[11px]" />
+                            <input type="text" 
+                                   id="name" 
+                                   name="name" 
+                                   required
+                                   value="{{ old('name') }}"
+                                   placeholder="Ex : Marcel Tchamba"
+                                   class="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400 hover:border-slate-300'">
                         </div>
-
-                        <!-- Confirmation -->
-                        <div>
-                            <label for="password_confirmation" 
-                                   class="block text-xs font-semibold mb-1"
-                                   :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
-                                Confirmer mot de passe <span class="text-amber-500">*</span>
-                            </label>
-                            <div class="relative flex items-center">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                    </svg>
-                                </div>
-                                <input :type="showConfirmPassword ? 'text' : 'password'" 
-                                       id="password_confirmation" 
-                                       name="password_confirmation" 
-                                       required
-                                       x-model="passwordConfirmation"
-                                       autocomplete="new-password"
-                                       placeholder="Répétez le mot de passe"
-                                       class="w-full pl-9 pr-9 py-2 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-                                       :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400'">
-                                <button type="button" 
-                                        @click="showConfirmPassword = !showConfirmPassword"
-                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-amber-400 transition"
-                                        aria-label="Afficher ou masquer la confirmation du mot de passe">
-                                    <template x-if="!showConfirmPassword">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                    </template>
-                                    <template x-if="showConfirmPassword">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
-                                        </svg>
-                                    </template>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-[11px]" />
-                        </div>
+                        <x-input-error :messages="$errors->get('name')" class="mt-1 text-[11px]" />
                     </div>
 
-                    <!-- LIGNE 5 : Conditions d'utilisation -->
+                    <!-- 5. Email professionnel -->
+                    <div>
+                        <label for="email" 
+                               class="block text-xs font-semibold mb-1.5"
+                               :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            Adresse email professionnelle <span class="text-amber-500">*</span>
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                                </svg>
+                            </div>
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   required
+                                   value="{{ old('email') }}"
+                                   placeholder="gerant@commerce.com"
+                                   class="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400 hover:border-slate-300'">
+                        </div>
+                        <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                            Servira d'identifiant administrateur principal pour gérer votre boutique.
+                        </p>
+                        <x-input-error :messages="$errors->get('email')" class="mt-1 text-[11px]" />
+                    </div>
+
+                    <!-- 6. Mot de passe -->
+                    <div>
+                        <label for="password" 
+                               class="block text-xs font-semibold mb-1.5"
+                               :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            Mot de passe <span class="text-amber-500">*</span>
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <input :type="showPassword ? 'text' : 'password'" 
+                                   id="password" 
+                                   name="password" 
+                                   required
+                                   x-model="password"
+                                   autocomplete="new-password"
+                                   placeholder="8 caractères minimum"
+                                   class="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400 hover:border-slate-300'">
+                            <button type="button" 
+                                    @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-amber-400 transition"
+                                    aria-label="Afficher ou masquer le mot de passe">
+                                <template x-if="!showPassword">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </template>
+                                <template x-if="showPassword">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                                    </svg>
+                                </template>
+                            </button>
+                        </div>
+                        <x-input-error :messages="$errors->get('password')" class="mt-1 text-[11px]" />
+                    </div>
+
+                    <!-- 7. Confirmer mot de passe -->
+                    <div>
+                        <label for="password_confirmation" 
+                               class="block text-xs font-semibold mb-1.5"
+                               :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            Confirmer le mot de passe <span class="text-amber-500">*</span>
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <input :type="showConfirmPassword ? 'text' : 'password'" 
+                                   id="password_confirmation" 
+                                   name="password_confirmation" 
+                                   required
+                                   x-model="passwordConfirmation"
+                                   autocomplete="new-password"
+                                   placeholder="Répétez le mot de passe"
+                                   class="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                                   :class="darkMode ? 'bg-slate-900/90 border-slate-800 text-white placeholder-slate-500 hover:border-slate-700' : 'bg-slate-50/80 border-slate-200 text-slate-900 placeholder-slate-400 hover:border-slate-300'">
+                            <button type="button" 
+                                    @click="showConfirmPassword = !showConfirmPassword"
+                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-amber-400 transition"
+                                    aria-label="Afficher ou masquer la confirmation du mot de passe">
+                                <template x-if="!showConfirmPassword">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </template>
+                                <template x-if="showConfirmPassword">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                                    </svg>
+                                </template>
+                            </button>
+                        </div>
+                        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-[11px]" />
+                    </div>
+
+                    <!-- 8. Conditions d'utilisation -->
                     <div class="pt-1">
                         <label class="flex items-start gap-2.5 cursor-pointer select-none">
                             <input type="checkbox" 
@@ -534,11 +532,11 @@
                         <x-input-error :messages="$errors->get('terms')" class="mt-1 text-[11px]" />
                     </div>
 
-                    <!-- Bouton de Soumission : Lancer ma boutique gratuitement -> -->
+                    <!-- 9. Bouton CTA : Lancer ma boutique gratuitement -->
                     <div class="pt-2">
                         <button type="submit" 
                                 :disabled="isSubmitting"
-                                class="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-lg shadow-amber-500/20 active:scale-[0.99] transition duration-150 flex items-center justify-center gap-2 font-outfit disabled:opacity-75 disabled:cursor-wait">
+                                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-lg shadow-amber-500/20 active:scale-[0.99] transition duration-150 flex items-center justify-center gap-2 font-outfit disabled:opacity-75 disabled:cursor-wait">
                             <template x-if="!isSubmitting">
                                 <span class="flex items-center gap-2">
                                     <span>Lancer ma boutique gratuitement</span>
@@ -559,7 +557,7 @@
                         </button>
                     </div>
 
-                    <!-- Mention sécurité réassurance -->
+                    <!-- 10. Mention sécurité réassurance -->
                     <div class="text-center pt-1">
                         <span class="inline-flex items-center gap-1.5 text-[11px] font-medium"
                               :class="darkMode ? 'text-slate-400' : 'text-slate-500'">
