@@ -27,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\EnsureTenantSubscriptionIsValid::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'logout',
+            '*/logout',
+            'client/logout',
+            'landlord/logout',
+        ]);
+
         $middleware->redirectGuestsTo(function ($request) {
             if ($request->is('landlord/*') || $request->is('landlord')) {
                 return route('landlord.login');

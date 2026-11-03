@@ -128,17 +128,20 @@
         </div>
 
         {{-- Profil --}}
+        @php
+            $portalClientName = session('portal_client_name') ?? (isset($client) ? $client->name : 'Client');
+        @endphp
         <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
             <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-white font-semibold text-xs">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                {{ strtoupper(substr($portalClientName, 0, 1)) }}
             </div>
             <div class="hidden md:block">
-                <p class="text-xs font-semibold text-slate-700 leading-none">{{ auth()->user()->name }}</p>
+                <p class="text-xs font-semibold text-slate-700 leading-none">{{ $portalClientName }}</p>
             </div>
         </div>
 
         {{-- Déconnexion --}}
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('client.portal.logout') }}">
             @csrf
             <button type="submit" title="Déconnexion"
                 class="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-100 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition">

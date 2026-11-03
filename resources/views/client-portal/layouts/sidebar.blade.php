@@ -294,18 +294,21 @@
     </nav>
 
     {{-- User --}}
+    @php
+        $portalClientName = session('portal_client_name') ?? (isset($client) ? $client->name : 'Client');
+    @endphp
     <div class="border-t border-slate-800 px-4 py-3 flex-shrink-0">
         <div class="flex items-center gap-2.5">
             <div class="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-bold text-xs flex-shrink-0">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                {{ strtoupper(substr($portalClientName, 0, 1)) }}
             </div>
 
             <div x-show="!sidebarCollapsed || mobileSidebarOpen" class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-slate-300 truncate leading-none">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-slate-600 truncate leading-none mt-0.5">{{ auth()->user()->role_label }}</p>
+                <p class="text-xs font-semibold text-slate-300 truncate leading-none">{{ $portalClientName }}</p>
+                <p class="text-xs text-slate-600 truncate leading-none mt-0.5">Espace Client</p>
             </div>
 
-            <form x-show="!sidebarCollapsed || mobileSidebarOpen" method="POST" action="{{ route('logout') }}">
+            <form x-show="!sidebarCollapsed || mobileSidebarOpen" method="POST" action="{{ route('client.portal.logout') }}">
                 @csrf
                 <button type="submit" title="Déconnexion"
                     class="text-slate-600 hover:text-red-400 transition">

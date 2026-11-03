@@ -292,7 +292,7 @@ Route::middleware(['permission:suppliers.manage'])->group(function () {
 // Portail client public
 Route::get('/client/login', [ClientPortalController::class, 'login'])->name('client.portal.login');
 Route::post('/client/login', [ClientPortalController::class, 'authenticate'])->name('client.portal.authenticate');
-Route::post('/client/logout', [ClientPortalController::class, 'logout'])->name('client.portal.logout');
+Route::match(['get', 'post'], '/client/logout', [ClientPortalController::class, 'logout'])->name('client.portal.logout');
 
 Route::get('/client/dashboard', [ClientPortalController::class, 'dashboard'])->name('client.portal.dashboard');
 Route::get('/client/sales', [ClientPortalController::class, 'sales'])->name('client.portal.sales');
@@ -314,10 +314,11 @@ Route::prefix('landlord')->name('landlord.')->group(function () {
         Route::post('login', [\App\Http\Controllers\Landlord\AuthController::class, 'login'])->name('login.store');
     });
 
+    // Public / Protected Logout (never blocked if session expired)
+    Route::match(['get', 'post'], 'logout', [\App\Http\Controllers\Landlord\AuthController::class, 'logout'])->name('logout');
+
     // Protected routes (Auth landlord)
     Route::middleware('auth:landlord')->group(function () {
-        Route::post('logout', [\App\Http\Controllers\Landlord\AuthController::class, 'logout'])->name('logout');
-        
         Route::get('dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
         
         // Tenants CRUD & Actions

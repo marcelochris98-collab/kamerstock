@@ -76,7 +76,7 @@ class IdentifyTenant
                 if (config('platform.tenancy_enabled', false)) {
                     $pendingStatuses = config('platform.tenant_pending_statuses', ['prepared', 'pending']);
                     if (in_array($tenant->provisioning_status, $pendingStatuses, true)) {
-                        if (!$request->routeIs('tenant.pending') && !$request->routeIs('tenant.debug')) {
+                        if (!$request->routeIs('tenant.pending', 'tenant.debug', 'logout', 'client.portal.logout', 'landlord.logout', 'support.exit') && !$request->is('logout', '*/logout', 'client/logout', 'landlord/logout')) {
                             return redirect()->route('tenant.pending', ['tenant' => $tenant->slug]);
                         }
                     }
@@ -85,14 +85,16 @@ class IdentifyTenant
                 if (config('platform.tenancy_enabled', false)) {
                     if ($this->statusService->isReadOnly($tenant)) {
                         if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-                            if (!app(SupportContext::class)->isSupportMode()) {
-                                if ($request->expectsJson() || $request->wantsJson()) {
-                                    return response()->json([
-                                        'error' => "Boutique en lecture seule. Modifications impossibles car l'abonnement a expiré."
-                                    ], 403);
-                                }
+                            if (!$request->routeIs('logout', 'client.portal.logout', 'landlord.logout', 'support.exit') && !$request->is('logout', '*/logout', 'client/logout', 'landlord/logout')) {
+                                if (!app(SupportContext::class)->isSupportMode()) {
+                                    if ($request->expectsJson() || $request->wantsJson()) {
+                                        return response()->json([
+                                            'error' => "Boutique en lecture seule. Modifications impossibles car l'abonnement a expiré."
+                                        ], 403);
+                                    }
 
-                                return back()->with('error', "Boutique en lecture seule. Les modifications de données sont impossibles.");
+                                    return back()->with('error', "Boutique en lecture seule. Les modifications de données sont impossibles.");
+                                }
                             }
                         }
                     }

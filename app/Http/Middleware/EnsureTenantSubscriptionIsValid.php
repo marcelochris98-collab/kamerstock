@@ -36,6 +36,9 @@ class EnsureTenantSubscriptionIsValid
             'tenant.billing',
             'tenant.read_only',
             'logout',
+            'client.portal.logout',
+            'landlord.logout',
+            'support.exit',
             'assets',
             'build',
             'storage'
@@ -47,7 +50,7 @@ class EnsureTenantSubscriptionIsValid
             }
         }
 
-        if ($request->is('assets/*') || $request->is('build/*') || $request->is('storage/*')) {
+        if ($request->is('logout', '*/logout', 'client/logout', 'landlord/logout', 'assets/*', 'build/*', 'storage/*')) {
             return $next($request);
         }
 

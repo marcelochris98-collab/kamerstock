@@ -191,4 +191,20 @@ class LandlordAdminTest extends TestCase
         $this->assertNotNull($tenant->owner_password_plain);
         $this->assertTrue(LandlordAuditLog::where('action', 'tenant_regenerate_password')->exists());
     }
+
+    public function test_landlord_user_can_logout_via_post()
+    {
+        $response = $this->actingAs($this->landlordUser, 'landlord')->post(route('landlord.logout'));
+
+        $this->assertGuest('landlord');
+        $response->assertRedirect(route('landlord.login'));
+    }
+
+    public function test_landlord_user_can_logout_via_get()
+    {
+        $response = $this->actingAs($this->landlordUser, 'landlord')->get(route('landlord.logout'));
+
+        $this->assertGuest('landlord');
+        $response->assertRedirect(route('landlord.login'));
+    }
 }
