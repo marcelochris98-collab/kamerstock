@@ -926,6 +926,210 @@
     </section>
 
     <!-- ========================================================================= -->
+    <!-- 5.1 EN ACTION : PENSÉ POUR VOTRE JOURNÉE DE TRAVAIL (Workflow Quotidien) -->
+    <!-- ========================================================================= -->
+    <section class="py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <!-- Section Header -->
+        <div class="max-w-3xl mx-auto text-center mb-20">
+            <span class="text-xs font-semibold text-amber-500 dark:text-amber-400 tracking-wider uppercase font-mono block mb-2">
+                En Action
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight leading-tight">
+                Pensé pour votre journée de travail
+            </h2>
+            <p class="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
+                De l'arrivage du matin à la clôture de caisse du soir, chaque tâche devient plus simple.
+            </p>
+        </div>
+
+        <div class="space-y-20 lg:space-y-28">
+
+            <!-- 1. Réception & inventaire (Titre à GAUCHE, Image à DROITE) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+                <!-- Texte (Gauche) -->
+                <div class="lg:col-span-6 space-y-5 lg:order-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Réception & inventaire
+                    </div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit leading-tight">
+                        Recevez, comptez, rangez — sans rien oublier
+                    </h3>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+                        Enregistrez vos achats fournisseurs, réapprovisionnez vos produits et corrigez les écarts d'inventaire. Le stock se met à jour tout seul.
+                    </p>
+                    <ul class="space-y-3 pt-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Achats et paiements fournisseurs</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Réapprovisionnements et ajustements</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Historique de chaque produit</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Image (Droite) -->
+                <div class="lg:col-span-6 lg:order-2">
+                    <div class="group relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08] shadow-2xl shadow-slate-200/50 dark:shadow-black/70 bg-slate-100 dark:bg-slate-800">
+                        <img src="{{ asset('images/landing/workflow_inventory.jpg') }}" 
+                             alt="Recevez, comptez, rangez — sans rien oublier" 
+                             class="w-full aspect-[16/10] object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-medium backdrop-blur-md bg-black/40 px-3.5 py-2 rounded-xl border border-white/10">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span> Stock & inventaire</span>
+                            <span class="font-mono text-amber-300">Synchronisé</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Ventes (Image à GAUCHE, Titre à DROITE) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+                <!-- Image (Gauche sur desktop) -->
+                <div class="lg:col-span-6 order-2 lg:order-1">
+                    <div class="group relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08] shadow-2xl shadow-slate-200/50 dark:shadow-black/70 bg-slate-100 dark:bg-slate-800">
+                        <img src="{{ asset('images/landing/workflow_pos.jpg') }}" 
+                             alt="Une caisse rapide, même aux heures de pointe" 
+                             class="w-full aspect-[16/10] object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-medium backdrop-blur-md bg-black/40 px-3.5 py-2 rounded-xl border border-white/10">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Point de Vente</span>
+                            <span class="font-mono text-emerald-300">&lt; 3s / encaissement</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Texte (Droite sur desktop) -->
+                <div class="lg:col-span-6 space-y-5 order-1 lg:order-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Ventes
+                    </div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit leading-tight">
+                        Une caisse rapide, même aux heures de pointe
+                    </h3>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+                        Trouvez un produit en le scannant ou en tapant son nom, appliquez une remise et validez la vente en quelques secondes. Le stock est déduit instantanément.
+                    </p>
+                    <ul class="space-y-3 pt-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Recherche et scan instantanés</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Remises sur les ventes</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Suivi des paiements partiels</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3. Facturation (Titre à GAUCHE, Image à DROITE) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+                <!-- Texte (Gauche) -->
+                <div class="lg:col-span-6 space-y-5 lg:order-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        Facturation
+                    </div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit leading-tight">
+                        Des factures professionnelles en un clic
+                    </h3>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+                        Factures et bons de livraison générés automatiquement à votre nom et à votre logo. Imprimez-les, téléchargez-les en PDF ou partagez-les à vos clients.
+                    </p>
+                    <ul class="space-y-3 pt-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Numérotation automatique</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Logo et coordonnées de l'entreprise</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Export PDF et impression</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Image (Droite) -->
+                <div class="lg:col-span-6 lg:order-2">
+                    <div class="group relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08] shadow-2xl shadow-slate-200/50 dark:shadow-black/70 bg-slate-100 dark:bg-slate-800">
+                        <img src="{{ asset('images/landing/workflow_invoicing.jpg') }}" 
+                             alt="Des factures professionnelles en un clic" 
+                             class="w-full aspect-[16/10] object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-medium backdrop-blur-md bg-black/40 px-3.5 py-2 rounded-xl border border-white/10">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-sky-400"></span> Documents légaux</span>
+                            <span class="font-mono text-sky-300">Format Pro & PDF</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Comptabilité (Image à GAUCHE, Titre à DROITE) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+                <!-- Image (Gauche sur desktop) -->
+                <div class="lg:col-span-6 order-2 lg:order-1">
+                    <div class="group relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08] shadow-2xl shadow-slate-200/50 dark:shadow-black/70 bg-slate-100 dark:bg-slate-800">
+                        <img src="{{ asset('images/landing/workflow_accounting.jpg') }}" 
+                             alt="Adieu les tableurs, bonjour la clarté" 
+                             class="w-full aspect-[16/10] object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-medium backdrop-blur-md bg-black/40 px-3.5 py-2 rounded-xl border border-white/10">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-400"></span> Clarté Financière</span>
+                            <span class="font-mono text-indigo-300">100% automatisé</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Texte (Droite sur desktop) -->
+                <div class="lg:col-span-6 space-y-5 order-1 lg:order-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                        Comptabilité
+                    </div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit leading-tight">
+                        Adieu les tableurs, bonjour la clarté
+                    </h3>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+                        Ventes, achats et dépenses génèrent leurs écritures comptables automatiquement. Consultez votre trésorerie et exportez vos rapports vers Excel quand vous voulez.
+                    </p>
+                    <ul class="space-y-3 pt-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Écritures automatiques</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Dépenses par catégorie</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 font-bold text-xs">✓</div>
+                            <span>Exports Excel & PDF</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
     <!-- 6. BUILT FOR SPEED & CONTROL (Linear 3-Pillar Section) -->
     <!-- ========================================================================= -->
     <section class="py-20 border-t border-slate-200/80 bg-slate-100/50 dark:border-white/[0.06] dark:bg-slate-900/20 relative z-10 transition-colors duration-200">
@@ -968,42 +1172,34 @@
     <section id="security" class="py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="linear-card rounded-3xl p-8 sm:p-12 border border-slate-200 dark:border-white/[0.08] relative overflow-hidden">
             
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div class="lg:col-span-7 space-y-4">
-                    <span class="text-xs font-semibold text-emerald-500 dark:text-emerald-400 font-mono uppercase tracking-wider">Sécurité d'Entreprise</span>
-                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight">
-                        Vos chiffres d'affaires et clients protégés comme dans un coffre-fort.
-                    </h3>
-                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-light leading-relaxed">
-                        Contrairement aux SaaS basiques qui stockent tous les clients dans la même table, KamerStock alloue une base de données physique distincte pour chaque entreprise. Un concurrent ne pourra jamais intercepter vos données.
-                    </p>
+            <div class="max-w-3xl mx-auto text-center space-y-5">
+                <span class="text-xs font-semibold text-emerald-500 dark:text-emerald-400 font-mono uppercase tracking-wider block">
+                    Sécurité d'Entreprise
+                </span>
+                <h3 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight leading-tight">
+                    Vos chiffres d'affaires et clients protégés comme dans un coffre-fort.
+                </h3>
+                <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
+                    Contrairement aux SaaS basiques qui stockent tous les clients dans la même table, KamerStock alloue une base de données physique distincte pour chaque entreprise. Un concurrent ne pourra jamais intercepter vos données.
+                </p>
 
-                    <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700 dark:text-slate-300">
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
-                            <span>Bases MySQL strictement séparées</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
-                            <span>Mode support avec audit trail</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
-                            <span>Dumps chiffrés et isolés</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
-                            <span>Mots de passe hachés bcrypt</span>
-                        </div>
+                <div class="pt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                    <div class="flex items-center gap-2">
+                        <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
+                        <span>Bases MySQL strictement séparées</span>
                     </div>
-                </div>
-
-                <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-5 font-mono text-[11px] space-y-2 text-slate-400 shadow-xl">
-                    <div class="text-slate-500">// Commutation de base de données à chaud</div>
-                    <div><span class="text-indigo-400">$tenant</span> = <span class="text-amber-400">TenantResolver</span>::<span class="text-emerald-400">resolve</span>($request);</div>
-                    <div><span class="text-indigo-400">$database</span> = <span class="text-slate-200">"kamerstock_tenant_"</span> . <span class="text-indigo-400">$tenant</span>->slug;</div>
-                    <div class="text-slate-500 pt-2">// Isolation validée sans fuite inter-commerces</div>
-                    <div class="text-emerald-400 font-semibold">✓ Connection: [tenant_dedicated] OK</div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
+                        <span>Mode support avec audit trail</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
+                        <span>Dumps chiffrés et isolés</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
+                        <span>Mots de passe hachés bcrypt</span>
+                    </div>
                 </div>
             </div>
 
