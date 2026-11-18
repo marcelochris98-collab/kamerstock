@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Platform\Tenant;
+use App\Services\Tenancy\TenantProvisioner;
+use App\Services\Tenancy\TenantProvisioningException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -30,22 +32,50 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
+            'company_name' => ['required', 'string', 'max:150'],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        $baseSlug = substr(Str::slug($validated['company_name']), 0, 100);
+        if ($baseSlug === '') {
+            throw ValidationException::withMessages([
+                'company_name' => 'Le nom de l’entreprise ne permet pas de créer son identifiant.',
+            ]);
+        }
+
+        $slug = $baseSlug;
+        $suffix = 2;
+        while (Tenant::on('landlord')->where('slug', $slug)->exists()) {
+            $tail = '-'.$suffix++;
+            $slug = substr($baseSlug, 0, 100 - strlen($tail)).$tail;
+        }
+
+        $tenant = Tenant::create([
+            'name' => $validated['company_name'],
+            'slug' => $slug,
+            'status' => 'provisioning',
         ]);
 
+        try {
+            $user = app(TenantProvisioner::class)->provision($tenant, [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+            ]);
+        } catch (TenantProvisioningException $exception) {
+            throw ValidationException::withMessages([
+                'company_name' => $exception->getMessage(),
+            ]);
+        }
+
+        $request->session()->put('current_tenant_slug', $tenant->slug);
+        Auth::login($user);
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('dashboard', absolute: false))
+            ->with('tenant_slug', $tenant->slug);
     }
 }

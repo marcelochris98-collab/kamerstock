@@ -45,6 +45,14 @@
                         placeholder="admin@kamerstock.cm">
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Identifiant de l’entreprise (si applicable)</label>
+                    <input type="text" name="tenant" value="{{ old('tenant', request('tenant')) }}"
+                        class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500
+                        focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
+                        placeholder="ex. ma-boutique">
+                </div>
+
                 <div class="mb-6">
                     <label class="block text-xs font-medium text-slate-400 mb-1.5">Mot de passe</label>
                     <input type="password" name="password" required

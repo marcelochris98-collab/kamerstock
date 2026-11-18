@@ -39,7 +39,10 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --force",
+            "@php -r \"file_exists('database/landlord.sqlite') || touch('database/landlord.sqlite');\"",
+            "@php artisan migrate --database=landlord --path=database/migrations/landlord --force",
             "npm install --ignore-scripts",
             "npm run build"
         ],
@@ -64,7 +67,9 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
-            "@php artisan migrate --graceful --ansi"
+            "@php artisan migrate --graceful --ansi",
+            "@php -r \"file_exists('database/landlord.sqlite') || touch('database/landlord.sqlite');\"",
+            "@php artisan migrate --database=landlord --path=database/migrations/landlord --graceful --ansi"
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"

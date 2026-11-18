@@ -17,29 +17,28 @@ class TenantResolver
             return null;
         }
 
-        try {
-            // Strategy 1: Path prefix (/t/boutique-test/...)
-            $tenant = $this->resolveFromPath($request);
-            if ($tenant) return $tenant;
+        // The session is authoritative after a user has entered a tenant.
+        $sessionSlug = session('current_tenant_slug');
+        if (is_string($sessionSlug) && $sessionSlug !== '') {
+            return $this->resolveBySlug($sessionSlug);
+        }
 
-            // Strategy 2: Query parameter (?tenant=boutique-test)
-            $tenant = $this->resolveFromQuery($request);
-            if ($tenant) return $tenant;
+        // Strategy 1: Path prefix (/t/boutique-test/...)
+        $tenant = $this->resolveFromPath($request);
+        if ($tenant) {
+            return $tenant;
+        }
 
-            // ✅ Strategy 3: Session (current_tenant_slug sauvegardé au login)
-            // Permet de maintenir le contexte tenant sur toutes les requêtes
-            // sans avoir besoin du ?tenant= dans chaque URL.
-            $tenant = $this->resolveFromSession($request);
-            if ($tenant) return $tenant;
+        // Strategy 2: Query parameter (?tenant=boutique-test)
+        $tenant = $this->resolveFromQuery($request);
+        if ($tenant) {
+            return $tenant;
+        }
 
-            // Strategy 4: Subdomain / Custom Domain
-            $tenant = $this->resolveFromSubdomain($request);
-            if ($tenant) return $tenant;
-
-        } catch (\Throwable $e) {
-            if (config('platform.security.log_tenant_resolution', true)) {
-                \Illuminate\Support\Facades\Log::warning("Erreur lors de la résolution du tenant: " . $e->getMessage());
-            }
+        // Strategy 3: Tenant subdomain
+        $tenant = $this->resolveFromSubdomain($request);
+        if ($tenant) {
+            return $tenant;
         }
 
         return null;
@@ -65,32 +64,11 @@ class TenantResolver
         }
 
         // tenant-debug only in local/testing
-        if ($request->is('tenant-debug') && !app()->environment('local', 'testing')) {
+        if ($request->is('tenant-debug') && ! app()->environment('local', 'testing')) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * ✅ Strategy 3 : Résolution depuis la session Laravel.
-     * Le slug est sauvegardé dans session('current_tenant_slug') au moment du login.
-     * Cela évite de devoir passer ?tenant= dans chaque URL après connexion.
-     */
-    public function resolveFromSession(Request $request): ?Tenant
-    {
-        // Ne pas résoudre depuis la session sur les routes de login/logout
-        if ($request->routeIs('login') || $request->routeIs('logout')) {
-            return null;
-        }
-
-        $slug = session('current_tenant_slug');
-
-        if ($slug && is_string($slug)) {
-            return $this->resolveBySlug($slug);
-        }
-
-        return null;
     }
 
     /**
@@ -100,13 +78,14 @@ class TenantResolver
     {
         $param = config('platform.tenant_query_parameter', 'tenant');
         $slug = $request->query($param);
-        if (!$slug) {
+        if (! $slug) {
             $slug = $request->input($param);
         }
 
         if ($slug && is_string($slug)) {
             return $this->resolveBySlug($slug);
         }
+
         return null;
     }
 
@@ -120,8 +99,10 @@ class TenantResolver
 
         if (count($segments) >= 2 && $segments[0] === $prefix) {
             $slug = $segments[1];
+
             return $this->resolveBySlug($slug);
         }
+
         return null;
     }
 
@@ -142,9 +123,9 @@ class TenantResolver
                 continue;
             }
 
-            if (Str::endsWith($host, '.' . $centralDomain)) {
-                $subdomain = Str::before($host, '.' . $centralDomain);
-                if (!Str::contains($subdomain, '.')) {
+            if (Str::endsWith($host, '.'.$centralDomain)) {
+                $subdomain = Str::before($host, '.'.$centralDomain);
+                if (! Str::contains($subdomain, '.')) {
                     $tenant = $this->resolveBySlug($subdomain);
                     if ($tenant) {
                         return $tenant;
@@ -153,26 +134,16 @@ class TenantResolver
             }
         }
 
-        return $this->resolveByDomain($host);
+        return null;
     }
 
     /**
-     * Resolve tenant by slug (always on 'landlord' connection).
+     * Resolve tenant by slug (always on the landlord connection).
      */
     public function resolveBySlug(string $slug): ?Tenant
     {
         return Tenant::on('landlord')
             ->where('slug', $slug)
-            ->first();
-    }
-
-    /**
-     * Resolve tenant by domain (always on 'landlord' connection).
-     */
-    public function resolveByDomain(string $domain): ?Tenant
-    {
-        return Tenant::on('landlord')
-            ->where('domain', $domain)
             ->first();
     }
 }

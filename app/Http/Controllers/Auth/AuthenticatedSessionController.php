@@ -36,12 +36,16 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $tenantSlug = $request->session()->get('current_tenant_slug');
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return $tenantSlug
+            ? redirect()->route('login', ['tenant' => $tenantSlug])
+            : redirect('/');
     }
 }

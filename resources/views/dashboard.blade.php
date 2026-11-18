@@ -25,6 +25,13 @@
     @endif
 </div>
 
+@if(session('tenant_slug'))
+    <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+        Votre espace entreprise est créé. Conservez cet identifiant pour vos prochaines connexions :
+        <strong class="font-bold">{{ session('tenant_slug') }}</strong>
+    </div>
+@endif
+
 @if($siteSetting && !$siteSetting->setup_completed && auth()->user()->hasPermission('settings.manage'))
     <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-3">

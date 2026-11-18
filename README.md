@@ -21,22 +21,26 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Registre central des entreprises
+## Inscription et registre des entreprises
 
-Le registre central conserve uniquement le nom de l'entreprise, son identifiant
-unique (`slug`) et son statut. En local, il utilise `database/landlord.sqlite`
-par défaut. Pour une base centrale différente, configurez les variables
-`LANDLORD_DB_*` dans `.env`.
+L'inscription publique crée une entreprise, son compte administrateur et une
+base métier séparée. Le registre central conserve uniquement le nom, le slug
+unique et le statut de chaque entreprise. Le propriétaire peut se reconnecter
+avec l'identifiant affiché dans l'espace de connexion.
 
-Initialisez le registre avec :
+En local, le registre central utilise `database/landlord.sqlite` et les bases
+SQLite des entreprises sont créées dans `database/tenants/`. Initialisez le
+registre avec :
 
 ```bash
 touch database/landlord.sqlite
 php artisan migrate --database=landlord --path=database/migrations/landlord
 ```
 
-Cette étape crée le registre central uniquement ; elle n'active pas encore
-l'inscription self-service ni l'isolation des données métier par entreprise.
+Pour MySQL/MariaDB, configurez `DB_*` et `LANDLORD_DB_*`. L'utilisateur de
+`DB_*` doit pouvoir créer des bases pour que l'inscription provisionne chaque
+entreprise. Les bases existantes de l'installation avant multitenancy ne sont
+pas déplacées automatiquement.
 
 ## Learning Laravel
 
