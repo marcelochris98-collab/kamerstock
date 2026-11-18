@@ -67,7 +67,7 @@ class RegistrationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
 
         $tenant = Tenant::on('landlord')->where('slug', 'boutique-test')->firstOrFail();
-        $this->assertSame('active', $tenant->status);
+        $this->assertSame(Tenant::STATUS_ACTIVE, $tenant->status);
 
         $tenantUsers = DB::connection('tenant')->table('users');
         $this->assertSame('test@example.com', $tenantUsers->value('email'));
@@ -91,6 +91,24 @@ class RegistrationTest extends TestCase
         $response->assertRedirect('/register');
         $response->assertSessionHasErrors('company_name');
         $this->assertSame(0, Tenant::on('landlord')->count());
+    }
+
+    public function test_non_active_tenant_cannot_open_its_dashboard(): void
+    {
+        $this->post('/register', [
+            'company_name' => 'Boutique Suspendue',
+            'name' => 'Tenant Admin',
+            'email' => 'admin@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $tenant = Tenant::on('landlord')->where('slug', 'boutique-suspendue')->firstOrFail();
+        $tenant->update(['status' => Tenant::STATUS_SUSPENDED]);
+
+        $this->get('/dashboard')
+            ->assertForbidden()
+            ->assertSee('Cet espace entreprise a été suspendu.');
     }
 
     public function test_each_company_gets_an_isolated_database_and_can_reuse_an_email(): void

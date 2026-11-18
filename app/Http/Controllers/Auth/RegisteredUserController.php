@@ -56,7 +56,7 @@ class RegisteredUserController extends Controller
         $tenant = Tenant::create([
             'name' => $validated['company_name'],
             'slug' => $slug,
-            'status' => 'provisioning',
+            'status' => Tenant::STATUS_PROVISIONING,
         ]);
 
         try {

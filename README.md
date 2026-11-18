@@ -25,8 +25,10 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 L'inscription publique crée une entreprise, son compte administrateur et une
 base métier séparée. Le registre central conserve uniquement le nom, le slug
-unique et le statut de chaque entreprise. Le propriétaire peut se reconnecter
-avec l'identifiant affiché dans l'espace de connexion.
+unique et le statut de chaque entreprise (`pending`, `provisioning`, `active`,
+`failed` ou `suspended`). Seuls les espaces actifs sont accessibles. Le
+propriétaire peut se reconnecter avec l'identifiant affiché dans l'espace de
+connexion.
 
 En local, le registre central utilise `database/landlord.sqlite` et les bases
 SQLite des entreprises sont créées dans `database/tenants/`. Initialisez le

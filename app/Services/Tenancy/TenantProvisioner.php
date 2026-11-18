@@ -19,7 +19,7 @@ class TenantProvisioner
 
     public function provision(Tenant $tenant, array $ownerData): User
     {
-        $tenant->update(['status' => 'provisioning']);
+        $tenant->update(['status' => Tenant::STATUS_PROVISIONING]);
 
         try {
             $this->databaseManager->createDatabaseForTenant($tenant);
@@ -62,11 +62,11 @@ class TenantProvisioner
                 ['shop_name' => $tenant->name]
             );
 
-            $tenant->update(['status' => 'active']);
+            $tenant->update(['status' => Tenant::STATUS_ACTIVE]);
 
             return $user;
         } catch (Throwable $exception) {
-            $tenant->update(['status' => 'failed']);
+            $tenant->update(['status' => Tenant::STATUS_FAILED]);
 
             Log::error('Échec du provisionnement tenant.', [
                 'tenant_id' => $tenant->id,

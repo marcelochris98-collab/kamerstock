@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\Tenancy\TenantContext;
 use App\Services\Tenancy\TenantDatabaseManager;
 use App\Services\Tenancy\TenantResolver;
+use App\Services\Tenancy\TenantStatusService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,8 @@ class IdentifyTenant
     public function __construct(
         private TenantResolver $resolver,
         private TenantContext $context,
-        private TenantDatabaseManager $databaseManager
+        private TenantDatabaseManager $databaseManager,
+        private TenantStatusService $statusService
     ) {}
 
     public function handle(Request $request, Closure $next): Response
@@ -61,8 +63,8 @@ class IdentifyTenant
             abort(404, 'Boutique introuvable');
         }
 
-        if ($tenant->status !== 'active') {
-            abort(403, 'Cet espace entreprise n’est pas disponible.');
+        if (! $this->statusService->canAccess($tenant)) {
+            abort(403, $this->statusService->blockedMessage($tenant));
         }
 
         $this->context->setTenant($tenant);
