@@ -21,6 +21,23 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Registre central des entreprises
+
+Le registre central conserve uniquement le nom de l'entreprise, son identifiant
+unique (`slug`) et son statut. En local, il utilise `database/landlord.sqlite`
+par défaut. Pour une base centrale différente, configurez les variables
+`LANDLORD_DB_*` dans `.env`.
+
+Initialisez le registre avec :
+
+```bash
+touch database/landlord.sqlite
+php artisan migrate --database=landlord --path=database/migrations/landlord
+```
+
+Cette étape crée le registre central uniquement ; elle n'active pas encore
+l'inscription self-service ni l'isolation des données métier par entreprise.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

@@ -44,6 +44,31 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
+        'landlord' => [
+            'driver' => env('LANDLORD_DB_CONNECTION', 'sqlite'),
+            'url' => env('LANDLORD_DB_URL'),
+            'database' => env('LANDLORD_DB_DATABASE') ?: database_path('landlord.sqlite'),
+            'host' => env('LANDLORD_DB_HOST', '127.0.0.1'),
+            'port' => env('LANDLORD_DB_PORT', '3306'),
+            'username' => env('LANDLORD_DB_USERNAME', 'root'),
+            'password' => env('LANDLORD_DB_PASSWORD', ''),
+            'unix_socket' => env('LANDLORD_DB_SOCKET', ''),
+            'charset' => env('LANDLORD_DB_CHARSET', 'utf8mb4'),
+            'collation' => env('LANDLORD_DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'foreign_key_constraints' => env('LANDLORD_DB_FOREIGN_KEYS', true),
+            'busy_timeout' => null,
+            'journal_mode' => null,
+            'synchronous' => null,
+            'transaction_mode' => 'DEFERRED',
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('LANDLORD_MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
