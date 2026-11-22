@@ -10,4 +10,9 @@ return [
         'trim',
         explode(',', env('PLATFORM_CENTRAL_DOMAINS', 'localhost,127.0.0.1'))
     ))),
+    'central_routes' => [
+        'register',
+        'forgot-password',
+        'reset-password',
+    ],
 ];

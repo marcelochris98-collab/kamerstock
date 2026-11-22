@@ -51,6 +51,12 @@ class TenantResolver
     {
         $path = $request->path();
 
+        foreach (config('platform.central_routes', []) as $centralRoute) {
+            if ($request->is($centralRoute) || $request->is($centralRoute.'/*')) {
+                return true;
+            }
+        }
+
         // landlord routes
         if ($request->is('landlord/*') || $request->is('landlord')) {
             return true;
