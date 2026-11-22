@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -30,6 +31,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'tenant' => ['nullable', 'string', 'max:100'],
         ];
     }
 
@@ -41,6 +43,21 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+
+        $tenantSlug = $this->input('tenant');
+        if (is_string($tenantSlug) && $tenantSlug !== '') {
+            $tenantExists = DB::connection('landlord')
+                ->table('tenants')
+                ->where('slug', $tenantSlug)
+                ->where('status', 'active')
+                ->exists();
+
+            if (! $tenantExists) {
+                throw ValidationException::withMessages([
+                    'tenant' => 'Cet espace entreprise est introuvable ou indisponible.',
+                ]);
+            }
+        }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());

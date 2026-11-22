@@ -111,6 +111,41 @@ class RegistrationTest extends TestCase
             ->assertSee('Cet espace entreprise a été suspendu.');
     }
 
+    public function test_tenant_slug_from_query_resolves_the_tenant_database(): void
+    {
+        $this->post('/register', [
+            'company_name' => 'Boutique Query',
+            'name' => 'Query Owner',
+            'email' => 'query@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $tenant = Tenant::on('landlord')->where('slug', 'boutique-query')->firstOrFail();
+
+        $this->post('/logout')->assertRedirect(route('login', ['tenant' => $tenant->slug]));
+        $this->get('/login?tenant=boutique-query')->assertOk();
+
+        $this->post('/login', [
+            'tenant' => 'boutique-query',
+            'email' => 'query@example.com',
+            'password' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticated();
+        $this->get('/dashboard')->assertOk();
+    }
+
+    public function test_unknown_tenant_slug_is_rejected(): void
+    {
+        $this->get('/login?tenant=enterprise-inconnue')->assertNotFound();
+        $this->post('/login', [
+            'tenant' => 'enterprise-inconnue',
+            'email' => 'nobody@example.com',
+            'password' => 'password',
+        ])->assertNotFound();
+    }
+
     public function test_each_company_gets_an_isolated_database_and_can_reuse_an_email(): void
     {
         $this->post('/register', [

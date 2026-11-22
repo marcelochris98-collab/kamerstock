@@ -41,6 +41,13 @@ class IdentifyTenant
         $sessionSlug = $request->session()->get('current_tenant_slug');
         $authenticatedWithoutTenant = ! $sessionSlug && Auth::guard('web')->check();
 
+        if ($request->routeIs('login') && $requestedSlug && ! $sessionSlug) {
+            $requestedTenant = $this->resolver->resolveBySlug((string) $requestedSlug);
+            if (! $requestedTenant) {
+                abort(404, 'Boutique introuvable');
+            }
+        }
+
         if ($sessionSlug && $requestedSlug && $requestedSlug !== $sessionSlug) {
             abort(404, 'Boutique introuvable');
         }

@@ -44,6 +44,18 @@ Pour MySQL/MariaDB, configurez `DB_*` et `LANDLORD_DB_*`. L'utilisateur de
 entreprise. Les bases existantes de l'installation avant multitenancy ne sont
 pas déplacées automatiquement.
 
+## Résolution du tenant
+
+Après l'inscription, chaque entreprise peut être ouverte avec son slug. La
+connexion garde l'identifiant dans la session afin que les requêtes suivantes
+utilisent automatiquement la même base. Un slug déclaré dans la barre
+d'adresse ou dans le formulaire doit correspondre à celui de la session
+authentifiée.
+
+La résolution accepte également un sous-domaine tenant sur les domaines
+centraux configurés dans `PLATFORM_CENTRAL_DOMAINS`, par exemple
+`boutique-test.localhost`.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
