@@ -146,6 +146,58 @@ class RegistrationTest extends TestCase
         ])->assertNotFound();
     }
 
+    public function test_credentials_are_isolated_when_two_tenants_reuse_the_same_email(): void
+    {
+        $this->post('/register', [
+            'company_name' => 'Entreprise A',
+            'name' => 'Administrateur A',
+            'email' => 'shared@example.com',
+            'password' => 'password-a',
+            'password_confirmation' => 'password-a',
+        ]);
+
+        $tenantA = Tenant::on('landlord')->where('slug', 'entreprise-a')->firstOrFail();
+        $this->post('/logout');
+
+        $this->post('/register', [
+            'company_name' => 'Entreprise B',
+            'name' => 'Administrateur B',
+            'email' => 'shared@example.com',
+            'password' => 'password-b',
+            'password_confirmation' => 'password-b',
+        ]);
+
+        $tenantB = Tenant::on('landlord')->where('slug', 'entreprise-b')->firstOrFail();
+        $this->post('/logout');
+
+        $this->post('/login', [
+            'tenant' => $tenantA->slug,
+            'email' => 'shared@example.com',
+            'password' => 'password-b',
+        ])->assertSessionHasErrors('email');
+
+        $this->post('/login', [
+            'tenant' => $tenantA->slug,
+            'email' => 'shared@example.com',
+            'password' => 'password-a',
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $this->get('/dashboard')->assertOk();
+        $this->post('/logout');
+
+        $this->post('/login', [
+            'tenant' => $tenantB->slug,
+            'email' => 'shared@example.com',
+            'password' => 'password-a',
+        ])->assertSessionHasErrors('email');
+
+        $this->post('/login', [
+            'tenant' => $tenantB->slug,
+            'email' => 'shared@example.com',
+            'password' => 'password-b',
+        ])->assertRedirect(route('dashboard', absolute: false));
+    }
+
     public function test_each_company_gets_an_isolated_database_and_can_reuse_an_email(): void
     {
         $this->post('/register', [

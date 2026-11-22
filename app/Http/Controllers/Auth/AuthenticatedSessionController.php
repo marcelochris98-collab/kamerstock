@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\Tenancy\TenantContext;
+use App\Services\Tenancy\TenantSecurityService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request, TenantContext $tenantContext): RedirectResponse
+    public function store(LoginRequest $request, TenantContext $tenantContext, TenantSecurityService $securityService): RedirectResponse
     {
         $request->authenticate();
 
@@ -31,7 +32,7 @@ class AuthenticatedSessionController extends Controller
 
         $tenant = $tenantContext->tenant();
         if ($tenant) {
-            $request->session()->put('current_tenant_slug', $tenant->slug);
+            $securityService->bindAuthenticatedUser($request, $tenant, Auth::guard('web')->user());
         }
 
         return redirect()->intended(route('dashboard', absolute: false));

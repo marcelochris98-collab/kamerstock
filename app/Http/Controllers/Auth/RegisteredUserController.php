@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Platform\Tenant;
 use App\Services\Tenancy\TenantProvisioner;
 use App\Services\Tenancy\TenantProvisioningException;
+use App\Services\Tenancy\TenantSecurityService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class RegisteredUserController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, TenantSecurityService $securityService): RedirectResponse
     {
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:150'],
@@ -73,6 +74,7 @@ class RegisteredUserController extends Controller
 
         $request->session()->put('current_tenant_slug', $tenant->slug);
         Auth::login($user);
+        $securityService->bindAuthenticatedUser($request, $tenant, $user);
         event(new Registered($user));
 
         return redirect(route('dashboard', absolute: false))

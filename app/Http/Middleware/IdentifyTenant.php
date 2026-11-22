@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\Tenancy\TenantContext;
 use App\Services\Tenancy\TenantDatabaseManager;
 use App\Services\Tenancy\TenantResolver;
+use App\Services\Tenancy\TenantSecurityService;
 use App\Services\Tenancy\TenantStatusService;
 use Closure;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class IdentifyTenant
         private TenantResolver $resolver,
         private TenantContext $context,
         private TenantDatabaseManager $databaseManager,
-        private TenantStatusService $statusService
+        private TenantStatusService $statusService,
+        private TenantSecurityService $securityService
     ) {}
 
     public function handle(Request $request, Closure $next): Response
@@ -40,6 +42,26 @@ class IdentifyTenant
         $requestedSlug = $request->query($tenantParameter) ?? $request->input($tenantParameter) ?? $pathSlug;
         $sessionSlug = $request->session()->get('current_tenant_slug');
         $authenticatedWithoutTenant = ! $sessionSlug && Auth::guard('web')->check();
+
+        if ($sessionSlug) {
+            $boundTenantId = $request->session()->get('current_tenant_id');
+            if ($boundTenantId !== null) {
+                $tenantBySession = $this->resolver->resolveBySlug((string) $sessionSlug);
+                if (! $tenantBySession || (int) $boundTenantId !== (int) $tenantBySession->id) {
+                    $this->securityService->forgetTenantBinding($request);
+                    abort(403, 'La session ne correspond pas à cet espace entreprise.');
+                }
+            }
+        }
+
+        if (Auth::guard('web')->check() && $sessionSlug) {
+            $boundUserId = $request->session()->get('current_tenant_user_id');
+            if ($boundUserId !== null && (int) $boundUserId !== (int) Auth::id()) {
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                abort(403, 'Cette session utilisateur ne correspond pas à cet espace entreprise.');
+            }
+        }
 
         if ($request->routeIs('login') && $requestedSlug && ! $sessionSlug) {
             $requestedTenant = $this->resolver->resolveBySlug((string) $requestedSlug);
